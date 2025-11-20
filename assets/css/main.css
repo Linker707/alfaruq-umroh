@@ -1,0 +1,79 @@
+/* Custom CSS untuk ALFARUQ TEAM */
+/* Font */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    animation: fadeIn 1s ease-in;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.btn-success {
+    background-color: #33a661;
+    border-color: #33a661;
+}
+.btn-success:hover {
+    background-color: #164924;
+    border-color: #164924;
+}
+.btn-warning {
+    background-color: #fae314;
+    border-color: #fae314;
+    color: #164924;
+}
+.btn-warning:hover {
+    background-color: #d5ae29;
+    border-color: #d5ae29;
+}
+
+/* Countdown */
+#countdown-timer span {
+    animation: pulse 2s infinite;
+}    
+/* Form Testimoni */
+.form-control, .form-select {
+     border: 2px solid #33a661;
+}
+.form-control:focus, .form-select:focus {
+     border-color: #164924;
+     box-shadow: 0 0 5px rgba(51, 166, 97, 0.5);
+}
+     
+
+
+
+/* Animasi Ringan */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .hero-section {
+        height: 70vh;
+    }
+    .display-4 {
+        font-size: 2rem;
+    }
+}
