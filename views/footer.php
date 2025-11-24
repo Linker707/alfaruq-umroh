@@ -9,19 +9,6 @@
 
 <!-- Bootstrap 5 JS Bundle + Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script>
-    window.addEventListener('scroll', function() {
-        const navbar = document.getElementById('mainNavbar');
-        const heroHeight = document.querySelector('header').offsetHeight;  // Tinggi hero/slider
-        if (window.scrollY > heroHeight - 50) {  // Saat scroll melewati hero (kurangi 50px untuk buffer)
-            navbar.classList.remove('bg-green', 'navbar-dark');
-            navbar.classList.add('navbar-light-cstm');
-        } else {
-            navbar.classList.remove('navbar-light-cstm');
-            navbar.classList.add('bg-green', 'navbar-dark');
-        }
-    });
-</script> -->
 
 <!-- Tambahkan di bagian bawah index.php atau footer.php -->
 <script>
