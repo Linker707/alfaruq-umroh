@@ -40,9 +40,8 @@
                 <!-- Link menu dengan class active untuk halaman saat ini -->
                 <li class="nav-item"><a class="nav-link active" href="index.php">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="about.php">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="services.php">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="services.php">Testimonials</a></li>
                 <li class="nav-item"><a class="nav-link" href="packages.php">Packages</a></li>
-                <li class="nav-item"><a class="nav-link" href="blog.php">Blog</a></li>
                 <!-- Dropdown menu untuk halaman tambahan -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown"
@@ -51,6 +50,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pagesDropdown">
                         <li><a class="dropdown-item" href="contact.php">Contact</a></li>
+                        <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
                         <li><a class="dropdown-item" href="register.php">Register</a></li>
                     </ul>
                 </li>
