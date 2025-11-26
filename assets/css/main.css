@@ -134,6 +134,35 @@ header .btn-success.shadow {
     padding: 10px !important;
 }
 
+/* Gallery Styles - Efek hover dan responsif untuk galeri */
+/* Efek hover pada card galeri */
+#gallery-grid .card:hover {
+    transform: scale(1.05); /* Zoom ringan */
+    box-shadow: 0 8px 25px rgba(51, 166, 97, 0.3); /* Shadow hijau untuk kontras */
+}
+#gallery-grid .card:hover .card-img-top {
+    transform: scale(1.1); /* Zoom gambar */
+}
+#gallery-grid .card:hover .card-img-overlay {
+    opacity: 1; /* Tampilkan overlay teks */
+}
+/* Button filter hover */
+#gallery-filter .btn-outline-success:hover {
+    background-color: #33a661;
+    border-color: #33a661;
+    color: #fff;
+}
+/* Responsif untuk mobile */
+@media (max-width: 768px) {
+    #gallery-grid .card-img-top {
+        height: 200px; /* Tinggi gambar lebih kecil di mobile */
+    }
+    #gallery-filter .d-flex {
+        flex-direction: column; /* Button filter vertikal di mobile */
+        align-items: center;
+    }
+}
+
 /* Responsive adjustments - Penyesuaian untuk mobile */
 @media (max-width: 768px) {
     header .carousel-item {
