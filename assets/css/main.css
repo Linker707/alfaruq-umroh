@@ -163,6 +163,59 @@ header .btn-success.shadow {
     }
 }
 
+.divider hr {
+    border: 1px solid #33a661;
+    opacity: 0.5;
+}
+.divider i {
+    font-size: 2rem;
+    color: #33a661;
+}
+
+/* Efek hover untuk section partners */
+#partners .card:hover {
+    transform: scale(1.05); /* Zoom ringan */
+    box-shadow: 0 15px 40px rgba(51, 166, 97, 0.4); /* Shadow hijau lebih besar */
+}
+#partners .card:hover .card-overlay {
+    opacity: 1; /* Overlay muncul */
+}
+#partners .card:hover .card-img-top {
+    filter: none; /* Logo jadi color */
+    transform: scale(1.1); /* Zoom logo */
+}
+
+/* Fasilitas Premium – Tampilan mewah & rapat */
+.package-facilities {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.package-facilities li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.4;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.package-facilities li:last-child {
+    border-bottom: none !important;
+}
+
+.package-facilities li::before {
+    content: "✔";
+    color: #33a661;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+
 /* Responsive adjustments - Penyesuaian untuk mobile */
 @media (max-width: 768px) {
     header .carousel-item {

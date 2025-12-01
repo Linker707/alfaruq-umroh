@@ -40,7 +40,6 @@
                 <!-- Link menu dengan class active untuk halaman saat ini -->
                 <li class="nav-item"><a class="nav-link active" href="index.php">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="about.php">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="services.php">Testimonials</a></li>
                 <li class="nav-item"><a class="nav-link" href="packages.php">Packages</a></li>
                 <!-- Dropdown menu untuk halaman tambahan -->
                 <li class="nav-item dropdown">
