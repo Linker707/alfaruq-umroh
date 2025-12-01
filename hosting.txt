@@ -4,3 +4,4 @@ mysql hostname : sql200.infinityfree.com
 if0_40479898_alfaruq
 
 https://alfaruqteam.infinityfreeapp.com/
+https://alfaruqteam.infinityfreeapp.com/

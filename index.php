@@ -127,8 +127,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
                 </div>
             <?php endforeach; ?>
         </div>
+        <!-- Button tambahan untuk berpindah ke page packages -->
+        <div class="text-center mt-4">
+            <a href="packages.php" class="btn btn-success btn-lg rounded-pill px-4">Lihat Semua Paket</a>
+        </div>
     </div>
 </section>
+
+<!-- Pembatas setelah Paket Unggulan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
+        </div>
+    </div>
+</div>
 
 <!-- Testimoni - Carousel slider dengan 3 card per slide, semua dari DB -->
 <section id="testimonials" class="py-5 bg-white">
@@ -221,6 +235,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
     </div>
 </section>
 
+<!-- Pembatas setelah Galeri Perjalanan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
+        </div>
+    </div>
+</div>
+
 <!-- Galeri Slider - Carousel gambar galeri -->
 <section id="gallery" class="py-5 bg-light">
     <div class="container">
@@ -247,6 +271,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
+        <!-- Button tambahan untuk detail lebih lanjut ke page gallery -->
+        <div class="text-center mt-4">
+            <a href="gallery.php" class="btn btn-success btn-lg rounded-pill px-4">Detail Lebih Lanjut</a>
+        </div>
+    </div>
+</section>
+
+<!-- Pembatas setelah Galeri Perjalanan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
+        </div>
+    </div>
+</div>
+
+<!-- Section Mitra Kami - Grid logo mitra dengan card menarik, animasi, efek, dan hover -->
+<section id="partners" class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-5 text-success fw-bold">Mitra Kami</h2>
+        <p class="text-center text-muted mb-5">Kami bekerja sama dengan mitra terpercaya untuk memberikan layanan terbaik kepada jamaah.</p>
+        <div class="row g-4 justify-content-center"> <!-- Grid responsif dengan gap -->
+            <?php
+            // Array logo mitra dengan path gambar (sesuaikan path jika berbeda)
+            $partners = [
+                ['name' => 'Kemenag', 'image' => 'assets/img/KEMENAG.png'],
+                ['name' => '5 PASTI UMRAH', 'image' => 'assets/img/5pasti.png'],
+                ['name' => 'SISKOPATUH', 'image' => 'assets/img/SISKOPATUH.png'],
+                ['name' => 'ASPHIRASI', 'image' => 'assets/img/LOGO ASPHIRASI.png'],
+                ['name' => 'Lion Air', 'image' => 'assets/img/lionair.png'],
+                ['name' => 'Batik Air', 'image' => 'assets/img/batik-air.png'],
+                ['name' => 'Bank BSI', 'image' => 'assets/img/logo-bsi.png'],
+                ['name' => 'Bank BCA', 'image' => 'assets/img/logo-bca.png']
+            ];
+            foreach ($partners as $partner): ?>
+                <div class="col-lg-3 col-md-4 col-sm-6 d-flex justify-content-center"> <!-- Kolom responsif, center align -->
+                    <div class="card border-0 shadow-sm rounded-lg h-100 d-flex align-items-center justify-content-center p-4" style="transition: transform 0.3s ease, box-shadow 0.3s ease; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); max-width: 200px;"> <!-- Card dengan gradient background, efek hover -->
+                        <img src="<?php echo htmlspecialchars($partner['image']); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($partner['name']); ?>" style="max-height: 80px; object-fit: contain; transition: transform 0.3s ease;"> <!-- Logo dengan efek hover zoom -->
+        
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </section>
 
@@ -261,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
         $waNumber = "6281266303236";
 
         // Pesan otomatis yang aman untuk URL
-        $text = urlencode("Halo ALFARUQ TEAM, saya ingin konsultasi paket umroh yang ada di website");
+        $text = urlencode("Halo ALFARUQ TEAM, saya ingin konsultasi paket umroh");
         ?>
 
         <a href="https://wa.me/<?php echo $waNumber; ?>?text=<?php echo $text; ?>"
