@@ -1,294 +1,351 @@
 <?php
 // index.php - Homepage ALFARUQ TEAM
-// Include koneksi database
-require_once 'config/database.php';
+require_once 'config/database.php'; // Memuat koneksi database PDO
 
-     // Handle form submit testimoni
-     $message = ''; // Untuk pesan sukses/error
-     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
-         $name = trim($_POST['name'] ?? '');
-         $email = trim($_POST['email'] ?? '');
-         $testimonial_message = trim($_POST['message'] ?? '');
-         $rating = (int)($_POST['rating'] ?? 0);
+// Mulai session di awal file untuk menyimpan data testimonial sementara
+session_start();
 
-         // Validasi sederhana
-         if (empty($name) || empty($email) || empty($testimonial_message) || $rating < 1 || $rating > 5) {
-             $message = '<div class="alert alert-danger">Semua field wajib diisi, dan rating 1-5!</div>';
-         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-             $message = '<div class="alert alert-danger">Email tidak valid!</div>';
-         } else {
-             // Insert ke database
-             $queryInsert = "INSERT INTO testimonials (name, email, message, rating, is_approved) VALUES (?, ?, ?, ?, 0)";
-             $stmtInsert = $pdo->prepare($queryInsert);
-             if ($stmtInsert->execute([$name, $email, $testimonial_message, $rating])) {
-                 $message = '<div class="alert alert-success">Terima kasih! Testimoni Anda telah dikirim dan akan dimoderasi.</div>';
-             } else {
-                 $message = '<div class="alert alert-danger">Gagal mengirim testimoni. Coba lagi!</div>';
-             }
-         }
-     }
-     
+// Check jika ada pesan sukses dari testimonial-qna.php
+$popupMessage = '';
+if (isset($_SESSION['success_message'])) {
+    $popupMessage = $_SESSION['success_message'];
+    unset($_SESSION['success_message']); // Hapus session setelah ambil
+}
 
-// Query untuk paket unggulan (ambil semua aktif)
+// Ambil settings (tagline & contact phone) - Menggunakan PDO prepared statement untuk keamanan
+$querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2', 'contact_phone')";
+$stmtSettings = $pdo->prepare($querySettings);
+$stmtSettings->execute();
+$settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR); // Mengambil sebagai array key => value
+
+// Ambil paket unggulan aktif (limit 3) - Query paket yang aktif, urutkan berdasarkan ID terbaru
 $queryPackages = "SELECT * FROM packages WHERE is_active = 1 ORDER BY id DESC LIMIT 3";
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute();
 $packages = $stmtPackages->fetchAll();
 
-// Query untuk jadwal terdekat (ambil yang available dan departure_date terdekat)
-$querySchedule = "SELECT s.*, p.name AS package_name FROM schedules s JOIN packages p ON s.package_id = p.id WHERE s.status = 'available' AND s.departure_date >= CURDATE() ORDER BY s.departure_date ASC LIMIT 1";
-$stmtSchedule = $pdo->prepare($querySchedule);
-$stmtSchedule->execute();
-$nearestSchedule = $stmtSchedule->fetch();
-
-// Query untuk testimoni (5 terbaru yang approved)
-$queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC LIMIT 5";
+// Ambil semua testimoni yang approved - Hapus LIMIT agar semua muncul di slider
+$queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC";
 $stmtTestimonials = $pdo->prepare($queryTestimonials);
 $stmtTestimonials->execute();
 $testimonials = $stmtTestimonials->fetchAll();
 
-// Query untuk galeri (8 foto aktif)
+// Ambil galeri 8 foto aktif - Galeri gambar yang aktif, urutkan terbaru
 $queryGalleries = "SELECT * FROM galleries WHERE type = 'image' AND is_active = 1 ORDER BY created_at DESC LIMIT 8";
 $stmtGalleries = $pdo->prepare($queryGalleries);
 $stmtGalleries->execute();
 $galleries = $stmtGalleries->fetchAll();
 
-// Query untuk settings (tagline, dll.)
-$querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2', 'contact_phone')";  // Diperbaiki: hanya 2 kolom
-$stmtSettings = $pdo->prepare($querySettings);
-$stmtSettings->execute();
-$settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR); // Sekarang OK
+// Set fallback untuk tagline dan whatsapp jika tidak ada di DB
+$tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
+$tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
+$whatsapp = $settings['contact_phone'] ?? "+6281234567890";
 
-// Ambil tagline
-$tagline1 = $settings['tagline1'] ?? 'LANGKAH AWAL MENUJU BAITULLAH';
-$tagline2 = $settings['tagline2'] ?? 'HARGA HEMAT FASILITAS TERHORMAT';
-$whatsapp = $settings['contact_phone'] ?? '+6281234567890';
-?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALFARUQ TEAM - <?php echo $tagline1; ?></title>
-    <meta name="description" content="Travel umroh terpercaya dengan harga hemat dan fasilitas terhormat. Pesan paket umroh Anda sekarang!">
-    <meta name="keywords" content="umroh, travel umroh, ALFARUQ TEAM, paket umroh, harga hemat">
-    <meta name="author" content="ALFARUQ TEAM">
-    <!-- Open Graph untuk SEO -->
-    <meta property="og:title" content="ALFARUQ TEAM - <?php echo $tagline1; ?>">
-    <meta property="og:description" content="Travel umroh terpercaya dengan harga hemat dan fasilitas terhormat.">
-    <meta property="og:image" content="assets/img/logo-alfaruq.jpg">
-    <meta property="og:url" content="https://alfaruqteam.com">
-    <!-- Schema JSON-LD -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "PT. ALFARUQ ANUGERAH UTAMA (ALFARUQ TEAM)",
-        "url": "https://alfaruqteam.com",
-        "logo": "assets/img/logo-alfaruq.jpg",
-        "description": "<?php echo $tagline1; ?> - <?php echo $tagline2; ?>",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "<?php echo $whatsapp; ?>",
-            "contactType": "customer service"
-        }
+// Handle form testimonial awal (nama, email, rating) - Gabungkan handler menjadi satu, simpan ke session, redirect ke QnA
+$message = ''; // Variabel untuk pesan sukses/error, ditampilkan di halaman
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
+    // Ambil data dari form (sesuai nama field di form: name, email, rating)
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $rating = (int)($_POST['rating'] ?? 0);
+
+    // Validasi sederhana: pastikan semua field diisi, rating 1-5, email valid
+    if (empty($name) || empty($email) || $rating < 1 || $rating > 5) {
+        $message = '<div class="alert alert-danger">Semua field wajib diisi, dan rating 1-5!</div>';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = '<div class="alert alert-danger">Email tidak valid!</div>';
+    } else {
+        // Simpan data awal ke session untuk digunakan di halaman QnA
+        $_SESSION['testimonial'] = [
+            'name' => $name,
+            'email' => $email,
+            'rating' => $rating
+        ];
+        // Redirect ke halaman QnA setelah sukses
+        header('Location: testimonial-qna.php');
+        exit; // Hentikan eksekusi script agar tidak lanjut ke HTML
     }
-    </script>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/main.css">
-    <!-- Font Poppins/Montserrat -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <?php include 'views/header.php'; ?>
+}
+?>
+<?php include 'views/header.php'; // Include file header (navbar, meta tags, dll.) ?>
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero-section text-white d-flex align-items-center" style="background: linear-gradient(135deg, #164924 0%, #33a661 100%), url('assets/img/masjid-hero.jpg') no-repeat center center; background-size: cover; height: 100vh;">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-3"><?php echo $tagline1; ?></h1>
-            <p class="lead mb-4"><?php echo $tagline2; ?></p>
-            <a href="packages.php" class="btn btn-warning btn-lg rounded-pill px-4">Lihat Paket Umroh</a>
+<!-- Hero Section - Slider gambar dengan overlay teks -->
+<header>
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="2500">
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active" style="height:90vh; background: url('assets/img/gambar 1.jpeg') center center/cover no-repeat;">
+                <div class="overlay d-flex flex-column justify-content-center align-items-center text-center text-white h-100 px-3"
+                     style="background-color: rgba(22, 73, 36, 0.63);">
+                    <h6 class="text-uppercase fw-semibold mb-2" style="letter-spacing: 3px; color: #FAE314;"><?php echo htmlspecialchars($tagline1); ?></h6>
+                    <h1 class="display-4 fw-bold" style="font-family: 'Montserrat', sans-serif;">ALFARUQ TEAM</h1>
+                    <p class="lead mt-3 w-75 mx-auto" style="font-family: 'Poppins', sans-serif;"><?php echo htmlspecialchars($tagline2); ?></p>
+                    <a href="packages.php" class="btn btn-success rounded-pill px-4 py-2 mt-4 shadow"
+                       style="background: #33a661; border: none;">Lihat Paket Umroh</a>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-item" style="height:90vh; background: url('assets/img/gambar 2.jpeg') center center/cover no-repeat;">
+                <div class="overlay d-flex flex-column justify-content-center align-items-center text-center text-white h-100 px-3"
+                     style="background-color: rgba(22,73,36, 0.6);">
+                    <h6 class="text-uppercase fw-semibold mb-2" style="letter-spacing: 3px; color: #FAE314;">HARGA HEMAT FASILITAS TERHORMAT</h6>
+                    <h1 class="display-4 fw-bold" style="font-family: 'Montserrat', sans-serif;">Melayani Perjalanan Ibadah Anda</h1>
+                    <p class="lead mt-3 w-75 mx-auto" style="font-family: 'Poppins', sans-serif;">Dapatkan pengalaman umroh terbaik bersama ALFARUQ TEAM.</p>
+                    <a href="contact.php" class="btn btn-success rounded-pill px-4 py-2 mt-4 shadow"
+                       style="background: #33a661; border: none;">Hubungi Kami</a>
+                </div>
+            </div>
         </div>
-    </section>
+        <!-- Kontrol carousel -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bg-success rounded-circle p-3" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon bg-success rounded-circle p-3" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</header>
 
-    <!-- Paket Unggulan -->
-    <section id="packages" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Paket Unggulan</h2>
-            <div class="row">
-                <?php foreach ($packages as $package): ?>
+<!-- Paket Unggulan - Grid card paket dengan link ke detail -->
+<section id="packages" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4 text-success fw-bold">Paket Unggulan</h2>
+        <div class="row">
+            <?php foreach ($packages as $package): // Loop untuk setiap paket ?>
                 <div class="col-md-4 mb-4">
                     <div class="card rounded shadow-sm border-0 h-100">
-                        <img src="<?php echo $package['image']; ?>" class="card-img-top" alt="<?php echo $package['name']; ?>">
+                        <img src="<?php echo htmlspecialchars($package['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($package['name']); ?>">
                         <div class="card-body">
-                            <h5 class="card-title text-success"><?php echo $package['name']; ?></h5>
-                            <p class="card-text"><?php echo substr($package['description'], 0, 100) . '...'; ?></p>
-                            <p class="text-primary fw-bold">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?> / <?php echo $package['duration']; ?> hari</p>
-                            <a href="package-detail.php?id=<?php echo $package['id']; ?>" class="btn btn-success rounded-pill">Detail</a>
+                            <h5 class="card-title text-success fw-bold"><?php echo htmlspecialchars($package['name']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars(substr($package['description'], 0, 100)) . '...'; ?></p>
+                            <p class="text-primary fw-bold">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?> / <?php echo (int)$package['duration']; ?> hari</p>
+                            <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" class="btn btn-success rounded-pill">Detail</a>
                         </div>
                     </div>
                 </div>
-                <?php endforeach; ?>
-            </div>
+            <?php endforeach; ?>
         </div>
-    </section>
-
-    <!-- Countdown Keberangkatan -->
-    <section id="countdown" class="py-5 bg-success text-white">
-        <div class="container text-center">
-            <h2 class="mb-4 fw-bold">Keberangkatan Terdekat</h2>
-            <?php if ($nearestSchedule): ?>
-            <p class="mb-3">Paket: <?php echo $nearestSchedule['package_name']; ?> - Tanggal: <?php echo date('d M Y', strtotime($nearestSchedule['departure_date'])); ?></p>
-            <div id="countdown-timer" class="d-flex justify-content-center gap-3">
-                <div class="text-center">
-                    <span id="days" class="display-4 fw-bold">00</span>
-                    <p>Hari</p>
-                </div>
-                <div class="text-center">
-                    <span id="hours" class="display-4 fw-bold">00</span>
-                    <p>Jam</p>
-                </div>
-                <div class="text-center">
-                    <span id="minutes" class="display-4 fw-bold">00</span>
-                    <p>Menit</p>
-                </div>
-                <div class="text-center">
-                    <span id="seconds" class="display-4 fw-bold">00</span>
-                    <p>Detik</p>
-                </div>
-            </div>
-            <?php else: ?>
-            <p>Tidak ada jadwal keberangkatan tersedia saat ini.</p>
-            <?php endif; ?>
+        <!-- Button tambahan untuk berpindah ke page packages -->
+        <div class="text-center mt-4">
+            <a href="packages.php" class="btn btn-success btn-lg rounded-pill px-4">Lihat Semua Paket</a>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Testimoni -->
-    <section id="testimonials" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Testimoni Jamaah</h2>
-            <div class="row">
-                <?php foreach ($testimonials as $testimonial): ?>
-                <div class="col-md-6 mb-4">
-                    <div class="card rounded shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="<?php echo $testimonial['image']; ?>" class="rounded-circle me-3" width="50" height="50" alt="<?php echo $testimonial['name']; ?>">
-                                <div>
-                                    <h6 class="mb-0"><?php echo $testimonial['name']; ?></h6>
-                                    <small class="text-warning"><?php echo str_repeat('★', $testimonial['rating']); ?></small>
-                                </div>
-                            </div>
-                            <p class="card-text"><?php echo $testimonial['message']; ?></p>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
+<!-- Pembatas setelah Paket Unggulan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
         </div>
-    </section>
+    </div>
+</div>
 
-         <!-- Form Input Testimoni -->
-     <section id="testimonial-form" class="py-5 bg-light">
-         <div class="container">
-             <h2 class="text-center mb-4 text-success fw-bold">Berikan Testimoni Anda</h2>
-             <?php echo $message; ?> <!-- Tampilkan pesan sukses/error -->
-             <form method="POST" action="" class="row g-3 justify-content-center">
-                 <div class="col-md-6">
-                     <label for="name" class="form-label">Nama</label>
-                     <input type="text" class="form-control rounded" id="name" name="name" required>
-                 </div>
-                 <div class="col-md-6">
-                     <label for="email" class="form-label">Email</label>
-                     <input type="email" class="form-control rounded" id="email" name="email" required>
-                 </div>
-                 <div class="col-12">
-                     <label for="rating" class="form-label">Rating (1-5 Bintang)</label>
-                     <select class="form-select rounded" id="rating" name="rating" required>
-                         <option value="">Pilih Rating</option>
-                         <option value="1">1 ★</option>
-                         <option value="2">2 ★★</option>
-                         <option value="3">3 ★★★</option>
-                         <option value="4">4 ★★★★</option>
-                         <option value="5">5 ★★★★★</option>
-                     </select>
-                 </div>
-                 <div class="col-12">
-                     <label for="message" class="form-label">Pesan Testimoni</label>
-                     <textarea class="form-control rounded" id="message" name="message" rows="4" required placeholder="Ceritakan pengalaman Anda..."></textarea>
-                 </div>
-                 <div class="col-12 text-center">
-                     <button type="submit" name="submit_testimonial" class="btn btn-success btn-lg rounded-pill px-4">Kirim Testimoni</button>
-                 </div>
-             </form>
-         </div>
-     </section>
-     
-
-    <!-- Galeri Slider -->
-    <section id="gallery" class="py-5 bg-white">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Galeri Perjalanan</h2>
-            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+<!-- Testimoni - Carousel slider dengan 3 card per slide, semua dari DB -->
+<section id="testimonials" class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-4 text-success fw-bold">Testimoni Jamaah</h2>
+        <?php if (!empty($testimonials)): ?>
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000"> <!-- Interval 5 detik -->
                 <div class="carousel-inner">
-                    <?php foreach ($galleries as $index => $gallery): ?>
-                    <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                        <img src="<?php echo $gallery['image']; ?>" class="d-block w-100 rounded" alt="<?php echo $gallery['title']; ?>">
-                        <div class="carousel-caption d-none d-md-block">
-                            <h5><?php echo $gallery['title']; ?></h5>
-                            <p><?php echo $gallery['description']; ?></p>
+                    <?php
+                    $totalTestimonials = count($testimonials);
+                    $testimonialsPerSlide = 3; // 3 card per slide
+                    $totalSlides = ceil($totalTestimonials / $testimonialsPerSlide);
+                    for ($slideIndex = 0; $slideIndex < $totalSlides; $slideIndex++):
+                        $startIndex = $slideIndex * $testimonialsPerSlide;
+                        $slideTestimonials = array_slice($testimonials, $startIndex, $testimonialsPerSlide);
+                    ?>
+                        <div class="carousel-item <?php echo ($slideIndex === 0) ? 'active' : ''; ?>">
+                            <div class="row justify-content-center">
+                                <?php foreach ($slideTestimonials as $testimonial): ?>
+                                    <div class="col-md-4 mb-4"> <!-- 3 card per row -->
+                                        <div class="card rounded shadow-sm border-0 h-100">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <img src="<?php echo htmlspecialchars($testimonial['image']); ?>" class="rounded-circle me-3" width="50" height="50" alt="<?php echo htmlspecialchars($testimonial['name']); ?>">
+                                                    <div>
+                                                        <h6 class="mb-0"><?php echo htmlspecialchars($testimonial['name']); ?></h6>
+                                                        <small class="text-warning"><?php echo str_repeat('★', (int)$testimonial['rating']); ?></small>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text"><?php echo htmlspecialchars($testimonial['message']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                    </div>
-                    <?php endforeach; ?>
+                    <?php endfor; ?>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <!-- Kontrol carousel -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: #33a661; border-radius: 50%; padding: 10px;"></span>
                     <span class="visually-hidden">Previous</span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: #33a661; border-radius: 50%; padding: 10px;"></span>
                     <span class="visually-hidden">Next</span>
                 </button>
+                <!-- Indikator carousel (opsional, untuk navigasi dot) -->
+                <div class="carousel-indicators">
+                    <?php for ($i = 0; $i < $totalSlides; $i++): ?>
+                        <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide-to="<?php echo $i; ?>" class="<?php echo ($i === 0) ? 'active' : ''; ?>" aria-current="true" aria-label="Slide <?php echo $i + 1; ?>"></button>
+                    <?php endfor; ?>
+                </div>
             </div>
-        </div>
-    </section>
-
-    <!-- CTA WhatsApp -->
-    <section id="cta" class="py-5 bg-warning text-dark text-center">
-        <div class="container">
-            <h2 class="mb-3 fw-bold">Siap Berangkat Umroh?</h2>
-            <p class="mb-4">Hubungi kami sekarang untuk konsultasi gratis!</p>
-            <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $whatsapp); ?>?text=Halo%20ALFARUQ%20TEAM,%20saya%20ingin%20konsultasi%20paket%20umroh" class="btn btn-success btn-lg rounded-pill px-4" target="_blank">Chat WhatsApp</a>
-        </div>
-    </section>
-
-    <?php include 'views/footer.php'; ?>
-
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS untuk Countdown -->
-    <script>
-        <?php if ($nearestSchedule): ?>
-        const targetDate = new Date('<?php echo $nearestSchedule['departure_date']; ?>').getTime();
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-            if (distance > 0) {
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                document.getElementById('days').innerText = days.toString().padStart(2, '0');
-                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
-                document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
-                document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
-            }
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
+        <?php else: ?>
+            <p class="text-center text-muted">Belum ada testimoni.</p>
         <?php endif; ?>
+    </div>
+</section>
+
+<!-- Form Input Testimoni Awal - Form sederhana untuk nama, email, rating -->
+<section id="testimonial-form" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4 text-success fw-bold">Berikan Testimoni Anda</h2>
+        <?php echo $message; // Tampilkan pesan error jika ada ?>
+        <form method="POST" action="" class="row g-3 justify-content-center">
+            <div class="col-md-4">
+                <label for="name" class="form-label fw-bold text-success">Nama Lengkap</label>
+                <input type="text" class="form-control rounded-pill" id="name" name="name" style="border: 2px solid #33a661;" required>
+            </div>
+            <div class="col-md-4">
+                <label for="email" class="form-label fw-bold text-success">Email</label>
+                <input type="email" class="form-control rounded-pill" id="email" name="email" style="border: 2px solid #33a661;" required>
+            </div>
+            <div class="col-md-4">
+                <label for="rating" class="form-label fw-bold text-success">Rating (1-5 Bintang)</label>
+                <select class="form-select rounded-pill" id="rating" name="rating" style="border: 2px solid #33a661;" required>
+                    <option value="">Pilih Rating</option>
+                    <option value="1">1 ★</option>
+                    <option value="2">2 ★★</option>
+                    <option value="3">3 ★★★</option>
+                    <option value="4">4 ★★★★</option>
+                    <option value="5">5 ★★★★★</option>
+                </select>
+            </div>
+            <div class="col-12 text-center">
+                <button type="submit" name="submit_testimonial" class="btn btn-success btn-lg rounded-pill px-4">Lanjutkan</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Pembatas setelah Galeri Perjalanan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
+        </div>
+    </div>
+</div>
+
+<!-- Galeri Slider - Carousel gambar galeri -->
+<section id="gallery" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4 text-success fw-bold">Galeri Perjalanan</h2>
+        <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <?php foreach ($galleries as $index => $gallery): // Loop untuk setiap gambar galeri ?>
+                    <div class="carousel-item <?php echo ($index === 0) ? 'active' : ''; ?>">
+                        <img src="<?php echo htmlspecialchars($gallery['image']); ?>" class="d-block w-100 rounded" alt="<?php echo htmlspecialchars($gallery['title']); ?>">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5><?php echo htmlspecialchars($gallery['title']); ?></h5>
+                            <p><?php echo htmlspecialchars($gallery['description']); ?></p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <!-- Kontrol carousel -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: #33a661; border-radius: 50%; padding: 10px;"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: #33a661; border-radius: 50%; padding: 10px;"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        <!-- Button tambahan untuk detail lebih lanjut ke page gallery -->
+        <div class="text-center mt-4">
+            <a href="gallery.php" class="btn btn-success btn-lg rounded-pill px-4">Detail Lebih Lanjut</a>
+        </div>
+    </div>
+</section>
+
+<!-- Pembatas setelah Galeri Perjalanan - Garis horizontal dengan ikon hijau -->
+<div class="divider my-5">
+    <div class="container">
+        <hr class="my-4" style="border: 1px solid #33a661; opacity: 0.5;">
+        <div class="text-center">
+            <i class="fas fa-leaf text-success" style="font-size: 2rem;"></i> <!-- Ikon daun hijau untuk tema -->
+        </div>
+    </div>
+</div>
+
+<!-- Section Mitra Kami - Grid logo mitra dengan card menarik, animasi, efek, dan hover -->
+<section id="partners" class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-5 text-success fw-bold">Mitra Kami</h2>
+        <p class="text-center text-muted mb-5">Kami bekerja sama dengan mitra terpercaya untuk memberikan layanan terbaik kepada jamaah.</p>
+        <div class="row g-4 justify-content-center"> <!-- Grid responsif dengan gap -->
+            <?php
+            // Array logo mitra dengan path gambar (sesuaikan path jika berbeda)
+            $partners = [
+                ['name' => 'Kemenag', 'image' => 'assets/img/KEMENAG.png'],
+                ['name' => '5 PASTI UMRAH', 'image' => 'assets/img/5pasti.png'],
+                ['name' => 'SISKOPATUH', 'image' => 'assets/img/SISKOPATUH.png'],
+                ['name' => 'ASPHIRASI', 'image' => 'assets/img/LOGO ASPHIRASI.png'],
+                ['name' => 'Lion Air', 'image' => 'assets/img/lionair.png'],
+                ['name' => 'Batik Air', 'image' => 'assets/img/batik-air.png'],
+                ['name' => 'Bank BSI', 'image' => 'assets/img/logo-bsi.png'],
+                ['name' => 'Bank BCA', 'image' => 'assets/img/logo-bca.png']
+            ];
+            foreach ($partners as $partner): ?>
+                <div class="col-lg-3 col-md-4 col-sm-6 d-flex justify-content-center"> <!-- Kolom responsif, center align -->
+                    <div class="card border-0 shadow-sm rounded-lg h-100 d-flex align-items-center justify-content-center p-4" style="transition: transform 0.3s ease, box-shadow 0.3s ease; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); max-width: 200px;"> <!-- Card dengan gradient background, efek hover -->
+                        <img src="<?php echo htmlspecialchars($partner['image']); ?>" class="card-img-top img-fluid" alt="<?php echo htmlspecialchars($partner['name']); ?>" style="max-height: 80px; object-fit: contain; transition: transform 0.3s ease;"> <!-- Logo dengan efek hover zoom -->
+        
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- CTA WhatsApp - Call to action untuk hubungi via WhatsApp -->
+<section id="cta" class="py-5 bg-warning text-dark text-center">
+    <div class="container">
+        <h2 class="mb-3 fw-bold">Siap Berangkat Umroh?</h2>
+        <p class="mb-4">Hubungi kami sekarang untuk konsultasi gratis!</p>
+
+        <?php 
+        // Nomor WhatsApp (bisa fixed atau bisa dari database)
+        $waNumber = "6281266303236";
+
+        // Pesan otomatis yang aman untuk URL
+        $text = urlencode("Halo ALFARUQ TEAM, saya ingin konsultasi paket umroh");
+        ?>
+
+        <a href="https://wa.me/<?php echo $waNumber; ?>?text=<?php echo $text; ?>"
+           class="btn btn-success btn-lg rounded-pill px-4" 
+           target="_blank">
+            Chat WhatsApp
+        </a>
+    </div>
+</section>
+
+
+<?php include 'views/footer.php'; // Include file footer (script, dll.) ?>
+
+<!-- Script untuk pop-up notifikasi jika ada pesan sukses -->
+<?php if ($popupMessage): ?>
+    <script>
+        alert("<?php echo addslashes($popupMessage); ?>");
     </script>
-</body>
-</html>
+<?php endif; ?>

@@ -1,28 +1,113 @@
-/* Custom CSS untuk ALFARUQ TEAM */
-/* Font */
-body {
-    font-family: 'Poppins', sans-serif;
+/* Font Families - Mengatur font global untuk konsistensi brand */
+body, button, input, select, textarea {
+    font-family: 'Poppins', sans-serif; /* Font utama untuk teks body */
 }
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', sans-serif; /* Font untuk heading */
 }
 
-/* Hero Section */
-.hero-section {
+/* Navbar Putih (style awal - di atas hero/slider) */
+.navbar-light-cstm {
+    background-color: #fff !important; /* Background putih solid */
+    box-shadow: 0 2px 8px rgba(22, 73, 36, 0.15); /* Shadow ringan untuk efek depth */
+    transition: all 0.3s ease; /* Transisi smooth untuk perubahan */
+}
+.navbar-light-cstm .navbar-nav .nav-link {
+    color: #000 !important; /* Tulisan hitam untuk kontras di putih */
+    font-weight: 600 !important; /* Semibold untuk ketebalan */
+}
+.navbar-light-cstm .navbar-nav .nav-link:hover,
+.navbar-light-cstm .navbar-nav .nav-link.active {
+    color: #33a661 !important; /* Hover hijau cerah */
+}
+.navbar-light-cstm .navbar-toggler-icon {
+    /* Filter untuk membuat ikon toggle terlihat di putih */
+    filter: invert(31%) sepia(52%) saturate(962%) hue-rotate(98deg) brightness(85%) contrast(83%);
+}
+.navbar-light-cstm .btn-outline-success {
+    border-color: rgb(22, 73, 36); /* Outline hijau tua */
+    color: #164924; /* Tulisan hijau tua */
+    font-weight: 600;
+}
+.navbar-light-cstm .btn-outline-success:hover {
+    background-color: #33a661; /* Background hijau saat hover */
+    border-color: #33a661;
+    color: #fff; /* Tulisan putih saat hover */
+}
+/* Styling untuk tulisan brand/logo di navbar putih - mengikuti warna link */
+.navbar-light-cstm .navbar-brand-text {
+    color: #000 !important; /* Tulisan hitam, sama dengan link navbar */
+}
+
+/* Navbar Transparan (saat scroll melewati hero) - Sekarang hijau solid seperti update Anda */
+.navbar-transparent {
+    background-color: #33a661 !important; /* Background hijau solid (bukan transparan) */
+    backdrop-filter: blur(10px); /* Efek blur untuk readability tanpa solid background */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow ringan */
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+.navbar-transparent .navbar-nav .nav-link {
+    color: #ffffff !important; /* Tulisan putih untuk kontras di hijau */
+    font-weight: 600 !important; /* Semibold */
+}
+.navbar-transparent .navbar-nav .nav-link:hover,
+.navbar-transparent .navbar-nav .nav-link.active {
+    color: #fae314 !important; /* Hover kuning terang */
+}
+.navbar-transparent .navbar-toggler-icon {
+    filter: invert(100%); /* Ikon putih untuk kontras */
+}
+.navbar-transparent .btn-outline-success {
+    background-color: #fff !important; /* Background putih solid untuk tombol */
+    border-color: #ffffff; /* Border putih */
+    color: #164924 !important; /* Tulisan hijau tua untuk kontras */
+    font-weight: 600 !important;
+}
+.navbar-transparent .btn-outline-success:hover {
+    background-color: #fae314 !important; /* Hover kuning terang */
+    border-color: #fae314;
+    color: #164924 !important; /* Tulisan tetap kontras */
+}
+/* Styling untuk tulisan brand/logo di navbar transparan - mengikuti warna link */
+.navbar-transparent .navbar-brand-text {
+    color: #ffffff !important; /* Tulisan putih, sama dengan link navbar */
+}
+
+/* Hero Slider - Styling untuk carousel gambar */
+header .overlay {
     position: relative;
-    animation: fadeIn 1s ease-in;
+    height: 100%;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    /* Filter untuk membuat kontrol carousel hijau */
+    filter: invert(40%) sepia(100%) saturate(600%) hue-rotate(80deg) brightness(90%) contrast(85%);
 }
 
-/* Cards */
+/* Text shadow untuk readability di hero */
+header h1,
+header h6,
+header p {
+    text-shadow: 0 0 8px rgba(0,0,0,0.7);
+}
+
+/* Button shadow di hero */
+header .btn-success.shadow {
+    box-shadow: 0 4px 12px rgba(51,166,97,0.5);
+}
+
+/* Cards - Styling untuk paket dan testimoni */
 .card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animasi hover */
+    border-radius: 0.75rem; /* Rounded corners */
 }
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px); /* Efek lift */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Buttons */
+/* Buttons umum - Styling untuk tombol sukses dan warning */
 .btn-success {
     background-color: #33a661;
     border-color: #33a661;
@@ -41,39 +126,105 @@ h1, h2, h3, h4, h5, h6 {
     border-color: #d5ae29;
 }
 
-/* Countdown */
-#countdown-timer span {
-    animation: pulse 2s infinite;
-}    
-/* Form Testimoni */
-.form-control, .form-select {
-     border: 2px solid #33a661;
-}
-.form-control:focus, .form-select:focus {
-     border-color: #164924;
-     box-shadow: 0 0 5px rgba(51, 166, 97, 0.5);
-}
-     
-
-
-
-/* Animasi Ringan */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+/* Carousel gallery controls - Styling untuk kontrol galeri */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #33a661 !important;
+    border-radius: 50% !important;
+    padding: 10px !important;
 }
 
-/* Responsif */
+/* Gallery Styles - Efek hover dan responsif untuk galeri */
+/* Efek hover pada card galeri */
+#gallery-grid .card:hover {
+    transform: scale(1.05); /* Zoom ringan */
+    box-shadow: 0 8px 25px rgba(51, 166, 97, 0.3); /* Shadow hijau untuk kontras */
+}
+#gallery-grid .card:hover .card-img-top {
+    transform: scale(1.1); /* Zoom gambar */
+}
+#gallery-grid .card:hover .card-img-overlay {
+    opacity: 1; /* Tampilkan overlay teks */
+}
+/* Button filter hover */
+#gallery-filter .btn-outline-success:hover {
+    background-color: #33a661;
+    border-color: #33a661;
+    color: #fff;
+}
+/* Responsif untuk mobile */
 @media (max-width: 768px) {
-    .hero-section {
-        height: 70vh;
+    #gallery-grid .card-img-top {
+        height: 200px; /* Tinggi gambar lebih kecil di mobile */
     }
-    .display-4 {
-        font-size: 2rem;
+    #gallery-filter .d-flex {
+        flex-direction: column; /* Button filter vertikal di mobile */
+        align-items: center;
+    }
+}
+
+.divider hr {
+    border: 1px solid #33a661;
+    opacity: 0.5;
+}
+.divider i {
+    font-size: 2rem;
+    color: #33a661;
+}
+
+/* Efek hover untuk section partners */
+#partners .card:hover {
+    transform: scale(1.05); /* Zoom ringan */
+    box-shadow: 0 15px 40px rgba(51, 166, 97, 0.4); /* Shadow hijau lebih besar */
+}
+#partners .card:hover .card-overlay {
+    opacity: 1; /* Overlay muncul */
+}
+#partners .card:hover .card-img-top {
+    filter: none; /* Logo jadi color */
+    transform: scale(1.1); /* Zoom logo */
+}
+
+/* Fasilitas Premium – Tampilan mewah & rapat */
+.package-facilities {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.package-facilities li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.4;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.package-facilities li:last-child {
+    border-bottom: none !important;
+}
+
+.package-facilities li::before {
+    content: "✔";
+    color: #33a661;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+
+/* Responsive adjustments - Penyesuaian untuk mobile */
+@media (max-width: 768px) {
+    header .carousel-item {
+        height: 60vh !important; /* Tinggi hero lebih kecil di mobile */
+    }
+    header h1 {
+        font-size: 1.8rem !important;
+    }
+    header p.lead {
+        font-size: 0.95rem !important;
     }
 }
