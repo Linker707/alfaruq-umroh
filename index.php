@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
                     <div class="card rounded shadow-sm border-0 h-100">
                         <img src="<?php echo htmlspecialchars($package['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($package['name']); ?>">
                         <div class="card-body">
-                            <h5 class="card-title text-success"><?php echo htmlspecialchars($package['name']); ?></h5>
+                            <h5 class="card-title text-success fw-bold"><?php echo htmlspecialchars($package['name']); ?></h5>
                             <p class="card-text"><?php echo htmlspecialchars(substr($package['description'], 0, 100)) . '...'; ?></p>
                             <p class="text-primary fw-bold">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?> / <?php echo (int)$package['duration']; ?> hari</p>
                             <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" class="btn btn-success rounded-pill">Detail</a>
