@@ -13,11 +13,7 @@ if ($packageId > 0) {
     $package = $stmtPackage->fetch();
 
     if ($package) {
-        $querySchedules = "SELECT * FROM schedules 
-                           WHERE package_id = ? 
-                           AND status = 'available' 
-                           AND departure_date >= CURDATE()
-                           ORDER BY departure_date ASC";
+        $querySchedules = "SELECT * FROM schedules WHERE package_id = ? AND status = 'available' AND departure_date >= CURDATE() ORDER BY departure_date ASC";
         $stmtSchedules = $pdo->prepare($querySchedules);
         $stmtSchedules->execute([$packageId]);
         $schedules = $stmtSchedules->fetchAll();
@@ -93,7 +89,7 @@ include 'views/header.php';
                         <?php endforeach; ?>
                     </ul>
 
-                    <a href="register.php?package_id=<?php echo (int)$package['id']; ?>"
+                    <a href="contact.php"
                        class="btn btn-success btn-lg rounded-pill px-4">
                         Daftar Sekarang
                     </a>
@@ -102,43 +98,68 @@ include 'views/header.php';
         </div>
     </section>
 
-    <!-- Jadwal -->
-    <section id="schedules" class="py-5 bg-white">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Jadwal Keberangkatan</h2>
-
+    <!-- Section Jadwal Keberangkatan - Tabel jadwal terkait paket -->
+<section id="schedules" class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-4 text-success fw-bold">Jadwal Keberangkatan</h2>
+        
+        <!-- Debug Lengkap -->
+        <!-- <div class="alert alert-info">
+            <strong>Debug Info:</strong><br>
+            Package ID: <?php echo $packageId; ?><br>
+            CURDATE: <?php echo date('Y-m-d'); ?><br>
+            Jumlah jadwal diambil: <?php echo count($schedules); ?><br>
+            Query: SELECT * FROM schedules WHERE package_id = <?php echo $packageId; ?> AND status = 'available' AND departure_date >= CURDATE() ORDER BY departure_date ASC<br>
             <?php if (!empty($schedules)): ?>
-                <div class="row">
-                    <?php foreach ($schedules as $schedule): ?>
-                        <div class="col-md-6 mb-4">
-                            <div class="card border border-success rounded shadow-sm" style="border-width: 3px !important;">
-                                <div class="card-body">
-                                    <h5 class="card-title text-success fw-bold">
-                                        Keberangkatan: <?php echo date('d M Y', strtotime($schedule['departure_date'])); ?>
-                                    </h5>
-                                    <p class="card-text">Kembali: <?php echo date('d M Y', strtotime($schedule['return_date'])); ?></p>
-                                    <p class="text-muted">
-                                        Slot Tersedia: <?php echo (int)$schedule['available_slots']; ?>
-                                    </p>
-
-                                    <a href="register.php?package_id=<?php echo (int)$package['id']; ?>&schedule_id=<?php echo (int)$schedule['id']; ?>"
-                                       class="btn btn-success rounded-pill">
-                                        Pilih Jadwal
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-
+                Data jadwal pertama: <?php print_r($schedules[0]); ?>
             <?php else: ?>
-                <div class="text-center">
-                    <p class="text-muted">Belum ada jadwal keberangkatan tersedia untuk paket ini.</p>
-                </div>
+                Tidak ada jadwal ditemukan.
             <?php endif; ?>
-
-        </div>
-    </section>
+        </div> -->
+        
+        <?php if (!empty($schedules)): ?>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Tanggal Keberangkatan</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Maskapai</th>
+                            <th>Rute</th>
+                            <th>Hari Keberangkatan</th>
+                            <th>Slot Tersedia</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($schedules as $schedule): ?>
+                            <tr>
+                                <td><?php echo date('d M Y', strtotime($schedule['departure_date'])); ?></td>
+                                <td><?php echo date('d M Y', strtotime($schedule['return_date'])); ?></td>
+                                <td><?php echo htmlspecialchars($schedule['airline']); ?></td>
+                                <td><?php echo htmlspecialchars($schedule['route']); ?></td>
+                                <td><?php echo htmlspecialchars($schedule['departure_day']); ?></td>
+                                <td><?php echo (int)$schedule['available_slots']; ?></td>
+                                <td><?php echo htmlspecialchars($schedule['status']); ?></td>
+                                <td>
+                                    <a href="contact.php" class="btn btn-success btn-sm rounded-pill">
+                                        Pilih
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="text-center">
+                <p class="text-muted">Belum ada jadwal keberangkatan tersedia untuk paket ini.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+   
 
 <?php else: ?>
     <section class="py-5 bg-light text-center">
