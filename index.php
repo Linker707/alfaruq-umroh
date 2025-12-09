@@ -1,294 +1,1310 @@
 <?php
-// index.php - Homepage ALFARUQ TEAM
-// Include koneksi database
+// index.php - Homepage ALFARUQ TEAM dengan Modern Green Theme
 require_once 'config/database.php';
 
-     // Handle form submit testimoni
-     $message = ''; // Untuk pesan sukses/error
-     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
-         $name = trim($_POST['name'] ?? '');
-         $email = trim($_POST['email'] ?? '');
-         $testimonial_message = trim($_POST['message'] ?? '');
-         $rating = (int)($_POST['rating'] ?? 0);
+// Mulai session
+session_start();
 
-         // Validasi sederhana
-         if (empty($name) || empty($email) || empty($testimonial_message) || $rating < 1 || $rating > 5) {
-             $message = '<div class="alert alert-danger">Semua field wajib diisi, dan rating 1-5!</div>';
-         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-             $message = '<div class="alert alert-danger">Email tidak valid!</div>';
-         } else {
-             // Insert ke database
-             $queryInsert = "INSERT INTO testimonials (name, email, message, rating, is_approved) VALUES (?, ?, ?, ?, 0)";
-             $stmtInsert = $pdo->prepare($queryInsert);
-             if ($stmtInsert->execute([$name, $email, $testimonial_message, $rating])) {
-                 $message = '<div class="alert alert-success">Terima kasih! Testimoni Anda telah dikirim dan akan dimoderasi.</div>';
-             } else {
-                 $message = '<div class="alert alert-danger">Gagal mengirim testimoni. Coba lagi!</div>';
-             }
-         }
-     }
-     
+// Check pesan sukses dari testimonial-qna.php
+$popupMessage = '';
+if (isset($_SESSION['success_message'])) {
+    $popupMessage = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
 
-// Query untuk paket unggulan (ambil semua aktif)
+// Ambil settings
+$querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2', 'contact_phone')";
+$stmtSettings = $pdo->prepare($querySettings);
+$stmtSettings->execute();
+$settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// Ambil paket unggulan aktif
 $queryPackages = "SELECT * FROM packages WHERE is_active = 1 ORDER BY id DESC LIMIT 3";
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute();
 $packages = $stmtPackages->fetchAll();
 
-// Query untuk jadwal terdekat (ambil yang available dan departure_date terdekat)
-$querySchedule = "SELECT s.*, p.name AS package_name FROM schedules s JOIN packages p ON s.package_id = p.id WHERE s.status = 'available' AND s.departure_date >= CURDATE() ORDER BY s.departure_date ASC LIMIT 1";
-$stmtSchedule = $pdo->prepare($querySchedule);
-$stmtSchedule->execute();
-$nearestSchedule = $stmtSchedule->fetch();
-
-// Query untuk testimoni (5 terbaru yang approved)
-$queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC LIMIT 5";
+// Ambil semua testimoni yang approved
+$queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC";
 $stmtTestimonials = $pdo->prepare($queryTestimonials);
 $stmtTestimonials->execute();
 $testimonials = $stmtTestimonials->fetchAll();
 
-// Query untuk galeri (8 foto aktif)
+// Ambil galeri 8 foto aktif
 $queryGalleries = "SELECT * FROM galleries WHERE type = 'image' AND is_active = 1 ORDER BY created_at DESC LIMIT 8";
 $stmtGalleries = $pdo->prepare($queryGalleries);
 $stmtGalleries->execute();
 $galleries = $stmtGalleries->fetchAll();
 
-// Query untuk settings (tagline, dll.)
-$querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2', 'contact_phone')";  // Diperbaiki: hanya 2 kolom
-$stmtSettings = $pdo->prepare($querySettings);
-$stmtSettings->execute();
-$settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR); // Sekarang OK
+// Set fallback
+$tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
+$tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
+$whatsapp = $settings['contact_phone'] ?? "+6281234567890";
 
-// Ambil tagline
-$tagline1 = $settings['tagline1'] ?? 'LANGKAH AWAL MENUJU BAITULLAH';
-$tagline2 = $settings['tagline2'] ?? 'HARGA HEMAT FASILITAS TERHORMAT';
-$whatsapp = $settings['contact_phone'] ?? '+6281234567890';
+// Handle form testimonial
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $rating = (int)($_POST['rating'] ?? 0);
+
+    if (empty($name) || empty($email) || $rating < 1 || $rating > 5) {
+        $message = '<div class="alert alert-danger rounded-pill">Semua field wajib diisi, dan rating 1-5!</div>';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = '<div class="alert alert-danger rounded-pill">Email tidak valid!</div>';
+    } else {
+        $_SESSION['testimonial'] = [
+            'name' => $name,
+            'email' => $email,
+            'rating' => $rating
+        ];
+        header('Location: testimonial-qna.php');
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALFARUQ TEAM - <?php echo $tagline1; ?></title>
-    <meta name="description" content="Travel umroh terpercaya dengan harga hemat dan fasilitas terhormat. Pesan paket umroh Anda sekarang!">
-    <meta name="keywords" content="umroh, travel umroh, ALFARUQ TEAM, paket umroh, harga hemat">
-    <meta name="author" content="ALFARUQ TEAM">
-    <!-- Open Graph untuk SEO -->
-    <meta property="og:title" content="ALFARUQ TEAM - <?php echo $tagline1; ?>">
-    <meta property="og:description" content="Travel umroh terpercaya dengan harga hemat dan fasilitas terhormat.">
-    <meta property="og:image" content="assets/img/logo-alfaruq.jpg">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>ALFARUQ TEAM - Travel Umroh Terpercaya</title>
+    <meta name="description" content="ALFARUQ TEAM, travel umroh harga hemat dan fasilitas terhormat. <?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?>" />
+    <meta name="author" content="ALFARUQ TEAM" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ALFARUQ TEAM - Travel Umroh Terpercaya">
+    <meta property="og:description" content="<?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?>">
+    <meta property="og:image" content="assets/img/og-image.jpg">
     <meta property="og:url" content="https://alfaruqteam.com">
-    <!-- Schema JSON-LD -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "PT. ALFARUQ ANUGERAH UTAMA (ALFARUQ TEAM)",
-        "url": "https://alfaruqteam.com",
-        "logo": "assets/img/logo-alfaruq.jpg",
-        "description": "<?php echo $tagline1; ?> - <?php echo $tagline2; ?>",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "<?php echo $whatsapp; ?>",
-            "contactType": "customer service"
-        }
-    }
-    </script>
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ALFARUQ TEAM - Travel Umroh Terpercaya">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?>">
+    <meta name="twitter:image" content="assets/img/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="assets/img/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4CAF50">
+    
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/main.css">
-    <!-- Font Poppins/Montserrat -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <!-- Modern Green Theme CSS -->
+    <link rel="stylesheet" href="assets/css/modern-green.css" />
+    
+    <!-- Responsive Fixes -->
+    <link rel="stylesheet" href="assets/css/responsive-fix.css" />
 </head>
-<body>
-    <?php include 'views/header.php'; ?>
+<body class="modern-green">
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero-section text-white d-flex align-items-center" style="background: linear-gradient(135deg, #164924 0%, #33a661 100%), url('assets/img/masjid-hero.jpg') no-repeat center center; background-size: cover; height: 100vh;">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-3"><?php echo $tagline1; ?></h1>
-            <p class="lead mb-4"><?php echo $tagline2; ?></p>
-            <a href="packages.php" class="btn btn-warning btn-lg rounded-pill px-4">Lihat Paket Umroh</a>
+<!-- ============================================
+    MODERN NAVBAR
+============================================ -->
+<nav class="navbar navbar-expand-lg navbar-modern-green sticky-top">
+    <div class="container">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="index.php">
+            <img src="assets/img/logo.svg" alt="Logo Alfaruq" width="60" height="60">
+            <span class="navbar-brand-text ms-2">ALFARUQ TEAM</span>
+        </a>
+        
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Nav Menu -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link active" href="index.php">
+                        <i class="fas fa-home me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.php">
+                        <i class="fas fa-info-circle me-1"></i> About
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="packages.php">
+                        <i class="fas fa-box-open me-1"></i> Packages
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" 
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-file-alt me-1"></i> Pages
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pagesDropdown">
+                        <li><a class="dropdown-item" href="contact.php"><i class="fas fa-phone me-2"></i> Contact</a></li>
+                        <li><a class="dropdown-item" href="gallery.php"><i class="fas fa-images me-2"></i> Gallery</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="register.php"><i class="fas fa-user-plus me-2"></i> Register</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item ms-lg-3">
+                    <a href="package-detail.php?id=1" class="btn-modern-green outline sm">
+                        <i class="fas fa-calendar-check me-2"></i> Book Now
+                    </a>
+                </li>
+            </ul>
         </div>
-    </section>
+    </div>
+</nav>
 
-    <!-- Paket Unggulan -->
-    <section id="packages" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Paket Unggulan</h2>
-            <div class="row">
-                <?php foreach ($packages as $package): ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card rounded shadow-sm border-0 h-100">
-                        <img src="<?php echo $package['image']; ?>" class="card-img-top" alt="<?php echo $package['name']; ?>">
-                        <div class="card-body">
-                            <h5 class="card-title text-success"><?php echo $package['name']; ?></h5>
-                            <p class="card-text"><?php echo substr($package['description'], 0, 100) . '...'; ?></p>
-                            <p class="text-primary fw-bold">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?> / <?php echo $package['duration']; ?> hari</p>
-                            <a href="package-detail.php?id=<?php echo $package['id']; ?>" class="btn btn-success rounded-pill">Detail</a>
-                        </div>
+<!-- ============================================
+    MODERN HERO SECTION DENGAN CAROUSEL
+============================================ -->
+<header>
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
+            <!-- Slide 1 -->
+            <div class="carousel-item active" style="height:90vh; background: url('assets/img/gambar 1.jpeg') center center/cover no-repeat;">
+                <div class="hero-overlay-modern d-flex flex-column justify-content-center align-items-center text-center text-white h-100 px-3">
+                    <!-- Tagline Badge -->
+                    <div class="mb-4">
+                        <span class="badge bg-accent-gradient text-dark px-4 py-2 rounded-pill animate__animated animate__pulse animate__infinite">
+                            <i class="fas fa-star me-2"></i><?php echo htmlspecialchars($tagline1); ?>
+                        </span>
+                    </div>
+                    
+                    <!-- Main Heading -->
+                    <h1 class="display-3 fw-bold mb-4 text-white">
+                        ALFARUQ TEAM
+                        <br>
+                        <span class="fs-4 text-white opacity-90">Travel Umroh Terpercaya</span>
+                    </h1>
+                    
+                    <!-- Subtitle -->
+                    <p class="lead mb-5 text-white opacity-90 w-75 mx-auto">
+                        <?php echo htmlspecialchars($tagline2); ?>
+                        <br>
+                        <small class="text-white opacity-75">Melayani perjalanan ibadah Anda dengan penuh kepercayaan dan profesionalisme.</small>
+                    </p>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                        <a href="packages.php" class="btn-modern-green primary lg with-icon">
+                            <i class="fas fa-box-open me-2"></i> Lihat Paket Umroh
+                        </a>
+                        <a href="contact.php" class="btn-modern-green accent lg with-icon">
+                            <i class="fas fa-phone-alt me-2"></i> Hubungi Kami
+                        </a>
                     </div>
                 </div>
-                <?php endforeach; ?>
             </div>
-        </div>
-    </section>
-
-    <!-- Countdown Keberangkatan -->
-    <section id="countdown" class="py-5 bg-success text-white">
-        <div class="container text-center">
-            <h2 class="mb-4 fw-bold">Keberangkatan Terdekat</h2>
-            <?php if ($nearestSchedule): ?>
-            <p class="mb-3">Paket: <?php echo $nearestSchedule['package_name']; ?> - Tanggal: <?php echo date('d M Y', strtotime($nearestSchedule['departure_date'])); ?></p>
-            <div id="countdown-timer" class="d-flex justify-content-center gap-3">
-                <div class="text-center">
-                    <span id="days" class="display-4 fw-bold">00</span>
-                    <p>Hari</p>
-                </div>
-                <div class="text-center">
-                    <span id="hours" class="display-4 fw-bold">00</span>
-                    <p>Jam</p>
-                </div>
-                <div class="text-center">
-                    <span id="minutes" class="display-4 fw-bold">00</span>
-                    <p>Menit</p>
-                </div>
-                <div class="text-center">
-                    <span id="seconds" class="display-4 fw-bold">00</span>
-                    <p>Detik</p>
+            
+            <!-- Slide 2 -->
+            <div class="carousel-item" style="height:90vh; background: url('assets/img/gambar 2.jpeg') center center/cover no-repeat;">
+                <div class="hero-overlay-modern d-flex flex-column justify-content-center align-items-center text-center text-white h-100 px-3">
+                    <div class="mb-4">
+                        <span class="badge bg-green-gradient px-4 py-2 rounded-pill">
+                            <i class="fas fa-hands-helping me-2"></i>Pelayanan Profesional
+                        </span>
+                    </div>
+                    
+                    <h1 class="display-3 fw-bold mb-4 text-white">
+                        Pengalaman Ibadah<br>Terbaik
+                    </h1>
+                    
+                    <p class="lead mb-5 text-white opacity-90 w-75 mx-auto">
+                        Dapatkan bimbingan ibadah lengkap, akomodasi terbaik, dan<br>pendampingan dari tim profesional kami.
+                    </p>
+                    
+                    <a href="about.php" class="btn-modern-green primary lg with-icon">
+                        <i class="fas fa-info-circle me-2"></i>Tentang Kami
+                    </a>
                 </div>
             </div>
-            <?php else: ?>
-            <p>Tidak ada jadwal keberangkatan tersedia saat ini.</p>
-            <?php endif; ?>
+            
+            <!-- Slide 3 -->
+            <div class="carousel-item" style="height:90vh; background: url('assets/img/makkah5.jpeg') center center/cover no-repeat;">
+                <div class="hero-overlay-modern d-flex flex-column justify-content-center align-items-center text-center text-white h-100 px-3">
+                    <div class="mb-4">
+                        <span class="badge bg-accent-gradient text-dark px-4 py-2 rounded-pill">
+                            <i class="fas fa-calendar-check me-2"></i>Jadwal Terjamin
+                        </span>
+                    </div>
+                    
+                    <h1 class="display-3 fw-bold mb-4 text-white">
+                        Jadwal Keberangkatan<br>Pasti
+                    </h1>
+                    
+                    <p class="lead mb-5 text-white opacity-90 w-75 mx-auto">
+                        Pilih dari berbagai jadwal keberangkatan yang tersedia.<br>Keberangkatan tepat waktu, pulang dengan penuh berkah.
+                    </p>
+                    
+                    <a href="packages.php" class="btn-modern-green primary lg with-icon">
+                        <i class="fas fa-calendar-alt me-2"></i>Cek Jadwal
+                    </a>
+                </div>
+            </div>
         </div>
-    </section>
+        
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon bg-green-gradient rounded-circle p-3" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon bg-green-gradient rounded-circle p-3" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+        
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+    </div>
+</header>
 
-    <!-- Testimoni -->
-    <section id="testimonials" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Testimoni Jamaah</h2>
-            <div class="row">
-                <?php foreach ($testimonials as $testimonial): ?>
-                <div class="col-md-6 mb-4">
-                    <div class="card rounded shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <img src="<?php echo $testimonial['image']; ?>" class="rounded-circle me-3" width="50" height="50" alt="<?php echo $testimonial['name']; ?>">
+<!-- ============================================
+    MODERN PACKAGE SECTION - CARD LEBIH TERANG
+============================================ -->
+<section id="packages" class="py-5 bg-green-50">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Paket Unggulan</h2>
+            <p class="lead text-neutral-700 mb-0">Pilih paket umroh terbaik sesuai kebutuhan dan budget Anda</p>
+            <div class="mt-3">
+                <span class="badge bg-green-100 text-green-800 px-3 py-2 border border-green-300">
+                    <i class="fas fa-check-circle me-2 text-green-600"></i>Garansi Harga Terbaik
+                </span>
+            </div>
+        </div>
+        
+        <!-- Package Cards -->
+        <div class="row g-4">
+            <?php foreach ($packages as $index => $package): ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="card-modern-green-light <?php echo $index === 0 ? 'featured' : ''; ?> 
+                         animate__animated animate__fadeInUp" 
+                     style="animation-delay: <?php echo $index * 0.1; ?>s;">
+                    
+                    <?php if ($index === 0): ?>
+                    <div class="card-badge-popular">
+                        <i class="fas fa-crown me-1"></i> Paling Populer
+                    </div>
+                    <?php endif; ?>
+                    
+                    <img src="<?php echo htmlspecialchars($package['image']); ?>" 
+                         class="card-img-modern" 
+                         alt="Paket <?php echo htmlspecialchars($package['name']); ?>"
+                         loading="lazy">
+                    
+                    <div class="card-body-modern">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title-modern text-green-900 mb-0">
+                                <?php echo htmlspecialchars($package['name']); ?>
+                            </h5>
+                            <span class="badge bg-green-100 text-green-800 px-3 border border-green-300">
+                                <i class="fas fa-clock me-1 text-green-600"></i><?php echo (int)$package['duration']; ?> Hari
+                            </span>
+                        </div>
+                        
+                        <p class="card-text-modern text-neutral-700 mb-4">
+                            <?php echo htmlspecialchars(substr($package['description'], 0, 120)); ?>
+                            <?php if (strlen($package['description']) > 120): ?>
+                            <span class="text-green-700 fw-medium">...selengkapnya</span>
+                            <?php endif; ?>
+                        </p>
+                        
+                        <!-- Facilities Preview -->
+                        <div class="mb-4">
+                            <h6 class="text-green-800 fw-semibold mb-3">
+                                <i class="fas fa-check-circle text-green-600 me-2"></i>Fasilitas Unggulan:
+                            </h6>
+                            <?php 
+                            $facilities = json_decode($package['facilities'], true);
+                            if (is_array($facilities) && count($facilities) > 0):
+                                $previewFacilities = array_slice($facilities, 0, 3);
+                            ?>
+                            <ul class="list-unstyled mb-0">
+                                <?php foreach ($previewFacilities as $facility): ?>
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-check text-green-500 me-2" style="font-size: 0.875rem;"></i>
+                                    <small class="text-neutral-700"><?php echo htmlspecialchars(substr(trim($facility), 0, 35)); ?></small>
+                                </li>
+                                <?php endforeach; ?>
+                                <?php if (count($facilities) > 3): ?>
+                                <li class="text-green-700 fw-medium mt-2">
+                                    <i class="fas fa-plus-circle me-1"></i>
+                                    +<?php echo count($facilities) - 3; ?> fasilitas lainnya
+                                </li>
+                                <?php endif; ?>
+                            </ul>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <!-- Price & Rating -->
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div>
-                                    <h6 class="mb-0"><?php echo $testimonial['name']; ?></h6>
-                                    <small class="text-warning"><?php echo str_repeat('★', $testimonial['rating']); ?></small>
+                                    <p class="package-price-modern mb-1 text-green-900">
+                                        Rp <?php echo number_format($package['price'], 0, ',', '.'); ?>
+                                    </p>
+                                    <small class="text-neutral-600">
+                                        <i class="fas fa-user me-1"></i>Per Orang
+                                    </small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-warning mb-1">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    <small class="text-neutral-600">4.8/5 (24 Reviews)</small>
                                 </div>
                             </div>
-                            <p class="card-text"><?php echo $testimonial['message']; ?></p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" 
+                                   class="btn-modern-green primary with-icon">
+                                    <i class="fas fa-eye me-2"></i>Detail Paket
+                                </a>
+                                <a href="contact.php?package=<?php echo $package['id']; ?>" 
+                                   class="btn-modern-green outline-green">
+                                    <i class="fas fa-calendar-check me-2"></i>Konsultasi Jadwal
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <?php endforeach; ?>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- View All Button -->
+        <div class="text-center mt-5 pt-3">
+            <a href="packages.php" class="btn-modern-green primary lg with-icon">
+                <i class="fas fa-boxes me-2"></i>Lihat Semua Paket
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+    DECORATIVE DIVIDER
+============================================ -->
+<div class="divider-modern py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <div class="icon-box-modern">
+                    <i class="fas fa-shield-alt"></i>
+                    <p class="mb-0 text-green-800 fw-semibold">Garansi Legal PPIU</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="icon-box-modern">
+                    <i class="fas fa-handshake"></i>
+                    <p class="mb-0 text-green-800 fw-semibold">Pelayanan Profesional</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="icon-box-modern">
+                    <i class="fas fa-heart"></i>
+                    <p class="mb-0 text-green-800 fw-semibold">Bimbingan Ibadah</p>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</div>
 
-         <!-- Form Input Testimoni -->
-     <section id="testimonial-form" class="py-5 bg-light">
-         <div class="container">
-             <h2 class="text-center mb-4 text-success fw-bold">Berikan Testimoni Anda</h2>
-             <?php echo $message; ?> <!-- Tampilkan pesan sukses/error -->
-             <form method="POST" action="" class="row g-3 justify-content-center">
-                 <div class="col-md-6">
-                     <label for="name" class="form-label">Nama</label>
-                     <input type="text" class="form-control rounded" id="name" name="name" required>
-                 </div>
-                 <div class="col-md-6">
-                     <label for="email" class="form-label">Email</label>
-                     <input type="email" class="form-control rounded" id="email" name="email" required>
-                 </div>
-                 <div class="col-12">
-                     <label for="rating" class="form-label">Rating (1-5 Bintang)</label>
-                     <select class="form-select rounded" id="rating" name="rating" required>
-                         <option value="">Pilih Rating</option>
-                         <option value="1">1 ★</option>
-                         <option value="2">2 ★★</option>
-                         <option value="3">3 ★★★</option>
-                         <option value="4">4 ★★★★</option>
-                         <option value="5">5 ★★★★★</option>
-                     </select>
-                 </div>
-                 <div class="col-12">
-                     <label for="message" class="form-label">Pesan Testimoni</label>
-                     <textarea class="form-control rounded" id="message" name="message" rows="4" required placeholder="Ceritakan pengalaman Anda..."></textarea>
-                 </div>
-                 <div class="col-12 text-center">
-                     <button type="submit" name="submit_testimonial" class="btn btn-success btn-lg rounded-pill px-4">Kirim Testimoni</button>
-                 </div>
-             </form>
-         </div>
-     </section>
-     
-
-    <!-- Galeri Slider -->
-    <section id="gallery" class="py-5 bg-white">
-        <div class="container">
-            <h2 class="text-center mb-4 text-success fw-bold">Galeri Perjalanan</h2>
-            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <?php foreach ($galleries as $index => $gallery): ?>
-                    <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                        <img src="<?php echo $gallery['image']; ?>" class="d-block w-100 rounded" alt="<?php echo $gallery['title']; ?>">
-                        <div class="carousel-caption d-none d-md-block">
-                            <h5><?php echo $gallery['title']; ?></h5>
-                            <p><?php echo $gallery['description']; ?></p>
+<!-- ============================================
+    CLEAN MODERN TESTIMONIAL SECTION
+============================================ -->
+<section id="testimonials" class="py-5 bg-green-50">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Apa Kata Mereka?</h2>
+            <p class="lead text-neutral-700 mb-4">Pengalaman jamaah yang telah berangkat bersama ALFARUQ TEAM</p>
+            
+            <!-- Overall Rating -->
+            <div class="d-inline-block bg-white px-4 py-3 rounded-pill shadow-sm mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-center">
+                        <div class="text-warning mb-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <small class="text-neutral-600">4.8/5 Rating</small>
+                    </div>
+                    <div class="vr"></div>
+                    <div class="text-center">
+                        <h4 class="text-green-700 fw-bold mb-0"><?php echo count($testimonials); ?>+</h4>
+                        <small class="text-neutral-600">Testimoni</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <?php if (!empty($testimonials)): ?>
+        <!-- Testimonial Grid -->
+        <div class="testimonial-grid-clean">
+            <?php foreach (array_slice($testimonials, 0, 6) as $index => $testimonial): ?>
+            <div class="testimonial-clean-modern <?php echo $index === 0 ? 'featured' : ''; ?>">
+                <!-- Rating -->
+                <div class="testimonial-rating-clean">
+                    <?php echo str_repeat('<i class="fas fa-star"></i>', (int)$testimonial['rating']); ?>
+                    <?php echo str_repeat('<i class="far fa-star"></i>', 5 - (int)$testimonial['rating']); ?>
+                    <span class="rating-badge-clean"><?php echo $testimonial['rating']; ?>.0</span>
+                </div>
+                
+                <!-- Content -->
+                <div class="testimonial-content-clean">
+                    <p>"<?php echo htmlspecialchars($testimonial['message']); ?>"</p>
+                </div>
+                
+                <!-- Author -->
+                <div class="testimonial-author-clean">
+                    <img src="<?php echo htmlspecialchars($testimonial['image']); ?>" 
+                         class="testimonial-author-img-clean" 
+                         alt="<?php echo htmlspecialchars($testimonial['name']); ?>">
+                    <div class="testimonial-author-info-clean">
+                        <h6 class="mb-1"><?php echo htmlspecialchars($testimonial['name']); ?></h6>
+                        <div class="testimonial-date-clean">
+                            <i class="far fa-calendar"></i>
+                            <span><?php echo date('d M Y', strtotime($testimonial['created_at'])); ?></span>
                         </div>
                     </div>
-                    <?php endforeach; ?>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+                
+                <!-- Departure Info -->
+                <?php if (!empty($testimonial['q3'])): ?>
+                <div class="testimonial-departure-clean">
+                    <small>
+                        <i class="fas fa-users text-green-600"></i>
+                        <?php echo htmlspecialchars(substr($testimonial['q3'], 0, 25)); ?>
+                    </small>
+                </div>
+                <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- CTA Buttons -->
+        <div class="text-center mt-5 pt-3">
+            <a href="testimonial-qna.php" class="btn-modern-green primary with-icon me-3">
+                <i class="fas fa-pen me-2"></i>Berikan Testimoni
+            </a>
+            <a href="#" class="btn-modern-green outline-green with-icon" id="viewAllTestimonials">
+                <i class="fas fa-eye me-2"></i>Lihat Semua
+            </a>
+        </div>
+        
+        <?php else: ?>
+        <!-- Empty State -->
+        <div class="text-center py-5">
+            <div class="empty-state-modern">
+                <i class="fas fa-comments text-green-300"></i>
+                <h5 class="mt-3 text-green-800">Belum ada testimoni</h5>
+                <p class="text-neutral-700 mb-4">Jadilah yang pertama berbagi pengalaman</p>
+                <a href="testimonial-qna.php" class="btn-modern-green primary with-icon">
+                    <i class="fas fa-pen me-2"></i>Buat Testimoni Pertama
+                </a>
             </div>
         </div>
-    </section>
-
-    <!-- CTA WhatsApp -->
-    <section id="cta" class="py-5 bg-warning text-dark text-center">
-        <div class="container">
-            <h2 class="mb-3 fw-bold">Siap Berangkat Umroh?</h2>
-            <p class="mb-4">Hubungi kami sekarang untuk konsultasi gratis!</p>
-            <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $whatsapp); ?>?text=Halo%20ALFARUQ%20TEAM,%20saya%20ingin%20konsultasi%20paket%20umroh" class="btn btn-success btn-lg rounded-pill px-4" target="_blank">Chat WhatsApp</a>
-        </div>
-    </section>
-
-    <?php include 'views/footer.php'; ?>
-
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS untuk Countdown -->
-    <script>
-        <?php if ($nearestSchedule): ?>
-        const targetDate = new Date('<?php echo $nearestSchedule['departure_date']; ?>').getTime();
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-            if (distance > 0) {
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                document.getElementById('days').innerText = days.toString().padStart(2, '0');
-                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
-                document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
-                document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
-            }
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
         <?php endif; ?>
-    </script>
+    </div>
+</section>
+
+<!-- ============================================
+    TESTIMONIAL FORM MODERN
+============================================ -->
+<section id="testimonial-form" class="py-5 bg-green-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="pe-lg-4">
+                    <h2 class="text-green-gradient mb-3">Bagikan Pengalaman Anda</h2>
+                    <p class="text-neutral-700 mb-4">
+                        Ceritakan pengalaman ibadah umroh Anda bersama ALFARUQ TEAM. 
+                        Testimoni Anda sangat berarti bagi kami dan calon jamaah lainnya.
+                    </p>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-box-small bg-green-100 text-green-700 me-3">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-green-800 mb-0">Data Terjamin Aman</h6>
+                            <small class="text-neutral-600">Informasi pribadi dijaga kerahasiaannya</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box-small bg-green-100 text-green-700 me-3">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-green-800 mb-0">Proses Cepat & Mudah</h6>
+                            <small class="text-neutral-600">Hanya 5 menit untuk mengisi form</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-7">
+                <div class="card-modern-green">
+                    <div class="card-modern-green-body">
+                        <h4 class="card-modern-green-title mb-4">Mulai Testimoni Anda</h4>
+                        
+                        <?php echo $message; ?>
+                        
+                        <form method="POST" action="" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label-modern">
+                                    <i class="fas fa-user text-green-600 me-2"></i>Nama Lengkap
+                                </label>
+                                <input type="text" class="form-control-modern" id="name" name="name" 
+                                       placeholder="Masukkan nama lengkap Anda" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="email" class="form-label-modern">
+                                    <i class="fas fa-envelope text-green-600 me-2"></i>Email
+                                </label>
+                                <input type="email" class="form-control-modern" id="email" name="email" 
+                                       placeholder="email@contoh.com" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-star text-green-600 me-2"></i>Rating Pengalaman
+                                </label>
+                                <div class="rating-stars-modern">
+                                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                                    <input type="radio" id="star<?php echo $i; ?>" name="rating" value="<?php echo $i; ?>" 
+                                           class="d-none" required>
+                                    <label for="star<?php echo $i; ?>" class="star-label">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                    <?php endfor; ?>
+                                </div>
+                                <small class="text-neutral-600 mt-2 d-block">
+                                    Klik bintang untuk memberikan rating (1-5)
+                                </small>
+                            </div>
+                            
+                            <div class="col-12">
+                                <button type="submit" name="submit_testimonial" 
+                                        class="btn-modern-green primary w-100 with-icon">
+                                    <i class="fas fa-paper-plane me-2"></i>Lanjutkan ke Form Lengkap
+                                </button>
+                            </div>
+                            
+                            <div class="col-12">
+                                <small class="text-neutral-600">
+                                    <i class="fas fa-info-circle text-green-600 me-1"></i>
+                                    Anda akan diarahkan ke halaman form testimoni lengkap setelah mengisi data dasar.
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+    MODERN GALLERY SECTION DENGAN KONTRAYS BAIK
+============================================ -->
+<section id="gallery" class="py-5 bg-green-50">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Galeri Perjalanan</h2>
+            <p class="lead text-neutral-700 mb-0">Momen-momen indah dari perjalanan ibadah bersama jamaah kami</p>
+        </div>
+        
+        <?php if (!empty($galleries)): ?>
+        <!-- Gallery Grid -->
+        <div class="row g-3">
+            <?php foreach ($galleries as $index => $gallery): ?>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="gallery-item-modern-light">
+                    <img src="<?php echo htmlspecialchars($gallery['image']); ?>" 
+                         class="gallery-img-modern" 
+                         alt="<?php echo htmlspecialchars($gallery['title']); ?>"
+                         loading="lazy"
+                         data-bs-toggle="modal" 
+                         data-bs-target="#galleryModal"
+                         data-bs-image="<?php echo htmlspecialchars($gallery['image']); ?>"
+                         data-bs-title="<?php echo htmlspecialchars($gallery['title']); ?>"
+                         data-bs-description="<?php echo htmlspecialchars($gallery['description']); ?>">
+                    
+                    <div class="gallery-overlay-modern-light">
+                        <div class="gallery-info-modern">
+                            <h6 class="text-white mb-1"><?php echo htmlspecialchars($gallery['title']); ?></h6>
+                            <small class="text-white opacity-75">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <?php echo htmlspecialchars($gallery['destination'] ?? 'Umroh'); ?>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <!-- View All Button -->
+        <div class="text-center mt-5">
+            <a href="gallery.php" class="btn-modern-green outline-green with-icon">
+                <i class="fas fa-images me-2"></i>Lihat Semua Galeri
+            </a>
+        </div>
+        <?php else: ?>
+        <div class="text-center py-5">
+            <div class="empty-state-modern">
+                <i class="fas fa-image text-green-300" style="font-size: 4rem;"></i>
+                <h5 class="mt-3 text-green-800">Belum ada galeri</h5>
+                <p class="text-neutral-700">Galeri perjalanan akan segera tersedia</p>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- ============================================
+    MODERN PARTNERS SECTION
+============================================ -->
+<section id="partners" class="py-5 bg-green-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="text-green-gradient mb-3">Mitra Terpercaya</h2>
+            <p class="lead text-neutral-700 mb-0">Bekerjasama dengan institusi dan perusahaan terkemuka</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <?php
+            $partners = [
+                ['name' => 'Kemenag', 'image' => 'assets/img/KEMENAG.png', 'desc' => 'Kementerian Agama RI'],
+                ['name' => '5 PASTI UMRAH', 'image' => 'assets/img/5pasti.png', 'desc' => 'Travel Partner'],
+                ['name' => 'SISKOPATUH', 'image' => 'assets/img/SISKOPATUH.png', 'desc' => 'Sistem Komputerisasi Patuh'],
+                ['name' => 'ASPHIRASI', 'image' => 'assets/img/LOGO ASPHIRASI.png', 'desc' => 'Asosiasi Penyedia Haji & Umroh'],
+                ['name' => 'Lion Air', 'image' => 'assets/img/lionair.png', 'desc' => 'Maskapai Penerbangan'],
+                ['name' => 'Batik Air', 'image' => 'assets/img/batik-air.png', 'desc' => 'Maskapai Penerbangan'],
+                ['name' => 'Bank BSI', 'image' => 'assets/img/logo-bsi.png', 'desc' => 'Bank Syariah Indonesia'],
+                ['name' => 'Bank BCA', 'image' => 'assets/img/logo-bca.png', 'desc' => 'Bank Central Asia'],
+            ];
+            
+            foreach ($partners as $partner): 
+            ?>
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="partner-card-modern">
+                    <div class="partner-logo-modern">
+                        <img src="<?php echo htmlspecialchars($partner['image']); ?>" 
+                             alt="<?php echo htmlspecialchars($partner['name']); ?>"
+                             loading="lazy">
+                    </div>
+                    <div class="partner-info-modern">
+                        <h6 class="text-green-900 mb-1"><?php echo htmlspecialchars($partner['name']); ?></h6>
+                        <small class="text-neutral-600"><?php echo htmlspecialchars($partner['desc']); ?></small>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+    MODERN CTA SECTION
+============================================ -->
+<section id="cta" class="py-5 bg-green-gradient">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <h2 class="text-white mb-3">Siap Memulai Perjalanan Ibadah Anda?</h2>
+                <p class="text-white opacity-90 mb-0">
+                    Konsultasikan kebutuhan umroh Anda dengan tim profesional kami. 
+                    Dapatkan penawaran terbaik dan panduan lengkap untuk perjalanan spiritual Anda.
+                </p>
+            </div>
+            
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex flex-column flex-md-row gap-3">
+                    <?php
+                    $waNumber = preg_replace('/[^0-9]/', '', $whatsapp);
+                    $text = urlencode("Halo ALFARUQ TEAM, saya ingin konsultasi paket umroh");
+                    ?>
+                    <a href="https://wa.me/<?php echo $waNumber; ?>?text=<?php echo $text; ?>" 
+                       class="btn-modern-green accent with-icon" target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                    </a>
+                    <a href="contact.php" class="btn-modern-green outline text-white border-white">
+                        <i class="fas fa-phone-alt me-2"></i>Hubungi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+    MODERN FOOTER
+============================================ -->
+<footer class="footer-modern-green">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Brand Column -->
+            <div class="col-lg-4 mb-4">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="assets/img/logo.svg" alt="Logo" width="60" class="me-3">
+                    <div>
+                        <h5 class="text-white mb-0">ALFARUQ TEAM</h5>
+                        <small class="text-white opacity-75">Travel Umroh Terpercaya</small>
+                    </div>
+                </div>
+                
+                <p class="text-white opacity-75 mb-4">
+                    <?php echo htmlspecialchars($tagline1); ?> - 
+                    <?php echo htmlspecialchars($tagline2); ?>
+                </p>
+                
+                <div class="social-links-modern">
+                    <a href="#" class="social-link-modern" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link-modern" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link-modern" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://wa.me/<?php echo $waNumber; ?>" class="social-link-modern" title="WhatsApp" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h6 class="text-white mb-3">Navigasi</h6>
+                <ul class="footer-links-modern">
+                    <li><a href="index.php"><i class="fas fa-chevron-right me-2"></i>Home</a></li>
+                    <li><a href="about.php"><i class="fas fa-chevron-right me-2"></i>Tentang Kami</a></li>
+                    <li><a href="packages.php"><i class="fas fa-chevron-right me-2"></i>Paket Umroh</a></li>
+                    <li><a href="gallery.php"><i class="fas fa-chevron-right me-2"></i>Galeri</a></li>
+                    <li><a href="contact.php"><i class="fas fa-chevron-right me-2"></i>Kontak</a></li>
+                </ul>
+            </div>
+            
+            <!-- Legal -->
+            <div class="col-lg-3 col-md-4 mb-4">
+                <h6 class="text-white mb-3">Legalitas</h6>
+                <div class="legal-info-modern">
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-file-certificate text-accent-500 mt-1 me-3"></i>
+                        <div>
+                            <p class="text-white opacity-90 mb-0">PPIU No: SK PPIU NO.24022300153650007</p>
+                            <small class="text-white opacity-75">Izin resmi Kementerian Agama</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-shield-alt text-accent-500 mt-1 me-3"></i>
+                        <div>
+                            <p class="text-white opacity-90 mb-0">Terdaftar & Diawasi</p>
+                            <small class="text-white opacity-75">SISKOPATUH & ASPHIRASI</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-lg-3 col-md-4 mb-4">
+                <h6 class="text-white mb-3">Kontak Kami</h6>
+                <ul class="contact-info-modern">
+                    <li class="d-flex align-items-start mb-3">
+                        <i class="fas fa-map-marker-alt text-accent-500 mt-1 me-3"></i>
+                        <div>
+                            <p class="text-white opacity-90 mb-0">Ruko Bintan Center No. 56</p>
+                            <small class="text-white opacity-75">Tanjungpinang, Kepulauan Riau</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start mb-3">
+                        <i class="fas fa-phone text-accent-500 mt-1 me-3"></i>
+                        <div>
+                            <p class="text-white opacity-90 mb-0"><?php echo htmlspecialchars($whatsapp); ?></p>
+                            <small class="text-white opacity-75">Admin 1: +62 812-6630-3236</small>
+                        </div>
+                    </li>
+                    <li class="d-flex align-items-start">
+                        <i class="fas fa-envelope text-accent-500 mt-1 me-3"></i>
+                        <div>
+                            <p class="text-white opacity-90 mb-0">alfaruq5619@gmail.com</p>
+                            <small class="text-white opacity-75">Email resmi perusahaan</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <hr class="border-white opacity-25 my-4">
+        
+        <!-- Copyright -->
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <p class="text-white opacity-75 mb-0">
+                    &copy; <?php echo date('Y'); ?> PT. ALFARUQ ANUGERAH UTAMA. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <small class="text-white opacity-50">
+                    Made with <i class="fas fa-heart text-red-400"></i> for the ummah
+                </small>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================
+    GALLERY MODAL
+============================================ -->
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close bg-white rounded-circle p-2" 
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="" class="img-fluid rounded mb-3" id="modalGalleryImage" alt="">
+                <h5 id="modalGalleryTitle" class="text-green-900"></h5>
+                <p id="modalGalleryDescription" class="text-neutral-700 mb-0"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+    FLOATING WHATSAPP BUTTON
+============================================ -->
+<a href="https://wa.me/<?php echo $waNumber; ?>?text=<?php echo $text; ?>" 
+   class="whatsapp-float-modern" target="_blank" title="Chat WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+    <span class="whatsapp-pulse"></span>
+</a>
+
+<!-- ============================================
+    BACK TO TOP BUTTON
+============================================ -->
+<button class="back-to-top-modern" id="backToTop" title="Kembali ke atas">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- ============================================
+    SCRIPTS
+============================================ -->
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery (optional for animations) -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Modern Green Theme JS -->
+<script src="assets/js/modern-green.js"></script>
+
+<!-- Responsive JS -->
+<script src="assets/js/responsive.js"></script>
+
+<!-- Custom Scripts for this page -->
+<script>
+// DOM Ready Function
+$(document).ready(function() {
+    // Counter Animation
+    $('.counter').each(function() {
+        var $this = $(this);
+        var countTo = $this.attr('data-count');
+        
+        $({ countNum: 0 }).animate({
+            countNum: countTo
+        }, {
+            duration: 2000,
+            easing: 'swing',
+            step: function() {
+                $this.text(Math.floor(this.countNum));
+            },
+            complete: function() {
+                $this.text(this.countNum);
+            }
+        });
+    });
+    
+    // Rating Stars Interaction
+    $('.star-label').click(function() {
+        var rating = $(this).attr('for').replace('star', '');
+        $('input[name="rating"]').val(rating);
+        
+        // Update stars display
+        $('.star-label i').removeClass('fas text-warning').addClass('far text-muted');
+        $(this).prevAll('.star-label').addBack().find('i')
+            .removeClass('far text-muted').addClass('fas text-warning');
+    });
+    
+    // Gallery Modal
+    $('#galleryModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var image = button.data('bs-image');
+        var title = button.data('bs-title');
+        var description = button.data('bs-description');
+        
+        var modal = $(this);
+        modal.find('#modalGalleryImage').attr('src', image);
+        modal.find('#modalGalleryTitle').text(title);
+        modal.find('#modalGalleryDescription').text(description);
+    });
+    
+    // Back to Top Button
+    $('#backToTop').click(function() {
+        $('html, body').animate({ scrollTop: 0 }, 500);
+    });
+    
+    // Show/Hide Back to Top
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 300) {
+            $('#backToTop').fadeIn();
+        } else {
+            $('#backToTop').fadeOut();
+        }
+    });
+    
+    // Navbar scroll effect
+    $(window).scroll(function() {
+        if ($(this).scrollTop() > 50) {
+            $('.navbar-modern-green').addClass('scrolled');
+        } else {
+            $('.navbar-modern-green').removeClass('scrolled');
+        }
+    });
+    
+    // Popup Message
+    <?php if ($popupMessage): ?>
+    setTimeout(function() {
+        alert("<?php echo addslashes($popupMessage); ?>");
+    }, 500);
+    <?php endif; ?>
+});
+
+// WhatsApp Tracking
+document.querySelectorAll('a[href*="whatsapp"]').forEach(function(link) {
+    link.addEventListener('click', function() {
+        // You can add analytics tracking here
+        console.log('WhatsApp clicked:', this.href);
+    });
+});
+</script>
+
+<!-- Additional CSS for this page -->
+<style>
+/* Rating Stars */
+.rating-stars-modern {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.star-label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--neutral-300);
+    transition: all var(--transition-fast);
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label {
+    color: var(--accent-400) !important;
+}
+
+input[name="rating"]:checked ~ .star-label {
+    color: var(--accent-500) !important;
+}
+
+/* Gallery Item */
+.gallery-item-modern {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+}
+
+.gallery-item-modern:hover {
+    transform: translateY(-5px);
+}
+
+.gallery-img-modern {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.gallery-item-modern:hover .gallery-img-modern {
+    transform: scale(1.05);
+}
+
+.gallery-overlay-modern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item-modern:hover .gallery-overlay-modern {
+    opacity: 1;
+}
+
+/* Icon Box */
+.icon-box-modern {
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.icon-box-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-box-modern i {
+    font-size: 3rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* Partner Card */
+.partner-card-modern {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--neutral-200);
+}
+
+.partner-card-modern:hover {
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.partner-logo-modern {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.partner-logo-modern img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* WhatsApp Float */
+.whatsapp-float-modern {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.whatsapp-float-modern:hover {
+    transform: scale(1.1);
+    color: white;
+    background: #128C7E;
+}
+
+.whatsapp-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #25D366;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    z-index: -1;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Back to Top */
+.back-to-top-modern {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-green);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.back-to-top-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Empty State */
+.empty-state-modern {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+/* Social Links */
+.social-links-modern {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-link-modern {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.social-link-modern:hover {
+    background: var(--green-500);
+    transform: translateY(-3px);
+    color: white;
+}
+
+/* Footer Links */
+.footer-links-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links-modern li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links-modern a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.footer-links-modern a:hover {
+    color: white;
+    padding-left: 0.5rem;
+}
+
+/* Contact Info */
+.contact-info-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-info-modern li {
+    margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-content-modern h1 {
+        font-size: 2rem;
+    }
+    
+    .counter {
+        font-size: 1.5rem;
+    }
+    
+    .whatsapp-float-modern {
+        bottom: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .back-to-top-modern {
+        bottom: 5rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+}
+</style>
+
 </body>
 </html>

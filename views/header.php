@@ -1,27 +1,95 @@
+<?php
+// views/header.php - File header untuk navbar dan meta tags
+?>
 <!DOCTYPE html>
 <html lang="id">
+<link rel="preload" href="assets/css/modern-green.css" as="style">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>   
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALFARUQ TEAM</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/main.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ALFARUQ TEAM - Travel Umroh Terpercaya</title>
+    <meta name="description" content="ALFARUQ TEAM, travel umroh harga hemat dan fasilitas terhormat." />
+    <meta name="author" content="ALFARUQ TEAM" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover, user-scalable=yes">
+    <!-- Bootstrap 5 CSS - Framework untuk styling responsif -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Responsive Enhancements JS - Day 1 Improvement -->
+    <script src="assets/js/responsive.js" defer></script>
+    
+    <style>
+    <?php include 'assets/css/critical.css'; ?></style>
+
+    <!-- jQuery untuk compatibility (optional) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" 
+            integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" 
+            crossorigin="anonymous" defer></script>
+    <script src="assets/js/modern-green.js" defer></script>
+    <!-- Google Fonts: Poppins untuk body, Montserrat untuk heading -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+    <!-- Custom Stylesheet - Styling khusus untuk brand ALFARUQ TEAM -->
+    <link rel="stylesheet" href="assets/css/main.css" />
+    
+    <!-- Responsive Fixes CSS - Day 1 Improvement -->
+    <link rel="stylesheet" href="assets/css/modern-green.css">
+
+    <!-- Animate.css untuk animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Font Awesome untuk icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="assets/img/favicon/site.webmanifest">
+    <meta name="theme-color" content="#33a661">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">ALFARUQ TEAM</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="packages.php">Paket</a></li>
-                    <li class="nav-item"><a class="nav-link" href="gallery.php">Galeri</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.php">Kontak</a></li>
-                </ul>
-            </div>
+<body class="modern-green">
+
+<!-- Navbar - Awal dengan background putih, akan hijau solid saat scroll -->
+<!-- ID 'mainNavbar' digunakan untuk manipulasi JS saat scroll -->
+<nav id="mainNavbar" class="navbar navbar-expand-lg navbar-light-cstm sticky-top shadow-sm">
+    <div class="container">
+        <!-- Brand/Logo navbar dengan gambar logo dan teks -->
+        <a class="navbar-brand d-flex align-items-center" href="index.php">
+            <!-- Gambar logo SVG (ganti path jika perlu) -->
+            <img src="assets/img/logo.svg" alt="Logo Alfaruq" width="60" height="60" class="me-2">
+            <!-- Teks brand dengan class khusus untuk styling warna -->
+            <span class="fw-bold fs-4 mt-1 navbar-brand-text">ALFARUQ TEAM</span>
+        </a>
+        <!-- Tombol toggle untuk mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Menu navbar -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <!-- Link menu dengan class active untuk halaman saat ini -->
+                <li class="nav-item"><a class="nav-link active" href="index.php">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="about.php">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="packages.php">Packages</a></li>
+                <!-- Dropdown menu untuk halaman tambahan -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Pages
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pagesDropdown">
+                        <li><a class="dropdown-item" href="contact.php">Contact</a></li>
+                        <li><a class="dropdown-item" href="gallery.php">Gallery</a></li>
+                        <li><a class="dropdown-item" href="register.php">Register</a></li>
+                    </ul>
+                </li>
+                <!-- Tombol "Book Now" dengan outline hijau di awal, akan berubah saat scroll -->
+                <li class="nav-item ms-lg-3">
+                    <a href=http://localhost/alfaruq-umroh/package-detail.php?id=1 class="btn btn-outline-success rounded-pill px-4 py-2">Book Now</a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
