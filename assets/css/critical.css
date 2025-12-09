@@ -1,0 +1,21 @@
+/* assets/css/critical.css */
+/* CSS yang critical untuk above-the-fold content */
+.navbar-modern-green,
+.hero-overlay-modern,
+#packages .container,
+.card-modern-green-light {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Skeleton loading untuk cards */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

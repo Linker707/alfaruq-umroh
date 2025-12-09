@@ -3,20 +3,52 @@
 ?>
 <!DOCTYPE html>
 <html lang="id">
+<link rel="preload" href="assets/css/modern-green.css" as="style">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>   
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ALFARUQ TEAM - Travel Umroh Terpercaya</title>
     <meta name="description" content="ALFARUQ TEAM, travel umroh harga hemat dan fasilitas terhormat." />
     <meta name="author" content="ALFARUQ TEAM" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover, user-scalable=yes">
     <!-- Bootstrap 5 CSS - Framework untuk styling responsif -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Responsive Enhancements JS - Day 1 Improvement -->
+    <script src="assets/js/responsive.js" defer></script>
+    
+    <style>
+    <?php include 'assets/css/critical.css'; ?></style>
+
+    <!-- jQuery untuk compatibility (optional) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" 
+            integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" 
+            crossorigin="anonymous" defer></script>
+    <script src="assets/js/modern-green.js" defer></script>
     <!-- Google Fonts: Poppins untuk body, Montserrat untuk heading -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
     <!-- Custom Stylesheet - Styling khusus untuk brand ALFARUQ TEAM -->
     <link rel="stylesheet" href="assets/css/main.css" />
+    
+    <!-- Responsive Fixes CSS - Day 1 Improvement -->
+    <link rel="stylesheet" href="assets/css/modern-green.css">
+
+    <!-- Animate.css untuk animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Font Awesome untuk icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="assets/img/favicon/site.webmanifest">
+    <meta name="theme-color" content="#33a661">
 </head>
-<body>
+<body class="modern-green">
 
 <!-- Navbar - Awal dengan background putih, akan hijau solid saat scroll -->
 <!-- ID 'mainNavbar' digunakan untuk manipulasi JS saat scroll -->
