@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 06:44 AM
+-- Generation Time: Dec 09, 2025 at 10:13 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -284,13 +284,16 @@ INSERT INTO `testimonials` (`id`, `name`, `email`, `message`, `rating`, `image`,
 -- Indexes for table `galleries`
 --
 ALTER TABLE `galleries`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_active_type` (`is_active`,`type`);
 
 --
 -- Indexes for table `packages`
 --
 ALTER TABLE `packages`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_active` (`is_active`),
+  ADD KEY `idx_created` (`created_at`);
 
 --
 -- Indexes for table `schedules`
@@ -308,7 +311,8 @@ ALTER TABLE `settings`
 -- Indexes for table `testimonials`
 --
 ALTER TABLE `testimonials`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_approved_created` (`is_approved`,`created_at`);
 
 --
 -- AUTO_INCREMENT for dumped tables
