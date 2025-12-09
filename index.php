@@ -19,25 +19,10 @@ $stmtSettings->execute();
 $settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR);
 
 // Ambil paket unggulan aktif
-$queryPackages = "SELECT id, name, description, price, duration, image, facilities FROM packages WHERE is_active = 1 ORDER BY id DESC LIMIT 3";
+$queryPackages = "SELECT * FROM packages WHERE is_active = 1 ORDER BY id DESC LIMIT 3";
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute();
 $packages = $stmtPackages->fetchAll();
-// Function untuk optimize image loading
-function getOptimizedImage($imagePath) {
-    // Cek jika file ada
-    if (!file_exists($imagePath)) {
-        return 'assets/img/placeholder.jpg';
-    }
-    
-    // Jika file terlalu besar (>500KB), gunakan placeholder dulu
-    $fileSize = filesize($imagePath);
-    if ($fileSize > 500000) { // >500KB
-        return 'assets/img/placeholder.jpg';
-    }
-    
-    return $imagePath;
-}
 
 // Ambil semua testimoni yang approved
 $queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC";
@@ -90,8 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="ALFARUQ TEAM - Travel Umroh Terpercaya">
     <meta property="og:description" content="<?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?>">
-    <meta property="og:image" content="assets/img/gambar 1.jpeg">
-    <!-- <meta property="og:image" content="assets/img/og-image.jpg"> -->
+    <meta property="og:image" content="assets/img/og-image.jpg">
     <meta property="og:url" content="https://alfaruqteam.com">
     <meta property="og:type" content="website">
     
@@ -99,8 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ALFARUQ TEAM - Travel Umroh Terpercaya">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?>">
-    <!-- <meta name="twitter:image" content="assets/img/og-image.jpg"> -->
-     <meta name="twitter:image" content="assets/img/gambar 1.jpeg">
+    <meta name="twitter:image" content="assets/img/og-image.jpg">
     
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
@@ -324,10 +307,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
                     </div>
                     <?php endif; ?>
                     
-                    <img src="assets/img/placeholder.jpg" 
-                        data-src="<?php echo htmlspecialchars($package['image']); ?>" 
-                        class="card-img-modern lazy-load"
-                        alt="Paket <?php echo htmlspecialchars($package['name']); ?>">
+                    <img src="<?php echo htmlspecialchars($package['image']); ?>" 
+                         class="card-img-modern" 
+                         alt="Paket <?php echo htmlspecialchars($package['name']); ?>"
+                         loading="lazy">
                     
                     <div class="card-body-modern">
                         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -421,7 +404,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
             </a>
         </div>
     </div>
-</section>  
+</section>
 
 <!-- ============================================
     DECORATIVE DIVIDER
@@ -799,25 +782,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])
                     <img src="assets/img/logo.svg" alt="Logo" width="60" class="me-3">
                     <div>
                         <h5 class="text-white mb-0">ALFARUQ TEAM</h5>
-                        <small class="text-white opacity-75">Harga Hemat Fasilitas Terhormat</small>
+                        <small class="text-white opacity-75">Travel Umroh Terpercaya</small>
                     </div>
                 </div>
                 
-                <!-- <p class="text-white opacity-75 mb-4">
+                <p class="text-white opacity-75 mb-4">
                     <?php echo htmlspecialchars($tagline1); ?> - 
                     <?php echo htmlspecialchars($tagline2); ?>
-                </p> -->
+                </p>
                 
                 <div class="social-links-modern">
-                    <!-- <a href="#" class="social-link-modern" title="Facebook">
+                    <a href="#" class="social-link-modern" title="Facebook">
                         <i class="fab fa-facebook-f"></i>
-                    </a> -->
-                    <a href="https://www.instagram.com/alfaruq.team/" class="social-link-modern" title="Instagram">
+                    </a>
+                    <a href="#" class="social-link-modern" title="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    
-                    <a href="https://www.tiktok.com/@alfaruqteam" class="social-link-modern" title="Tiktok">
-                        <i class="fab fa-tiktok"></i>
+                    <a href="#" class="social-link-modern" title="YouTube">
+                        <i class="fab fa-youtube"></i>
                     </a>
                     <a href="https://wa.me/<?php echo $waNumber; ?>" class="social-link-modern" title="WhatsApp" target="_blank">
                         <i class="fab fa-whatsapp"></i>
@@ -1002,37 +984,6 @@ $(document).ready(function() {
         modal.find('#modalGalleryTitle').text(title);
         modal.find('#modalGalleryDescription').text(description);
     });
-
-    document.addEventListener('DOMContentLoaded', function() {
-    const loadMoreBtn = document.getElementById('loadMoreTestimonials');
-    
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Simulasi loading
-            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Memuat...';
-            this.disabled = true;
-            
-            // Setelah 1.5 detik, redirect ke halaman testimonial lengkap
-            setTimeout(() => {
-                window.location.href = 'testimonial-qna.php';
-            }, 1500);
-        });
-    }
-    
-    // Hover effect untuk testimonial cards
-    const testimonialCards = document.querySelectorAll('.testimonial-card-modern-gradient');
-    testimonialCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(-5px)';
-        });
-    });
-});
     
     // Back to Top Button
     $('#backToTop').click(function() {
