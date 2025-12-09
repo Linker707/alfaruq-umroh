@@ -55,7 +55,7 @@
                 </li>
                 <!-- Tombol "Book Now" dengan outline hijau di awal, akan berubah saat scroll -->
                 <li class="nav-item ms-lg-3">
-                    <a href="contact.php" class="btn btn-outline-success rounded-pill px-4 py-2">Book Now</a>
+                    <a href=http://localhost/alfaruq-umroh/package-detail.php?id=1 class="btn btn-outline-success rounded-pill px-4 py-2">Book Now</a>
                 </li>
             </ul>
         </div>

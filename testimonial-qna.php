@@ -31,11 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_qna'])) {
         }
     }
     
+    // Validasi tambahan untuk tanggal keberangkatan
+    $departureDay = trim($_POST['departure_day'] ?? '');
+    $departureMonth = trim($_POST['departure_month'] ?? '');
+    $departureYear = trim($_POST['departure_year'] ?? '');
+    if (empty($departureDay) || empty($departureMonth) || empty($departureYear)) {
+        $valid = false;
+    }
+    
     if (!$valid) {
-        $message = 'Semua pertanyaan wajib diisi!';
+        $message = 'Semua pertanyaan dan tanggal keberangkatan wajib diisi!';
     } else {
-        // Simpan ke DB: Pisah ke kolom q1-q23, message dari q23, image default, is_approved = 1
-        $queryInsert = "INSERT INTO testimonials (name, email, rating, message, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, image, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'assets/img/comment-photo.jpg', 1)";
+        // Gabungkan tanggal dari dropdown menjadi YYYY-MM-DD
+        $departureDate = $departureYear . '-' . $departureMonth . '-' . $departureDay;
+        
+        // Simpan ke DB: Tambah departure_date
+        $queryInsert = "INSERT INTO testimonials (name, email, rating, message, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, departure_date, image, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'assets/img/comment-photo.jpg', 1)";
         $stmtInsert = $pdo->prepare($queryInsert);
         if ($stmtInsert->execute([
             $testimonial['name'], $testimonial['email'], $testimonial['rating'], $qnaAnswers['q23'],  // message dari q23
@@ -43,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_qna'])) {
             $qnaAnswers['q6'], $qnaAnswers['q7'], $qnaAnswers['q8'], $qnaAnswers['q9'], $qnaAnswers['q10'],
             $qnaAnswers['q11'], $qnaAnswers['q12'], $qnaAnswers['q13'], $qnaAnswers['q14'], $qnaAnswers['q15'],
             $qnaAnswers['q16'], $qnaAnswers['q17'], $qnaAnswers['q18'], $qnaAnswers['q19'], $qnaAnswers['q20'],
-            $qnaAnswers['q21'], $qnaAnswers['q22'], $qnaAnswers['q23']
+            $qnaAnswers['q21'], $qnaAnswers['q22'], $qnaAnswers['q23'], $departureDate  // Tambah departure_date
         ])) {
             // Set pesan sukses ke session dan redirect ke index.php
             $_SESSION['success_message'] = 'Jazakillah Khairan Katsiiran Telah Mengisi Kuisioner';
@@ -100,6 +111,45 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                         <div class="mb-3">
                             <label class="form-label fw-bold text-success">3. Dengan siapa Anda berangkat Umroh?</label>
                             <input type="text" class="form-control rounded-pill" name="q3" placeholder="Contoh: Sendiri, keluarga, rombongan kantor, dll" style="border: 2px solid #33a661;" required>
+                        </div>
+                        <!-- Tambahan: Tanggal Keberangkatan -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-success">3a. Tanggal Keberangkatan</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select class="form-select rounded-pill" name="departure_day" style="border: 2px solid #33a661;" required>
+                                        <option value="">Tanggal</option>
+                                        <?php for ($i = 1; $i <= 31; $i++): ?>
+                                            <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select rounded-pill" name="departure_month" style="border: 2px solid #33a661;" required>
+                                        <option value="">Bulan</option>
+                                        <option value="01">Januari</option>
+                                        <option value="02">Februari</option>
+                                        <option value="03">Maret</option>
+                                        <option value="04">April</option>
+                                        <option value="05">Mei</option>
+                                        <option value="06">Juni</option>
+                                        <option value="07">Juli</option>
+                                        <option value="08">Agustus</option>
+                                        <option value="09">September</option>
+                                        <option value="10">Oktober</option>
+                                        <option value="11">November</option>
+                                        <option value="12">Desember</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select rounded-pill" name="departure_year" style="border: 2px solid #33a661;" required>
+                                        <option value="">Tahun</option>
+                                        <?php for ($i = 2020; $i <= 2030; $i++): ?>
+                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold text-success">4. Darimana Anda mengetahui Alfaruq Team?</label>
