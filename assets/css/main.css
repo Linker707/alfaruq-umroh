@@ -1,191 +1,1321 @@
-/* Font Families - Mengatur font global untuk konsistensi brand */
-body, button, input, select, textarea {
-    font-family: 'Poppins', sans-serif; /* Font utama untuk teks body */
-}
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif; /* Font untuk heading */
+/* =================================================================
+   MAIN STYLES - ALFARUQ TEAM (COMBINED VERSION)
+   ================================================================= */
+
+/* ============================================
+   1. MODERN COLOR SYSTEM (GREEN DOMINANT)
+   ============================================ */
+
+:root {
+    /* ========== PRIMARY GREEN PALETTE ========== */
+    --green-50: #E8F5E9;    /* Lightest green untuk background sections */
+    --green-100: #C8E6C9;   /* Light green untuk hover states */
+    --green-200: #A5D6A7;   /* Medium light green */
+    --green-300: #81C784;   /* Medium green untuk borders */
+    --green-400: #66BB6A;   /* Primary green - lebih soft */
+    --green-500: #4CAF50;   /* Brand green - utama */
+    --green-600: #43A047;   /* Darker green untuk hover */
+    --green-700: #388E3C;   /* Dark green untuk text/buttons */
+    --green-800: #2E7D32;   /* Darkest green untuk headings */
+    --green-900: #1B5E20;   /* Very dark green untuk strong accents */
+    
+    /* ========== ACCENT COLORS ========== */
+    --accent-50: #FFFDE7;   /* Light yellow */
+    --accent-100: #FFF9C4;  /* Light accent */
+    --accent-200: #FFF59D;  /* Medium light */
+    --accent-300: #FFF176;  /* Medium yellow */
+    --accent-400: #FFEE58;  /* Primary accent */
+    --accent-500: #FFEB3B;  /* Brand yellow */
+    --accent-600: #FDD835;  /* Darker yellow */
+    --accent-700: #FBC02D;  /* Gold-ish untuk premium feel */
+    --accent-800: #F9A825;  /* Dark gold */
+    --accent-900: #F57F17;  /* Orange-yellow untuk highlights */
+    
+    /* ========== NEUTRAL COLORS ========== */
+    --neutral-50: #FAFAFA;   /* Background light */
+    --neutral-100: #F5F5F5;  /* Card background */
+    --neutral-200: #EEEEEE;  /* Borders light */
+    --neutral-300: #E0E0E0;  /* Borders medium */
+    --neutral-400: #BDBDBD;  /* Text disabled */
+    --neutral-500: #9E9E9E;  /* Text secondary */
+    --neutral-600: #757575;  /* Text primary */
+    --neutral-700: #616161;  /* Text dark - UNTUK BODY TEXT */
+    --neutral-800: #424242;  /* Headings secondary */
+    --neutral-900: #212121;  /* Headings dark */
+    
+    /* ========== GRADIENTS MODERN ========== */
+    --gradient-green: linear-gradient(135deg, var(--green-400) 0%, var(--green-700) 100%);
+    --gradient-green-light: linear-gradient(135deg, var(--green-300) 0%, var(--green-500) 100%);
+    --gradient-green-dark: linear-gradient(135deg, var(--green-600) 0%, var(--green-900) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-700) 100%);
+    --gradient-green-accent: linear-gradient(135deg, var(--green-500) 0%, var(--accent-500) 100%);
+    
+    /* ========== SHADOWS MODERN ========== */
+    --shadow-xs: 0 1px 3px rgba(76, 175, 80, 0.05);
+    --shadow-sm: 0 2px 8px rgba(76, 175, 80, 0.08);
+    --shadow-md: 0 4px 16px rgba(76, 175, 80, 0.12);
+    --shadow-lg: 0 8px 28px rgba(76, 175, 80, 0.16);
+    --shadow-xl: 0 12px 40px rgba(76, 175, 80, 0.2);
+    --shadow-green: 0 4px 20px rgba(76, 175, 80, 0.15);
+    --shadow-accent: 0 4px 20px rgba(255, 235, 59, 0.15);
+    
+    /* ========== BORDER RADIUS MODERN ========== */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 40px;
+    --radius-circle: 50%;
+    
+    /* ========== TRANSITIONS & ANIMATIONS ========== */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+    
+    /* ========== SPACING SYSTEM ========== */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
 }
 
-/* Navbar Putih (style awal - di atas hero/slider) */
-.navbar-light-cstm {
-    background-color: #fff !important; /* Background putih solid */
-    box-shadow: 0 2px 8px rgba(22, 73, 36, 0.15); /* Shadow ringan untuk efek depth */
-    transition: all 0.3s ease; /* Transisi smooth untuk perubahan */
+/* ============================================
+   2. BASE STYLES & TYPOGRAPHY
+   ============================================ */
+
+/* Font Families */
+body, button, input, select, textarea {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-.navbar-light-cstm .navbar-nav .nav-link {
-    color: #000 !important; /* Tulisan hitam untuk kontras di putih */
-    font-weight: 600 !important; /* Semibold untuk ketebalan */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    color: var(--green-900);
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
 }
-.navbar-light-cstm .navbar-nav .nav-link:hover,
-.navbar-light-cstm .navbar-nav .nav-link.active {
-    color: #33a661 !important; /* Hover hijau cerah */
+
+h1 {
+    font-size: 2.5rem;
 }
-.navbar-light-cstm .navbar-toggler-icon {
-    /* Filter untuk membuat ikon toggle terlihat di putih */
-    filter: invert(31%) sepia(52%) saturate(962%) hue-rotate(98deg) brightness(85%) contrast(83%);
+
+h2 {
+    font-size: 2rem;
+    position: relative;
+    display: inline-block;
 }
-.navbar-light-cstm .btn-outline-success {
-    border-color: rgb(22, 73, 36); /* Outline hijau tua */
-    color: #164924; /* Tulisan hijau tua */
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--gradient-green);
+    border-radius: 2px;
+}
+
+p {
+    font-size: 1rem;
+    color: var(--neutral-700);
+    margin-bottom: var(--space-md);
+    line-height: 1.6;
+}
+
+.lead {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--neutral-800);
+}
+
+/* ============================================
+   3. NAVBAR STYLES
+   ============================================ */
+
+.navbar-modern-green {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+    box-shadow: var(--shadow-sm);
+    padding: 0.75rem 0;
+    transition: all var(--transition-normal);
+}
+
+.navbar-modern-green.scrolled {
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: var(--shadow-md);
+    padding: 0.5rem 0;
+}
+
+/* Brand */
+.navbar-modern-green .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.navbar-modern-green .navbar-brand img {
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 2px 4px rgba(76, 175, 80, 0.2));
+    transition: transform var(--transition-normal);
+}
+
+.navbar-modern-green .navbar-brand:hover img {
+    transform: scale(1.05) rotate(5deg);
+}
+
+.navbar-modern-green .navbar-brand-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+/* Nav Links */
+.navbar-modern-green .nav-link {
+    color: var(--neutral-800) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.25rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.navbar-modern-green .nav-link:hover {
+    color: var(--green-700) !important;
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.navbar-modern-green .nav-link.active {
+    color: var(--green-700) !important;
+    background: rgba(76, 175, 80, 0.1);
     font-weight: 600;
 }
-.navbar-light-cstm .btn-outline-success:hover {
-    background-color: #33a661; /* Background hijau saat hover */
-    border-color: #33a661;
-    color: #fff; /* Tulisan putih saat hover */
-}
-/* Styling untuk tulisan brand/logo di navbar putih - mengikuti warna link */
-.navbar-light-cstm .navbar-brand-text {
-    color: #000 !important; /* Tulisan hitam, sama dengan link navbar */
+
+.navbar-modern-green .nav-link.active::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 3px;
+    background: var(--gradient-green);
+    border-radius: 1.5px;
 }
 
-/* Navbar Transparan (saat scroll melewati hero) - Sekarang hijau solid seperti update Anda */
-.navbar-transparent {
-    background-color: #33a661 !important; /* Background hijau solid (bukan transparan) */
-    backdrop-filter: blur(10px); /* Efek blur untuk readability tanpa solid background */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow ringan */
-    font-weight: 600 !important;
-    color: #ffffff !important;
-}
-.navbar-transparent .navbar-nav .nav-link {
-    color: #ffffff !important; /* Tulisan putih untuk kontras di hijau */
-    font-weight: 600 !important; /* Semibold */
-}
-.navbar-transparent .navbar-nav .nav-link:hover,
-.navbar-transparent .navbar-nav .nav-link.active {
-    color: #fae314 !important; /* Hover kuning terang */
-}
-.navbar-transparent .navbar-toggler-icon {
-    filter: invert(100%); /* Ikon putih untuk kontras */
-}
-.navbar-transparent .btn-outline-success {
-    background-color: #fff !important; /* Background putih solid untuk tombol */
-    border-color: #ffffff; /* Border putih */
-    color: #164924 !important; /* Tulisan hijau tua untuk kontras */
-    font-weight: 600 !important;
-}
-.navbar-transparent .btn-outline-success:hover {
-    background-color: #fae314 !important; /* Hover kuning terang */
-    border-color: #fae314;
-    color: #164924 !important; /* Tulisan tetap kontras */
-}
-/* Styling untuk tulisan brand/logo di navbar transparan - mengikuti warna link */
-.navbar-transparent .navbar-brand-text {
-    color: #ffffff !important; /* Tulisan putih, sama dengan link navbar */
+/* Dropdown Menu */
+.navbar-modern-green .dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0;
 }
 
-/* Hero Slider - Styling untuk carousel gambar */
-header .overlay {
-    position: relative;
+.navbar-modern-green .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: var(--neutral-700);
+    transition: all var(--transition-fast);
+}
+
+.navbar-modern-green .dropdown-item:hover {
+    background-color: var(--green-50);
+    color: var(--green-700);
+}
+
+.navbar-modern-green .dropdown-item.active {
+    background-color: var(--green-100);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+/* ============================================
+   4. HERO CAROUSEL
+   ============================================ */
+
+.hero-overlay-modern {
+    background: linear-gradient(
+        to bottom,
+        rgba(27, 94, 32, 0.7) 0%,
+        rgba(46, 125, 50, 0.6) 50%,
+        rgba(76, 175, 80, 0.5) 100%
+    );
+    backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     height: 100%;
+    padding: 0 1rem;
 }
+
+.hero-overlay-modern h1,
+.hero-overlay-modern .lead,
+.hero-overlay-modern .badge,
+.hero-overlay-modern .btn-modern-green {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-overlay-modern h1 {
+    color: white !important;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: var(--space-md);
+}
+
+.hero-overlay-modern .lead {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xl);
+}
+
+/* Carousel Controls */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    /* Filter untuk membuat kontrol carousel hijau */
-    filter: invert(40%) sepia(100%) saturate(600%) hue-rotate(80deg) brightness(90%) contrast(85%);
-}
-
-/* Text shadow untuk readability di hero */
-header h1,
-header h6,
-header p {
-    text-shadow: 0 0 8px rgba(0,0,0,0.7);
-}
-
-/* Button shadow di hero */
-header .btn-success.shadow {
-    box-shadow: 0 4px 12px rgba(51,166,97,0.5);
-}
-
-/* Cards - Styling untuk paket dan testimoni */
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animasi hover */
-    border-radius: 0.75rem; /* Rounded corners */
-}
-.card:hover {
-    transform: translateY(-5px); /* Efek lift */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Buttons umum - Styling untuk tombol sukses dan warning */
-.btn-success {
-    background-color: #33a661;
-    border-color: #33a661;
-}
-.btn-success:hover {
-    background-color: #164924;
-    border-color: #164924;
-}
-.btn-warning {
-    background-color: #fae314;
-    border-color: #fae314;
-    color: #164924;
-}
-.btn-warning:hover {
-    background-color: #d5ae29;
-    border-color: #d5ae29;
-}
-
-/* Carousel gallery controls - Styling untuk kontrol galeri */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: #33a661 !important;
+    background-color: var(--green-500) !important;
     border-radius: 50% !important;
-    padding: 10px !important;
+    padding: 15px !important;
+    width: 50px !important;
+    height: 50px !important;
+    background-size: 60% !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Gallery Styles - Efek hover dan responsif untuk galeri */
-/* Efek hover pada card galeri */
-#gallery-grid .card:hover {
-    transform: scale(1.05); /* Zoom ringan */
-    box-shadow: 0 8px 25px rgba(51, 166, 97, 0.3); /* Shadow hijau untuk kontras */
-}
-#gallery-grid .card:hover .card-img-top {
-    transform: scale(1.1); /* Zoom gambar */
-}
-#gallery-grid .card:hover .card-img-overlay {
-    opacity: 1; /* Tampilkan overlay teks */
-}
-/* Button filter hover */
-#gallery-filter .btn-outline-success:hover {
-    background-color: #33a661;
-    border-color: #33a661;
-    color: #fff;
-}
-/* Responsif untuk mobile */
-@media (max-width: 768px) {
-    #gallery-grid .card-img-top {
-        height: 200px; /* Tinggi gambar lebih kecil di mobile */
-    }
-    #gallery-filter .d-flex {
-        flex-direction: column; /* Button filter vertikal di mobile */
-        align-items: center;
-    }
+.carousel-indicators button {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    border: 2px solid transparent !important;
+    margin: 0 5px !important;
 }
 
-.divider hr {
-    border: 1px solid #33a661;
+.carousel-indicators button.active {
+    background-color: var(--green-500) !important;
+    border-color: white !important;
+    transform: scale(1.2);
+}
+
+/* ============================================
+   5. BUTTON STYLES
+   ============================================ */
+
+.btn-modern-green {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none !important;
+    outline: none;
+}
+
+/* Button Sizes */
+.btn-modern-green.sm {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-modern-green.lg {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+}
+
+/* Button Variants */
+.btn-modern-green.primary {
+    background: var(--gradient-green);
+    color: white;
+    box-shadow: var(--shadow-green);
+}
+
+.btn-modern-green.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: var(--gradient-green-dark);
+}
+
+.btn-modern-green.accent {
+    background: var(--gradient-accent);
+    color: var(--neutral-900);
+    box-shadow: var(--shadow-accent);
+}
+
+.btn-modern-green.accent:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    color: var(--neutral-900);
+}
+
+.btn-modern-green.outline {
+    background: transparent;
+    border: 2px solid var(--green-400);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.btn-modern-green.outline:hover {
+    background: rgba(76, 175, 80, 0.05);
+    border-color: var(--green-600);
+    color: var(--green-800);
+    transform: translateY(-2px);
+}
+
+.btn-modern-green.outline-green {
+    background: transparent;
+    border: 2px solid var(--green-400);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.btn-modern-green.outline-green:hover {
+    background: rgba(76, 175, 80, 0.05);
+    border-color: var(--green-600);
+    color: var(--green-800);
+    transform: translateY(-2px);
+}
+
+.btn-modern-green.with-icon {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* ============================================
+   6. CARD STYLES
+   ============================================ */
+
+.card-modern-green-light {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--neutral-200);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+}
+
+.card-modern-green-light:hover {
+    transform: translateY(-8px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-img-modern {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.card-modern-green-light:hover .card-img-modern {
+    transform: scale(1.05);
+}
+
+.card-body-modern {
+    padding: var(--space-xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: var(--space-sm);
+    line-height: 1.3;
+}
+
+.card-text-modern {
+    color: var(--neutral-700);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+.card-badge-popular {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    background: var(--gradient-accent);
+    color: var(--neutral-900);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-xl);
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    z-index: 1;
+    border: 1px solid rgba(255, 235, 59, 0.3);
+}
+
+.package-price-modern {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green-900);
+}
+
+/* ============================================
+   7. TESTIMONIAL STYLES
+   ============================================ */
+
+.testimonial-clean-modern {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 2px solid var(--green-100);
+    position: relative;
+    transition: all var(--transition-normal);
+    height: 100%;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.testimonial-clean-modern:hover {
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
+}
+
+/* Quote Mark */
+.testimonial-clean-modern::before {
+    content: '"';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 4rem;
+    color: var(--green-100);
+    font-family: Georgia, serif;
+    line-height: 1;
     opacity: 0.5;
-}
-.divider i {
-    font-size: 2rem;
-    color: #33a661;
+    z-index: 0;
 }
 
-/* Efek hover untuk section partners */
-#partners .card:hover {
-    transform: scale(1.05); /* Zoom ringan */
-    box-shadow: 0 15px 40px rgba(51, 166, 97, 0.4); /* Shadow hijau lebih besar */
-}
-#partners .card:hover .card-overlay {
-    opacity: 1; /* Overlay muncul */
-}
-#partners .card:hover .card-img-top {
-    filter: none; /* Logo jadi color */
-    transform: scale(1.1); /* Zoom logo */
+/* Content */
+.testimonial-content-clean {
+    position: relative;
+    z-index: 1;
+    margin-bottom: var(--space-lg);
 }
 
-/* Fasilitas Premium – Tampilan mewah & rapat */
+.testimonial-content-clean p {
+    color: var(--neutral-800);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Rating */
+.testimonial-rating-clean {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: var(--space-md);
+}
+
+.testimonial-rating-clean i {
+    color: var(--accent-500);
+    font-size: 0.9rem;
+}
+
+.rating-badge-clean {
+    background: var(--green-50);
+    color: var(--green-800);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    border: 1px solid var(--green-200);
+}
+
+/* Author */
+.testimonial-author-clean {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--neutral-200);
+}
+
+.testimonial-author-img-clean {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--green-300);
+}
+
+.testimonial-author-info-clean h6 {
+    color: var(--green-900);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.testimonial-author-info-clean small {
+    color: var(--neutral-600);
+    font-size: 0.85rem;
+}
+
+.testimonial-date-clean {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--neutral-500);
+    font-size: 0.8rem;
+}
+
+/* Departure Info */
+.testimonial-departure-clean {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--neutral-100);
+}
+
+.testimonial-departure-clean small {
+    color: var(--green-700);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Testimonial Grid */
+.testimonial-grid-clean {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+/* ============================================
+   8. GALLERY STYLES
+   ============================================ */
+
+   /* ============================================
+   9.1 GALLERY MODERN (from index.php)
+   ============================================ */
+
+.gallery-item-modern {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+}
+
+.gallery-item-modern:hover {
+    transform: translateY(-5px);
+}
+
+.gallery-item-modern:hover .gallery-img-modern {
+    transform: scale(1.05);
+}
+
+.gallery-overlay-modern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item-modern:hover .gallery-overlay-modern {
+    opacity: 1;
+}
+
+.gallery-item-modern-light {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    border: 2px solid var(--neutral-200);
+    background: white;
+}
+
+.gallery-item-modern-light:hover {
+    transform: translateY(-5px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+}
+
+.gallery-img-modern {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.gallery-overlay-modern-light {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(27, 94, 32, 0.8));
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item-modern-light:hover .gallery-overlay-modern-light {
+    opacity: 1;
+}
+
+.gallery-info-modern {
+    color: white;
+}
+
+/* ============================================
+   9. PARTNER STYLES
+   ============================================ */
+
+.partner-card-modern {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--neutral-200);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.partner-card-modern:hover {
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.partner-logo-modern {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.partner-logo-modern img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.partner-info-modern h6 {
+    color: var(--green-900);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+/* ============================================
+   10. FORM STYLES
+   ============================================ */
+
+.form-control-modern {
+    border: 2px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    background: white;
+    color: var(--neutral-800);
+}
+
+.form-control-modern:focus {
+    border-color: var(--green-400);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    outline: none;
+}
+
+.form-label-modern {
+    font-weight: 600;
+    color: var(--green-800);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.rating-stars-modern {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.star-label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--neutral-300);
+    transition: all var(--transition-fast);
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label {
+    color: var(--accent-400) !important;
+}
+
+input[name="rating"]:checked ~ .star-label {
+    color: var(--accent-500) !important;
+}
+
+/* ============================================
+   11. FOOTER STYLES
+   ============================================ */
+
+   /* ============================================
+   11.2 FOOTER LINKS (from index.php)
+   ============================================ */
+
+.footer-links-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links-modern li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links-modern a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.footer-links-modern a:hover {
+    color: white;
+    padding-left: 0.5rem;
+}
+
+/* ============================================
+   11.3 CONTACT INFO (from index.php)
+   ============================================ */
+
+.contact-info-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-info-modern li {
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   UPDATE WHATSAPP PULSE ANIMATION
+   ============================================ */
+
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Hapus atau comment animation pulse yang lama */
+/* 
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+*/
+.footer-modern-green {
+    background: var(--green-900);
+    color: white;
+    padding: var(--space-2xl) 0 var(--space-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-modern-green::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-green);
+}
+
+/* Social Links */
+.social-links-modern {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-link-modern {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.social-link-modern:hover {
+    background: var(--green-500);
+    transform: translateY(-3px);
+    color: white;
+}
+
+/* Footer Links */
+.footer-links-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links-modern li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links-modern a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.footer-links-modern a:hover {
+    color: white;
+    padding-left: 0.5rem;
+}
+
+/* Contact Info */
+.contact-info-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-info-modern li {
+    margin-bottom: 1rem;
+}
+
+/* Legal Info */
+.legal-info-modern p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.legal-info-modern small {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ============================================
+   12. UTILITY CLASSES
+   ============================================ */
+
+/* Background Colors */
+.bg-green-50 { background-color: var(--green-50) !important; }
+.bg-green-100 { background-color: var(--green-100) !important; }
+.bg-green-200 { background-color: var(--green-200) !important; }
+.bg-green-300 { background-color: var(--green-300) !important; }
+.bg-green-400 { background-color: var(--green-400) !important; }
+.bg-green-500 { background-color: var(--green-500) !important; }
+.bg-green-600 { background-color: var(--green-600) !important; }
+.bg-green-700 { background-color: var(--green-700) !important; }
+.bg-green-800 { background-color: var(--green-800) !important; }
+.bg-green-900 { background-color: var(--green-900) !important; }
+
+.bg-neutral-50 { background-color: var(--neutral-50) !important; }
+.bg-neutral-100 { background-color: var(--neutral-100) !important; }
+.bg-green-light { background-color: var(--green-50) !important; }
+
+/* Text Colors */
+.text-green-50 { color: var(--green-50) !important; }
+.text-green-100 { color: var(--green-100) !important; }
+.text-green-200 { color: var(--green-200) !important; }
+.text-green-300 { color: var(--green-300) !important; }
+.text-green-400 { color: var(--green-400) !important; }
+.text-green-500 { color: var(--green-500) !important; }
+.text-green-600 { color: var(--green-600) !important; }
+.text-green-700 { color: var(--green-700) !important; }
+.text-green-800 { color: var(--green-800) !important; }
+.text-green-900 { color: var(--green-900) !important; }
+.text-green-gradient { background: var(--gradient-green); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.text-neutral-50 { color: var(--neutral-50) !important; }
+.text-neutral-100 { color: var(--neutral-100) !important; }
+.text-neutral-200 { color: var(--neutral-200) !important; }
+.text-neutral-300 { color: var(--neutral-300) !important; }
+.text-neutral-400 { color: var(--neutral-400) !important; }
+.text-neutral-500 { color: var(--neutral-500) !important; }
+.text-neutral-600 { color: var(--neutral-600) !important; }
+.text-neutral-700 { color: var(--neutral-700) !important; }
+.text-neutral-800 { color: var(--neutral-800) !important; }
+.text-neutral-900 { color: var(--neutral-900) !important; }
+
+.text-accent-500 { color: var(--accent-500) !important; }
+
+/* Border Colors */
+.border-green-100 { border-color: var(--green-100) !important; }
+.border-green-200 { border-color: var(--green-200) !important; }
+.border-green-300 { border-color: var(--green-300) !important; }
+.border-neutral-200 { border-color: var(--neutral-200) !important; }
+
+/* Gradients */
+.bg-green-gradient { background: var(--gradient-green) !important; }
+.bg-accent-gradient { background: var(--gradient-accent) !important; }
+
+/* Badges */
+.badge.bg-green-gradient {
+    background: var(--gradient-green) !important;
+    color: white;
+    font-weight: 600;
+}
+
+.badge.bg-accent-gradient {
+    background: var(--gradient-accent) !important;
+    color: var(--neutral-900);
+    font-weight: 600;
+}
+
+/* ============================================
+   13. SPECIAL ELEMENTS
+   ============================================ */
+
+/* WhatsApp Float */
+.whatsapp-float-modern {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.whatsapp-float-modern:hover {
+    transform: scale(1.1);
+    color: white;
+    background: #128C7E;
+}
+
+.whatsapp-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #25D366;
+    border-radius: 50%;
+    animation: pulse-ring 2s infinite;
+    z-index: -1;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Back to Top */
+.back-to-top-modern {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-green);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.back-to-top-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Divider */
+.divider-modern {
+    padding: var(--space-xl) 0;
+    background: var(--neutral-100);
+}
+
+/* ============================================
+   9.2 ICON BOX MODERN (from index.php)
+   ============================================ */
+
+.icon-box-modern {
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    text-align: center;
+}
+
+.icon-box-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-box-modern i {
+    font-size: 3rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   11.1 SOCIAL LINKS (from index.php)
+   ============================================ */
+
+.social-links-modern {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-link-modern {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.social-link-modern:hover {
+    background: var(--green-500);
+    transform: translateY(-3px);
+    color: white;
+}
+
+
+.icon-box-modern {
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    text-align: center;
+}
+
+.icon-box-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-box-modern i {
+    font-size: 3rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* Empty State */
+.empty-state-modern {
+    padding: 3rem 2rem;
+    text-align: center;
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--neutral-300);
+}
+
+.empty-state-modern i {
+    font-size: 4rem;
+    color: var(--green-300);
+    margin-bottom: var(--space-md);
+}
+
+/* ============================================
+   14. CTA SECTIONS
+   ============================================ */
+
+.bg-green-gradient {
+    background: var(--gradient-green) !important;
+    color: white;
+}
+
+.bg-green-gradient .text-white {
+    color: white !important;
+}
+
+/* ============================================
+   15. RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Typography */
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .lead {
+        font-size: 1rem !important;
+    }
+    
+    /* Hero */
+    .carousel-item {
+        height: 70vh !important;
+    }
+    
+    .hero-overlay-modern h1 {
+        font-size: 2rem !important;
+    }
+    
+    .hero-overlay-modern .lead {
+        font-size: 1rem !important;
+        width: 90% !important;
+    }
+    
+    /* Cards */
+    .card-body-modern {
+        padding: var(--space-lg) !important;
+    }
+    
+    .card-title-modern {
+        font-size: 1.125rem !important;
+    }
+    
+    /* Testimonials */
+    .testimonial-grid-clean {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .testimonial-clean-modern {
+        padding: var(--space-lg);
+    }
+    
+    .testimonial-clean-modern::before {
+        font-size: 3rem;
+        top: 15px;
+        right: 15px;
+    }
+    
+    /* Buttons */
+    .btn-modern-green.lg {
+        padding: 0.75rem 1.5rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Floating Elements */
+    .whatsapp-float-modern {
+        bottom: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .back-to-top-modern {
+        bottom: 5rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 95% !important;
+    }
+    
+    .hero-overlay-modern h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    .testimonial-grid-clean {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .testimonial-grid-clean {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ============================================
+   16. ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ============================================
+   17. PAGE SPECIFIC STYLES (untuk about, packages, etc)
+   ============================================ */
+
+/* Package Facilities List */
 .package-facilities {
     list-style: none;
     padding: 0;
@@ -215,16 +1345,26 @@ header .btn-success.shadow {
     margin-top: 2px;
 }
 
+/* Table Styles untuk schedules */
+.table-success thead {
+    background-color: var(--green-500) !important;
+    color: white;
+}
 
-/* Responsive adjustments - Penyesuaian untuk mobile */
-@media (max-width: 768px) {
-    header .carousel-item {
-        height: 60vh !important; /* Tinggi hero lebih kecil di mobile */
-    }
-    header h1 {
-        font-size: 1.8rem !important;
-    }
-    header p.lead {
-        font-size: 0.95rem !important;
-    }
+/* CTA Section Styles */
+#cta-packages, #cta-about, #cta-detail, #cta-gallery {
+    background-color: var(--accent-500);
+    color: var(--green-900);
+}
+
+/* Gallery Filter Buttons */
+#gallery-filter .btn-outline-success {
+    border-color: var(--green-500);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+#gallery-filter .btn-outline-success:hover {
+    background-color: var(--green-500);
+    color: white;
 }
