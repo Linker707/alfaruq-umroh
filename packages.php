@@ -1,24 +1,21 @@
 <?php
-// packages.php - Halaman daftar paket umroh
-require_once 'config/database.php'; // Koneksi database
+// packages.php - Hanya update style CSS
+require_once 'config/database.php';
 
-// Ambil parameter search dari URL (GET)
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Query untuk paket aktif, dengan filter search jika ada
 $queryPackages = "SELECT * FROM packages WHERE is_active = 1";
 $params = [];
 if (!empty($search)) {
     $queryPackages .= " AND name LIKE ?";
     $params[] = '%' . $search . '%';
 }
-$queryPackages .= " ORDER BY id DESC"; // Urutkan berdasarkan ID terbaru
+$queryPackages .= " ORDER BY id DESC";
 
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute($params);
 $packages = $stmtPackages->fetchAll();
 
-// Ambil settings untuk tagline jika perlu (opsional)
 $querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2')";
 $stmtSettings = $pdo->prepare($querySettings);
 $stmtSettings->execute();
@@ -26,50 +23,98 @@ $settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR);
 $tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
 $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 ?>
-<?php include 'views/header.php'; // Include header dengan navbar ?>
+<?php include 'views/header.php'; ?>
 
-<!-- Hero Section Kecil untuk Packages -->
-<section class="py-5 bg-success text-white text-center">
+<!-- Hero Section Kecil - Style modern -->
+<section class="py-5 bg-green-gradient text-white text-center">
     <div class="container">
-        <h1 class="display-4 fw-bold"><?php echo htmlspecialchars($tagline1); ?></h1>
-        <p class="lead"><?php echo htmlspecialchars($tagline2); ?> - Temukan Paket Umroh Terbaik Kami</p>
+        <h1 class="display-4 fw-bold text-white">Paket Umroh Kami</h1>
+        <p class="lead text-white opacity-90"><?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?></p>
     </div>
 </section>
 
 <!-- Section Daftar Paket -->
-<section id="packages-list" class="py-5 bg-light">
+<section id="packages-list" class="py-5 bg-green-50">
     <div class="container">
-        <h2 class="text-center mb-4 text-success fw-bold">Paket Umroh Kami</h2>
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Paket Umroh Kami</h2>
+            <p class="lead text-neutral-700 mb-0">Pilih paket yang sesuai dengan kebutuhan dan budget Anda</p>
+        </div>
         
-        <!-- Search Box -->
-        <div class="row justify-content-center mb-4">
+        <!-- Search Box Modern -->
+        <div class="row justify-content-center mb-5">
             <div class="col-md-6">
-                <form method="GET" action="packages.php" class="d-flex">
-                    <input type="text" name="search" class="form-control rounded-pill me-2" placeholder="Cari paket umroh..." value="<?php echo htmlspecialchars($search); ?>" style="border: 2px solid #33a661;">
-                    <button type="submit" class="btn btn-success rounded-pill px-4">Cari</button>
-                </form>
+                <div class="card-modern-green-light">
+                    <div class="card-body-modern">
+                        <form method="GET" action="packages.php" class="d-flex">
+                            <input type="text" name="search" 
+                                   class="form-control-modern me-2" 
+                                   placeholder="Cari paket umroh..." 
+                                   value="<?php echo htmlspecialchars($search); ?>">
+                            <button type="submit" class="btn-modern-green primary">
+                                <i class="fas fa-search me-2"></i>Cari
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- Pesan Jika Tidak Ada Paket -->
         <?php if (empty($packages)): ?>
-            <div class="text-center">
-                <p class="text-muted">Tidak ada paket yang ditemukan. Coba kata kunci lain.</p>
+            <div class="text-center py-5">
+                <div class="empty-state-modern">
+                    <i class="fas fa-box-open text-green-300" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3 text-green-800">Tidak ada paket yang ditemukan</h5>
+                    <p class="text-neutral-700 mb-4">Coba kata kunci lain atau lihat semua paket kami</p>
+                    <a href="packages.php" class="btn-modern-green primary with-icon">
+                        <i class="fas fa-redo me-2"></i>Lihat Semua
+                    </a>
+                </div>
             </div>
         <?php else: ?>
-            <!-- Grid Paket -->
+            <!-- Grid Paket Modern -->
             <div class="row">
                 <?php foreach ($packages as $package): ?>
                     <div class="col-lg-4 col-md-6 mb-4">
-                        <!-- Card dengan outline hijau dan ukuran mengikuti flyer -->
-                        <div class="card border border-success rounded shadow-sm h-auto" style="border-width: 3px !important;"> <!-- Outline hijau tebal -->
-                            <!-- Gambar flyer full dan besar, card adjust ukuran -->
-                            <img src="<?php echo htmlspecialchars($package['image']); ?>" class="card-img-top" alt="Paket <?php echo htmlspecialchars($package['name']); ?>" style="height: auto; max-height: 400px; object-fit: contain; width: 100%;"> <!-- Flyer terlihat full, besar, dan detail -->
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-success fw-bold"><?php echo htmlspecialchars($package['name']); ?></h5>
-                                <p class="card-text flex-grow-1"><?php echo htmlspecialchars(substr($package['description'], 0, 120)) . (strlen($package['description']) > 120 ? '...' : ''); ?></p>
-                                <p class="text-primary fw-bold mb-2">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?> / <?php echo (int)$package['duration']; ?> hari</p>
-                                <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" class="btn btn-success rounded-pill mt-auto">Lihat Detail</a>
+                        <div class="card-modern-green-light h-100">
+                            <img src="<?php echo htmlspecialchars($package['image']); ?>" 
+                                 class="card-img-modern" 
+                                 alt="Paket <?php echo htmlspecialchars($package['name']); ?>"
+                                 style="height: 300px; object-fit: contain;">
+                            
+                            <div class="card-body-modern d-flex flex-column">
+                                <h5 class="card-title-modern text-green-900 mb-3"><?php echo htmlspecialchars($package['name']); ?></h5>
+                                
+                                <p class="card-text-modern text-neutral-700 mb-4 flex-grow-1">
+                                    <?php echo htmlspecialchars(substr($package['description'], 0, 120)); ?>
+                                    <?php if (strlen($package['description']) > 120): ?>
+                                    <span class="text-green-700 fw-medium">...selengkapnya</span>
+                                    <?php endif; ?>
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <p class="package-price-modern mb-1">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?></p>
+                                            <small class="text-neutral-600">
+                                                <i class="fas fa-clock me-1 text-green-600"></i>
+                                                <?php echo (int)$package['duration']; ?> Hari
+                                            </small>
+                                        </div>
+                                        <div class="text-warning">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" 
+                                       class="btn-modern-green primary w-100 with-icon">
+                                        <i class="fas fa-eye me-2"></i>Lihat Detail
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -79,13 +124,20 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
     </div>
 </section>
 
-<!-- CTA Section -->
-<section id="cta-packages" class="py-5 bg-warning text-dark text-center">
-    <div class="container">
-        <h2 class="mb-3 fw-bold">Butuh Bantuan Memilih Paket?</h2>
-        <p class="mb-4">Konsultasikan kebutuhan umroh Anda dengan tim kami.</p>
-        <a href="contact.php" class="btn btn-success btn-lg rounded-pill px-4">Hubungi Kami</a>
+<!-- CTA Section - Style modern -->
+<section id="cta-packages" class="py-5 bg-green-gradient">
+    <div class="container text-center">
+        <h2 class="text-white mb-3 fw-bold">Butuh Bantuan Memilih Paket?</h2>
+        <p class="text-white opacity-90 mb-4">Konsultasikan kebutuhan umroh Anda dengan tim kami.</p>
+        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+            <a href="contact.php" class="btn-modern-green accent with-icon">
+                <i class="fas fa-phone-alt me-2"></i>Hubungi Kami
+            </a>
+            <a href="index.php" class="btn-modern-green outline text-white border-white">
+                <i class="fas fa-home me-2"></i>Kembali ke Home
+            </a>
+        </div>
     </div>
 </section>
 
-<?php include 'views/footer.php'; // Include footer ?>
+<?php include 'views/footer.php'; ?>

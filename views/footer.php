@@ -141,11 +141,10 @@
 <!-- jQuery (optional for animations) -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-<!-- Modern Green Theme JS -->
-<script src="assets/js/modern-green.js"></script>
-
-<!-- Responsive JS -->
-<script src="assets/js/responsive.js"></script>
+<script src="js/modern-green.js"></script>
+<script src="js/responsive.js"></script>
+<script src="js/form-validation.js"></script>
+<script src="js/carousel.js"></script>
 
 <script>
 // DOM Ready Function

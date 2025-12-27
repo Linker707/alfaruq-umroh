@@ -1,27 +1,20 @@
 <?php
-// testimonial-qna.php - Halaman QnA lengkap untuk testimonial, ambil data awal dari session, simpan semua jawaban ke DB
-session_start(); // Mulai session untuk ambil data awal dari index.php
-require_once 'config/database.php'; // Koneksi DB
+session_start();
+require_once 'config/database.php';
 
-// Ambil data awal dari session (dari form di index.php)
 $testimonial = $_SESSION['testimonial'] ?? null;
 if (!$testimonial) {
-    // Jika tidak ada data, redirect kembali ke index
     header('Location: index.php');
     exit;
 }
 
-$message = ''; // Pesan sukses/error
-
-// Handle submit QnA lengkap
+$message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_qna'])) {
-    // Ambil jawaban dari form (q1 sampai q23)
     $qnaAnswers = [];
     for ($i = 1; $i <= 23; $i++) {
         $qnaAnswers["q$i"] = trim($_POST["q$i"] ?? '');
     }
     
-    // Validasi: Pastikan semua field terisi
     $required = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17', 'q18', 'q19', 'q20', 'q21', 'q22', 'q23'];
     $valid = true;
     foreach ($required as $q) {
@@ -31,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_qna'])) {
         }
     }
     
-    // Validasi tambahan untuk tanggal keberangkatan
     $departureDay = trim($_POST['departure_day'] ?? '');
     $departureMonth = trim($_POST['departure_month'] ?? '');
     $departureYear = trim($_POST['departure_year'] ?? '');
@@ -40,34 +32,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_qna'])) {
     }
     
     if (!$valid) {
-        $message = 'Semua pertanyaan dan tanggal keberangkatan wajib diisi!';
+        $message = '<div class="alert alert-danger rounded-pill text-center">Semua pertanyaan dan tanggal keberangkatan wajib diisi!</div>';
     } else {
-        // Gabungkan tanggal dari dropdown menjadi YYYY-MM-DD
         $departureDate = $departureYear . '-' . $departureMonth . '-' . $departureDay;
         
-        // Simpan ke DB: Tambah departure_date
         $queryInsert = "INSERT INTO testimonials (name, email, rating, message, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, departure_date, image, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'assets/img/comment-photo.jpg', 1)";
         $stmtInsert = $pdo->prepare($queryInsert);
         if ($stmtInsert->execute([
-            $testimonial['name'], $testimonial['email'], $testimonial['rating'], $qnaAnswers['q23'],  // message dari q23
+            $testimonial['name'], $testimonial['email'], $testimonial['rating'], $qnaAnswers['q23'],
             $qnaAnswers['q1'], $qnaAnswers['q2'], $qnaAnswers['q3'], $qnaAnswers['q4'], $qnaAnswers['q5'],
             $qnaAnswers['q6'], $qnaAnswers['q7'], $qnaAnswers['q8'], $qnaAnswers['q9'], $qnaAnswers['q10'],
             $qnaAnswers['q11'], $qnaAnswers['q12'], $qnaAnswers['q13'], $qnaAnswers['q14'], $qnaAnswers['q15'],
             $qnaAnswers['q16'], $qnaAnswers['q17'], $qnaAnswers['q18'], $qnaAnswers['q19'], $qnaAnswers['q20'],
-            $qnaAnswers['q21'], $qnaAnswers['q22'], $qnaAnswers['q23'], $departureDate  // Tambah departure_date
+            $qnaAnswers['q21'], $qnaAnswers['q22'], $qnaAnswers['q23'], $departureDate
         ])) {
-            // Set pesan sukses ke session dan redirect ke index.php
             $_SESSION['success_message'] = 'Jazakillah Khairan Katsiiran Telah Mengisi Kuisioner';
-            unset($_SESSION['testimonial']); // Hapus session testimonial
-            header('Location: index.php'); // Redirect ke index
+            unset($_SESSION['testimonial']);
+            header('Location: index.php');
             exit;
         } else {
-            $message = 'Gagal mengirim. Coba lagi.';
+            $message = '<div class="alert alert-danger rounded-pill text-center">Gagal mengirim. Coba lagi.</div>';
         }
     }
 }
 
-// Ambil settings untuk tagline
 $querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2')";
 $stmtSettings = $pdo->prepare($querySettings);
 $stmtSettings->execute();
@@ -77,143 +65,347 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 ?>
 <?php include 'views/header.php'; ?>
 
-<!-- Hero Section -->
-<section class="py-5 bg-success text-white text-center">
+<!-- Hero Section - Style modern -->
+<section class="py-5 bg-green-gradient text-white text-center">
     <div class="container">
-        <h1 class="display-4 fw-bold">QnA Testimoni Lengkap</h1>
-        <p class="lead"><?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?></p>
+        <h1 class="display-4 fw-bold text-white">QnA Testimoni Lengkap</h1>
+        <p class="lead text-white opacity-90"><?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?></p>
     </div>
 </section>
 
-<!-- Section QnA Form - Form panjang dengan semua 23 pertanyaan -->
-<section id="qna-form" class="py-5 bg-light">
+<!-- Section QnA Form - Style modern -->
+<section id="qna-form" class="py-5 bg-green-50">
     <div class="container">
-        <h2 class="text-center mb-5 text-success fw-bold">Jawab Pertanyaan Berikut untuk Testimoni Lengkap</h2>
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Jawab Pertanyaan Berikut untuk Testimoni Lengkap</h2>
+            <p class="lead text-neutral-700 mb-0">Bantu kami meningkatkan pelayanan dengan memberikan feedback Anda</p>
+        </div>
+        
         <?php if ($message): ?>
-            <div class="alert <?php echo strpos($message, 'Terima kasih') !== false ? 'alert-success' : 'alert-danger'; ?> text-center rounded-pill">
-                <?php echo htmlspecialchars($message); ?>
+            <div class="mb-4">
+                <?php echo $message; ?>
             </div>
         <?php endif; ?>
+        
         <div class="row justify-content-center">
             <div class="col-md-10">
-                <div class="card rounded shadow-sm border-0 p-4" style="border: 3px solid #33a661 !important;">
-                    <form method="POST" action="testimonial-qna.php">
-                        <!-- Pertanyaan 1-5: Data pribadi dan awal -->
-                        <h5 class="text-success fw-bold mb-3">Data Pribadi</h5>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">1. Nama Lengkap</label>
-                            <input type="text" class="form-control rounded-pill" name="q1" value="<?php echo htmlspecialchars($testimonial['name']); ?>" placeholder="Masukkan nama lengkap Anda" style="border: 2px solid #33a661;" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">2. Nomor Handphone</label>
-                            <input type="tel" class="form-control rounded-pill" name="q2" placeholder="Masukkan nomor handphone aktif" style="border: 2px solid #33a661;" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">3. Dengan siapa Anda berangkat Umroh?</label>
-                            <input type="text" class="form-control rounded-pill" name="q3" placeholder="Contoh: Sendiri, keluarga, rombongan kantor, dll" style="border: 2px solid #33a661;" required>
-                        </div>
-                        <!-- Tambahan: Tanggal Keberangkatan -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">3a. Tanggal Keberangkatan</label>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <select class="form-select rounded-pill" name="departure_day" style="border: 2px solid #33a661;" required>
-                                        <option value="">Tanggal</option>
-                                        <?php for ($i = 1; $i <= 31; $i++): ?>
-                                            <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
-                                        <?php endfor; ?>
-                                    </select>
+                <div class="card-modern-green-light">
+                    <div class="card-body-modern">
+                        <form method="POST" action="testimonial-qna.php">
+                            <!-- Pertanyaan 1-5: Data pribadi dan awal -->
+                            <h5 class="text-green-800 fw-bold mb-3 border-bottom pb-2">
+                                <i class="fas fa-user-circle me-2"></i>Data Pribadi
+                            </h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label-modern fw-semibold">1. Nama Lengkap</label>
+                                    <input type="text" class="form-control-modern" name="q1" 
+                                           value="<?php echo htmlspecialchars($testimonial['name']); ?>" 
+                                           placeholder="Masukkan nama lengkap Anda" readonly>
                                 </div>
-                                <div class="col-md-4">
-                                    <select class="form-select rounded-pill" name="departure_month" style="border: 2px solid #33a661;" required>
-                                        <option value="">Bulan</option>
-                                        <option value="01">Januari</option>
-                                        <option value="02">Februari</option>
-                                        <option value="03">Maret</option>
-                                        <option value="04">April</option>
-                                        <option value="05">Mei</option>
-                                        <option value="06">Juni</option>
-                                        <option value="07">Juli</option>
-                                        <option value="08">Agustus</option>
-                                        <option value="09">September</option>
-                                        <option value="10">Oktober</option>
-                                        <option value="11">November</option>
-                                        <option value="12">Desember</option>
-                                    </select>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label-modern fw-semibold">2. Nomor Handphone</label>
+                                    <input type="tel" class="form-control-modern" name="q2" 
+                                           placeholder="Masukkan nomor handphone aktif" required>
                                 </div>
-                                <div class="col-md-4">
-                                    <select class="form-select rounded-pill" name="departure_year" style="border: 2px solid #33a661;" required>
-                                        <option value="">Tahun</option>
-                                        <?php for ($i = 2020; $i <= 2030; $i++): ?>
-                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                        <?php endfor; ?>
-                                    </select>
+                                
+                                <div class="col-12">
+                                    <label class="form-label-modern fw-semibold">3. Dengan siapa Anda berangkat Umroh?</label>
+                                    <input type="text" class="form-control-modern" name="q3" 
+                                           placeholder="Contoh: Sendiri, keluarga, rombongan kantor, dll" required>
+                                </div>
+                                
+                                <!-- Tanggal Keberangkatan -->
+                                <div class="col-12">
+                                    <label class="form-label-modern fw-semibold">3a. Tanggal Keberangkatan</label>
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <select class="form-control-modern" name="departure_day" required>
+                                                <option value="">Tanggal</option>
+                                                <?php for ($i = 1; $i <= 31; $i++): ?>
+                                                    <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select class="form-control-modern" name="departure_month" required>
+                                                <option value="">Bulan</option>
+                                                <option value="01">Januari</option>
+                                                <option value="02">Februari</option>
+                                                <option value="03">Maret</option>
+                                                <option value="04">April</option>
+                                                <option value="05">Mei</option>
+                                                <option value="06">Juni</option>
+                                                <option value="07">Juli</option>
+                                                <option value="08">Agustus</option>
+                                                <option value="09">September</option>
+                                                <option value="10">Oktober</option>
+                                                <option value="11">November</option>
+                                                <option value="12">Desember</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select class="form-control-modern" name="departure_year" required>
+                                                <option value="">Tahun</option>
+                                                <?php for ($i = 2020; $i <= 2030; $i++): ?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label-modern fw-semibold">4. Darimana Anda mengetahui Alfaruq Team?</label>
+                                    <div class="row g-2">
+                                        <?php 
+                                        $sources = [
+                                            'Media sosial' => 'Media sosial',
+                                            'Teman atau keluarga' => 'Teman atau keluarga',
+                                            'Website' => 'Website',
+                                            'Rekanan travel' => 'Rekanan travel',
+                                            'Lainnya' => 'Lainnya'
+                                        ];
+                                        foreach ($sources as $value => $label): ?>
+                                        <div class="col-md-3">
+                                            <div class="form-check-modern">
+                                                <input class="form-check-input" type="radio" name="q4" 
+                                                       value="<?php echo $value; ?>" id="q4_<?php echo $value; ?>" required>
+                                                <label class="form-check-label" for="q4_<?php echo $value; ?>">
+                                                    <?php echo $label; ?>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label-modern fw-semibold">5. Apa alasan utama Anda memilih Alfaruq Team?</label>
+                                    <textarea class="form-control-modern" name="q5" rows="3" 
+                                              placeholder="Jelaskan alasan Anda memilih Alfaruq Team" required></textarea>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">4. Darimana Anda mengetahui Alfaruq Team?</label>
-                            <div>
-                                <input type="radio" name="q4" value="Media sosial" required> Media sosial<br>
-                                <input type="radio" name="q4" value="Teman atau keluarga"> Teman atau keluarga<br>
-                                <input type="radio" name="q4" value="Website"> Website<br>
-                                <input type="radio" name="q4" value="Rekanan travel"> Rekanan travel<br>
-                                <input type="radio" name="q4" value="Lainnya"> Lainnya: <input type="text" name="q4_other" placeholder="Jelaskan" style="border: 1px solid #33a661; margin-left: 10px;">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">5. Apa alasan utama Anda memilih Alfaruq Team?</label>
-                            <textarea class="form-control rounded" name="q5" rows="3" placeholder="Jelaskan alasan Anda memilih Alfaruq Team" style="border: 2px solid #33a661;" required></textarea>
-                        </div>
 
-                        <!-- Pertanyaan 6-19: Penilaian pelayanan -->
-                        <h5 class="text-success fw-bold mb-3 mt-5">Penilaian Pelayanan</h5>
-                        <?php for ($i = 6; $i <= 19; $i += 2): // Loop untuk radio + textarea ?>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-success"><?php echo $i; ?>. <?php echo $i == 6 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team dalam pemberian informasi sebelum keberangkatan.' : ($i == 8 ? 'Penilaian Anda terhadap pelayanan dan penyampaian informasi saat manasik.' : ($i == 10 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team selama tour berlangsung.' : ($i == 12 ? 'Penilaian Anda terhadap makanan yang disajikan selama program Umroh.' : ($i == 14 ? 'Penilaian Anda terhadap pembimbingan ibadah atau Tour Leader.' : ($i == 16 ? 'Penilaian Anda terhadap pelayanan Muthawif atau Guide Local.' : 'Penilaian Anda terhadap itinerary program Umroh.'))))); ?></label>
-                                <div>
-                                    <input type="radio" name="q<?php echo $i; ?>" value="Sangat puas" required> Sangat puas<br>
-                                    <input type="radio" name="q<?php echo $i; ?>" value="Puas"> Puas<br>
-                                    <input type="radio" name="q<?php echo $i; ?>" value="Cukup puas"> Cukup puas<br>
-                                    <input type="radio" name="q<?php echo $i; ?>" value="Kurang puas"> Kurang puas<br>
-                                    <input type="radio" name="q<?php echo $i; ?>" value="Sangat tidak puas"> Sangat tidak puas
+                            <!-- Pertanyaan 6-19: Penilaian pelayanan -->
+                            <h5 class="text-green-800 fw-bold mb-3 mt-5 border-bottom pb-2">
+                                <i class="fas fa-star me-2"></i>Penilaian Pelayanan
+                            </h5>
+                            
+                            <?php for ($i = 6; $i <= 19; $i += 2): ?>
+                                <div class="mb-4">
+                                    <label class="form-label-modern fw-semibold">
+                                        <?php echo $i; ?>. 
+                                        <?php echo $i == 6 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team dalam pemberian informasi sebelum keberangkatan.' : 
+                                              ($i == 8 ? 'Penilaian Anda terhadap pelayanan dan penyampaian informasi saat manasik.' : 
+                                              ($i == 10 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team selama tour berlangsung.' : 
+                                              ($i == 12 ? 'Penilaian Anda terhadap makanan yang disajikan selama program Umroh.' : 
+                                              ($i == 14 ? 'Penilaian Anda terhadap pembimbingan ibadah atau Tour Leader.' : 
+                                              ($i == 16 ? 'Penilaian Anda terhadap pelayanan Muthawif atau Guide Local.' : 
+                                              'Penilaian Anda terhadap itinerary program Umroh.'))))); ?>
+                                    </label>
+                                    
+                                    <div class="row g-2 mb-3">
+                                        <?php 
+                                        $ratings = [
+                                            'Sangat puas' => 'Sangat puas',
+                                            'Puas' => 'Puas',
+                                            'Cukup puas' => 'Cukup puas',
+                                            'Kurang puas' => 'Kurang puas',
+                                            'Sangat tidak puas' => 'Sangat tidak puas'
+                                        ];
+                                        foreach ($ratings as $value => $label): ?>
+                                            <div class="col-md-3 col-6">
+                                                <div class="form-check-modern">
+                                                    <input class="form-check-input" type="radio" name="q<?php echo $i; ?>" 
+                                                           value="<?php echo $value; ?>" id="q<?php echo $i; ?>_<?php echo $value; ?>" required>
+                                                    <label class="form-check-label" for="q<?php echo $i; ?>_<?php echo $value; ?>">
+                                                        <?php echo $label; ?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label-modern fw-semibold">
+                                            <?php echo $i + 1; ?>. Jelaskan alasan Anda memilih penilaian tersebut.
+                                        </label>
+                                        <textarea class="form-control-modern" name="q<?php echo $i + 1; ?>" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                            <?php endfor; ?>
+
+                            <!-- Pertanyaan 20-23: Kesimpulan -->
+                            <h5 class="text-green-800 fw-bold mb-3 mt-5 border-bottom pb-2">
+                                <i class="fas fa-check-circle me-2"></i>Kesimpulan
+                            </h5>
+                            
+                            <div class="mb-4">
+                                <label class="form-label-modern fw-semibold">20. Apakah Anda berminat memilih Alfaruq Team untuk perjalanan Umroh selanjutnya?</label>
+                                <div class="row g-2">
+                                    <div class="col-md-3">
+                                        <div class="form-check-modern">
+                                            <input class="form-check-input" type="radio" name="q20" value="Ya" id="q20_ya" required>
+                                            <label class="form-check-label" for="q20_ya">Ya</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check-modern">
+                                            <input class="form-check-input" type="radio" name="q20" value="Tidak" id="q20_tidak">
+                                            <label class="form-check-label" for="q20_tidak">Tidak</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold text-success"><?php echo $i + 1; ?>. Jelaskan alasan Anda memilih penilaian tersebut.</label>
-                                <textarea class="form-control rounded" name="q<?php echo $i + 1; ?>" rows="3" style="border: 2px solid #33a661;" required></textarea>
+                            
+                            <div class="mb-4">
+                                <label class="form-label-modern fw-semibold">21. Jelaskan alasan Anda memilih jawaban tersebut.</label>
+                                <textarea class="form-control-modern" name="q21" rows="3" required></textarea>
                             </div>
-                        <?php endfor; ?>
-
-                        <!-- Pertanyaan 20-23: Kesimpulan -->
-                        <h5 class="text-success fw-bold mb-3 mt-5">Kesimpulan</h5>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">20. Apakah Anda berminat memilih Alfaruq Team untuk perjalanan Umroh selanjutnya?</label>
-                            <div>
-                                <input type="radio" name="q20" value="Ya" required> Ya<br>
-                                <input type="radio" name="q20" value="Tidak"> Tidak
+                            
+                            <div class="mb-4">
+                                <label class="form-label-modern fw-semibold">22. Berikan kritik dan saran Anda mengenai keseluruhan perjalanan Umroh atau tour yang kami selenggarakan.</label>
+                                <textarea class="form-control-modern" name="q22" rows="3" required></textarea>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">21. Jelaskan alasan Anda memilih jawaban tersebut.</label>
-                            <textarea class="form-control rounded" name="q21" rows="3" style="border: 2px solid #33a661;" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">22. Berikan kritik dan saran Anda mengenai keseluruhan perjalanan Umroh atau tour yang kami selenggarakan.</label>
-                            <textarea class="form-control rounded" name="q22" rows="3" style="border: 2px solid #33a661;" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold text-success">23. Bagaimana kesan Anda secara keseluruhan terhadap perjalanan Umroh atau tour bersama Alfaruq Team?</label>
-                            <textarea class="form-control rounded" name="q23" rows="3" style="border: 2px solid #33a661;" required></textarea>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" name="submit_qna" class="btn btn-success btn-lg rounded-pill px-5">Kirim Testimoni Lengkap</button>
-                        </div>
-                    </form>
+                            
+                            <div class="mb-4">
+                                <label class="form-label-modern fw-semibold">23. Bagaimana kesan Anda secara keseluruhan terhadap perjalanan Umroh atau tour bersama Alfaruq Team?</label>
+                                <textarea class="form-control-modern" name="q23" rows="3" required></textarea>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="text-center mt-5">
+                                <button type="submit" name="submit_qna" class="btn-modern-green primary lg with-icon">
+                                    <i class="fas fa-paper-plane me-2"></i>Kirim Testimoni Lengkap
+                                </button>
+                                <p class="text-neutral-600 mt-3">
+                                    <i class="fas fa-info-circle text-green-600 me-1"></i>
+                                    Testimoni Anda akan dipublikasikan setelah melalui proses moderasi.
+                                </p>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- CTA Section - Style modern -->
+<section id="cta-testimonial" class="py-5 bg-green-gradient">
+    <div class="container text-center">
+        <h2 class="text-white mb-3 fw-bold">Terima Kasih atas Partisipasi Anda</h2>
+        <p class="text-white opacity-90 mb-4">
+            Testimoni Anda sangat berharga bagi kami untuk meningkatkan kualitas pelayanan.
+        </p>
+        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+            <a href="index.php#testimonials" class="btn-modern-green accent with-icon">
+                <i class="fas fa-eye me-2"></i>Lihat Testimoni Lainnya
+            </a>
+            <a href="index.php" class="btn-modern-green outline text-white border-white">
+                <i class="fas fa-home me-2"></i>Kembali ke Home
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Custom styles for testimonial form */
+.form-check-modern {
+    padding: 0.75rem;
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.form-check-modern:hover {
+    border-color: var(--green-300);
+    background-color: var(--green-50);
+}
+
+.form-check-modern .form-check-input {
+    margin-top: 0.3rem;
+    border-color: var(--green-400);
+}
+
+.form-check-modern .form-check-input:checked {
+    background-color: var(--green-500);
+    border-color: var(--green-500);
+}
+
+.form-check-modern .form-check-label {
+    font-weight: 500;
+    color: var(--neutral-700);
+    margin-left: 0.5rem;
+}
+
+/* Form validation states */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.border-danger {
+    border-color: #dc3545 !important;
+}
+</style>
+
+<script>
+// Form validation
+$(document).ready(function() {
+    $('#qnaForm').submit(function(e) {
+        let isValid = true;
+        let firstError = null;
+        
+        // Check all required fields
+        $(this).find('[required]').each(function() {
+            if (!$(this).val().trim()) {
+                isValid = false;
+                if (!firstError) {
+                    firstError = $(this);
+                }
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        // Check radio buttons
+        $(this).find('input[type="radio"][required]').each(function() {
+            const name = $(this).attr('name');
+            if (!$('input[name="' + name + '"]:checked').length) {
+                isValid = false;
+                if (!firstError) {
+                    firstError = $(this);
+                }
+                $(this).closest('.form-check-modern').addClass('border-danger');
+            } else {
+                $(this).closest('.form-check-modern').removeClass('border-danger');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Harap lengkapi semua field yang wajib diisi!');
+            if (firstError) {
+                $('html, body').animate({
+                    scrollTop: firstError.offset().top - 100
+                }, 500);
+                firstError.focus();
+            }
+        }
+    });
+    
+    // Remove error classes on input
+    $('input, textarea, select').on('input change', function() {
+        $(this).removeClass('is-invalid');
+        $(this).closest('.form-check-modern').removeClass('border-danger');
+    });
+});
+</script>
 
 <?php include 'views/footer.php'; ?>

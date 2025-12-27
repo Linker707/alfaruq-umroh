@@ -1,5 +1,5 @@
 /* =================================================================
-   MAIN STYLES - ALFARUQ TEAM (COMBINED VERSION)
+   MAIN STYLES - ALFARUQ TRAVEL (MODERN GREEN THEME)
    ================================================================= */
 
 /* ============================================
@@ -617,10 +617,6 @@ p {
    8. GALLERY STYLES
    ============================================ */
 
-   /* ============================================
-   9.1 GALLERY MODERN (from index.php)
-   ============================================ */
-
 .gallery-item-modern {
     position: relative;
     border-radius: var(--radius-md);
@@ -739,115 +735,284 @@ p {
 }
 
 /* ============================================
-   10. FORM STYLES
+   10. FORM STYLES - DIPERBAIKI
    ============================================ */
 
 .form-control-modern {
     border: 2px solid var(--neutral-300);
     border-radius: var(--radius-md);
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     font-size: 1rem;
     transition: all var(--transition-normal);
     background: white;
     color: var(--neutral-800);
+    width: 100%;
+    font-family: inherit;
 }
 
 .form-control-modern:focus {
-    border-color: var(--green-400);
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    border-color: var(--green-500);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
     outline: none;
+    background-color: var(--green-50);
 }
 
-.form-label-modern {
+.form-control-modern::placeholder {
+    color: var(--neutral-400);
+    opacity: 1;
+}
+
+/* Form Label */
+.form-label {
     font-weight: 600;
     color: var(--green-800);
     margin-bottom: 0.5rem;
     display: block;
+    font-size: 0.95rem;
 }
 
-.rating-stars-modern {
+/* Form Validation States */
+.form-control-modern.is-valid {
+    border-color: var(--green-500);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%234CAF50' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: 2.5rem;
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.form-control-modern.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: 2.5rem;
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.form-control-modern.is-valid:focus {
+    border-color: var(--green-600);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
+}
+
+.form-control-modern.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+/* Invalid Feedback */
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.form-control-modern.is-invalid ~ .invalid-feedback,
+.form-control-modern:invalid:not(:focus):not(:placeholder-shown) ~ .invalid-feedback {
+    display: block;
+}
+
+/* Error Message */
+.error-message {
+    color: #dc3545;
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+    font-weight: 500;
+}
+
+/* Success Message */
+.success-message {
+    background-color: rgba(212, 237, 218, 0.9);
+    border: 1px solid rgba(195, 230, 203, 0.8);
+    color: var(--green-800);
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.5s ease-in;
+    margin-bottom: var(--space-md);
+    font-weight: 500;
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.star-label {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--neutral-300);
-    transition: all var(--transition-fast);
+.success-message i {
+    color: var(--green-500);
+    font-size: 1.1rem;
 }
 
-.star-label:hover,
-.star-label:hover ~ .star-label {
-    color: var(--accent-400) !important;
+/* Form Error Message */
+.form-error-message {
+    background-color: rgba(248, 215, 218, 0.9);
+    border: 1px solid rgba(245, 198, 203, 0.8);
+    color: #721c24;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.3s ease-in;
+    margin-bottom: var(--space-md);
+    font-weight: 500;
 }
 
-input[name="rating"]:checked ~ .star-label {
-    color: var(--accent-500) !important;
+.form-error-message i {
+    color: #dc3545;
+}
+
+/* Textarea Specific */
+textarea.form-control-modern {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.5;
+    padding: 1rem;
 }
 
 /* ============================================
-   11. FOOTER STYLES
+   11. PACKAGE DETAIL - FLYER LAYOUT
    ============================================ */
 
-   /* ============================================
-   11.2 FOOTER LINKS (from index.php)
-   ============================================ */
-
-.footer-links-modern {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* Container untuk card flyer */
+.card-body-flyer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    overflow: hidden;
+    position: relative;
 }
 
-.footer-links-modern li {
-    margin-bottom: 0.75rem;
+/* Wrapper untuk flyer */
+.flyer-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 450px;
+    max-height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--neutral-300);
 }
 
-.footer-links-modern a {
-    color: rgba(255, 255, 255, 0.75);
-    text-decoration: none;
-    transition: all var(--transition-fast);
+/* Gambar flyer */
+.flyer-image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 1.5rem;
+    transition: all var(--transition-normal);
 }
 
-.footer-links-modern a:hover {
+/* Hover effect untuk flyer */
+.flyer-wrapper:hover .flyer-image {
+    transform: scale(1.02);
+}
+
+/* Overlay untuk tombol zoom */
+.flyer-overlay {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all var(--transition-normal);
+    z-index: 10;
+}
+
+.flyer-wrapper:hover .flyer-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Tombol zoom */
+.flyer-zoom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--green-500);
     color: white;
-    padding-left: 0.5rem;
+    border-radius: var(--radius-circle);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    border: 2px solid white;
 }
 
-/* ============================================
-   11.3 CONTACT INFO (from index.php)
-   ============================================ */
+.flyer-zoom-btn:hover {
+    background: var(--green-600);
+    color: white;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--shadow-lg);
+}
 
-.contact-info-modern {
+.flyer-zoom-btn i {
+    font-size: 1.2rem;
+}
+
+/* Footer untuk card flyer */
+.card-footer-flyer {
+    background: var(--neutral-50);
+    border-top: 1px solid var(--neutral-200);
+    padding: 1rem var(--space-xl);
+}
+
+/* Price styling */
+.package-price-modern {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--green-900);
+    line-height: 1.2;
+}
+
+/* Facilities list */
+.package-facilities {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.contact-info-modern li {
-    margin-bottom: 1rem;
+.package-facilities li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: var(--neutral-700);
+    line-height: 1.5;
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.package-facilities li:last-child {
+    border-bottom: none;
+}
+
+.package-facilities li::before {
+    content: "✓";
+    color: var(--green-500);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
 }
 
 /* ============================================
-   UPDATE WHATSAPP PULSE ANIMATION
+   12. FOOTER STYLES
    ============================================ */
 
-@keyframes pulse-ring {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* Hapus atau comment animation pulse yang lama */
-/* 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-*/
 .footer-modern-green {
     background: var(--green-900);
     color: white;
@@ -935,7 +1100,7 @@ input[name="rating"]:checked ~ .star-label {
 }
 
 /* ============================================
-   12. UTILITY CLASSES
+   13. UTILITY CLASSES
    ============================================ */
 
 /* Background Colors */
@@ -1004,7 +1169,7 @@ input[name="rating"]:checked ~ .star-label {
 }
 
 /* ============================================
-   13. SPECIAL ELEMENTS
+   14. SPECIAL ELEMENTS
    ============================================ */
 
 /* WhatsApp Float */
@@ -1080,61 +1245,7 @@ input[name="rating"]:checked ~ .star-label {
     background: var(--neutral-100);
 }
 
-/* ============================================
-   9.2 ICON BOX MODERN (from index.php)
-   ============================================ */
-
-.icon-box-modern {
-    padding: 2rem;
-    background: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-normal);
-    text-align: center;
-}
-
-.icon-box-modern:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
-}
-
-.icon-box-modern i {
-    font-size: 3rem;
-    background: var(--gradient-green);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
-}
-
-/* ============================================
-   11.1 SOCIAL LINKS (from index.php)
-   ============================================ */
-
-.social-links-modern {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.social-link-modern {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-normal);
-    text-decoration: none;
-}
-
-.social-link-modern:hover {
-    background: var(--green-500);
-    transform: translateY(-3px);
-    color: white;
-}
-
-
+/* Icon Box */
 .icon-box-modern {
     padding: 2rem;
     background: white;
@@ -1173,7 +1284,7 @@ input[name="rating"]:checked ~ .star-label {
 }
 
 /* ============================================
-   14. CTA SECTIONS
+   15. CTA SECTIONS
    ============================================ */
 
 .bg-green-gradient {
@@ -1186,9 +1297,31 @@ input[name="rating"]:checked ~ .star-label {
 }
 
 /* ============================================
-   15. RESPONSIVE DESIGN
+   16. RESPONSIVE DESIGN
    ============================================ */
 
+/* Tablet (768px - 992px) */
+@media (max-width: 992px) {
+    .flyer-wrapper {
+        min-height: 400px;
+        max-height: 550px;
+    }
+    
+    .card-body-flyer,
+    .card-body-modern {
+        padding: var(--space-lg) !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.875rem var(--space-lg);
+    }
+    
+    .package-price-modern {
+        font-size: 1.75rem;
+    }
+}
+
+/* Mobile Landscape (576px - 768px) */
 @media (max-width: 768px) {
     /* Typography */
     h1 {
@@ -1217,13 +1350,48 @@ input[name="rating"]:checked ~ .star-label {
         width: 90% !important;
     }
     
+    /* Flyer */
+    .flyer-wrapper {
+        min-height: 350px;
+        max-height: 480px;
+    }
+    
+    .flyer-image {
+        padding: 1rem;
+    }
+    
+    .flyer-overlay {
+        opacity: 1;
+        transform: translateY(0);
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .flyer-zoom-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .flyer-zoom-btn i {
+        font-size: 1.1rem;
+    }
+    
     /* Cards */
+    .card-body-flyer,
     .card-body-modern {
-        padding: var(--space-lg) !important;
+        padding: var(--space-md) !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.75rem var(--space-md);
     }
     
     .card-title-modern {
         font-size: 1.125rem !important;
+    }
+    
+    .package-price-modern {
+        font-size: 1.5rem;
     }
     
     /* Testimonials */
@@ -1248,6 +1416,12 @@ input[name="rating"]:checked ~ .star-label {
         font-size: 1rem !important;
     }
     
+    /* Facilities */
+    .package-facilities li {
+        font-size: 0.9rem;
+        padding: 6px 0;
+    }
+    
     /* Floating Elements */
     .whatsapp-float-modern {
         bottom: 1rem;
@@ -1265,6 +1439,69 @@ input[name="rating"]:checked ~ .star-label {
     }
 }
 
+/* Mobile Portrait (< 576px) */
+@media (max-width: 576px) {
+    .flyer-wrapper {
+        min-height: 300px;
+        max-height: 420px;
+    }
+    
+    .flyer-image {
+        padding: 0.75rem;
+    }
+    
+    .card-body-flyer,
+    .card-body-modern {
+        padding: 1rem !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.625rem 1rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .package-price-modern {
+        font-size: 1.35rem;
+    }
+    
+    .package-facilities li {
+        font-size: 0.85rem;
+        padding: 5px 0;
+    }
+    
+    .form-control-modern {
+        font-size: 16px;
+    }
+    
+    .btn-modern-green {
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* Large Desktop (> 1200px) */
+@media (min-width: 1200px) {
+    .flyer-wrapper {
+        min-height: 500px;
+        max-height: 700px;
+    }
+    
+    .flyer-image {
+        padding: 2rem;
+    }
+}
+
+/* Extra Large Desktop (> 1400px) */
+@media (min-width: 1400px) {
+    .flyer-wrapper {
+        min-height: 550px;
+        max-height: 750px;
+    }
+}
+
+/* Tablet Landscape (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .container {
         max-width: 95% !important;
@@ -1279,6 +1516,7 @@ input[name="rating"]:checked ~ .star-label {
     }
 }
 
+/* Desktop (> 1025px) */
 @media (min-width: 1025px) {
     .testimonial-grid-clean {
         grid-template-columns: repeat(3, 1fr);
@@ -1286,7 +1524,7 @@ input[name="rating"]:checked ~ .star-label {
 }
 
 /* ============================================
-   16. ANIMATIONS
+   17. ANIMATIONS & KEYFRAMES
    ============================================ */
 
 @keyframes fadeIn {
@@ -1311,44 +1549,107 @@ input[name="rating"]:checked ~ .star-label {
     100% { transform: scale(1); }
 }
 
-/* ============================================
-   17. PAGE SPECIFIC STYLES (untuk about, packages, etc)
-   ============================================ */
-
-/* Package Facilities List */
-.package-facilities {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+@keyframes loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
-.package-facilities li {
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Loading state untuk flyer */
+.flyer-image.loading {
+    opacity: 0.7;
+    background: linear-gradient(90deg, var(--neutral-100) 25%, var(--neutral-200) 50%, var(--neutral-100) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+}
+
+/* Error state untuk flyer */
+.flyer-image.error {
+    padding: 3rem;
+    background: var(--neutral-100);
+    border: 2px dashed var(--neutral-300);
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 4px 0;
-    font-size: 15px;
-    color: #333;
-    line-height: 1.4;
-    border-bottom: 1px solid #e6e6e6;
+    align-items: center;
+    justify-content: center;
 }
 
-.package-facilities li:last-child {
-    border-bottom: none !important;
+.flyer-image.error::before {
+    content: "🖼️";
+    font-size: 3rem;
+    color: var(--neutral-400);
 }
 
-.package-facilities li::before {
-    content: "✔";
-    color: #33a661;
-    font-weight: 700;
-    font-size: 14px;
-    margin-top: 2px;
-}
+/* ============================================
+   18. PAGE SPECIFIC STYLES
+   ============================================ */
 
 /* Table Styles untuk schedules */
 .table-success thead {
     background-color: var(--green-500) !important;
     color: white;
+}
+
+/* Form Elements Enhancement */
+.form-check-modern {
+    padding: 0.75rem;
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.form-check-modern:hover {
+    border-color: var(--green-300);
+    background-color: var(--green-50);
+}
+
+.form-check-modern .form-check-input {
+    margin-top: 0.3rem;
+    border-color: var(--green-400);
+}
+
+.form-check-modern .form-check-input:checked {
+    background-color: var(--green-500);
+    border-color: var(--green-500);
+}
+
+.form-check-modern .form-check-label {
+    font-weight: 500;
+    color: var(--neutral-700);
+    margin-left: 0.5rem;
+}
+
+.form-select-modern {
+    border: 2px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    background: white;
+    color: var(--neutral-800);
+    width: 100%;
+}
+
+.form-select-modern:focus {
+    border-color: var(--green-400);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    outline: none;
+}
+
+/* Icon Box Small */
+.icon-box-small {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
 }
 
 /* CTA Section Styles */
@@ -1368,3 +1669,156 @@ input[name="rating"]:checked ~ .star-label {
     background-color: var(--green-500);
     color: white;
 }
+
+/* Mission & Vision Lists */
+.mission-list ul,
+.vision-list ul {
+    padding-left: 0;
+}
+
+.mission-list li,
+.vision-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    color: var(--neutral-800);
+    line-height: 1.5;
+}
+
+.mission-list .fa-check-circle,
+.vision-list .fa-star {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.mission-list .fa-check-circle {
+    color: var(--green-600);
+}
+
+.vision-list .fa-star {
+    color: var(--green-600);
+}
+
+/* ============================================
+   19. CERTIFICATE STYLES
+   ============================================ */
+
+.certificate-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--neutral-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--neutral-200);
+}
+
+.certificate-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.certificate-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 400px;
+    text-align: center;
+    transition: transform var(--transition-normal);
+}
+
+.certificate-card:hover {
+    transform: translateY(-5px);
+}
+
+.certificate-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    height: 240px;
+    border: 1px solid var(--neutral-300);
+    background-color: white;
+}
+
+.certificate-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.certificate-image:hover .certificate-img {
+    transform: scale(1.03);
+}
+
+.certificate-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.certificate-image:hover .certificate-overlay {
+    opacity: 1;
+}
+
+.view-certificate {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--green-600);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: background-color var(--transition-normal);
+}
+
+.view-certificate:hover {
+    background-color: var(--green-700);
+    color: white;
+}
+
+.certificate-label {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   20. PRINT STYLES
+   ============================================ */
+
+@media print {
+    .flyer-overlay,
+    .flyer-zoom-btn,
+    .card-footer-flyer,
+    .whatsapp-float-modern,
+    .back-to-top-modern {
+        display: none;
+    }
+    
+    .flyer-wrapper {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .card-modern-green-light {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* ============================================
+   END OF MAIN.CSS
+   ============================================ */
