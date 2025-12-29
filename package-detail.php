@@ -5,6 +5,18 @@ $packageId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $package = null;
 $schedules = [];
 
+// Ambil harga-harga untuk paket ini
+$queryPrices = "SELECT * FROM package_prices 
+                WHERE package_id = ? AND is_active = 1 
+                ORDER BY FIELD(type, 'bronze', 'silver', 'gold', 'platinum')";
+$stmtPrices = $pdo->prepare($queryPrices);
+$stmtPrices->execute([$packageId]);
+$packagePrices = $stmtPrices->fetchAll();
+
+$packageId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$package = null;
+$schedules = [];
+
 if ($packageId > 0) {
     $queryPackage = "SELECT * FROM packages WHERE id = ? AND is_active = 1";
     $stmtPackage = $pdo->prepare($queryPackage);
@@ -12,13 +24,32 @@ if ($packageId > 0) {
     $package = $stmtPackage->fetch();
 
     if ($package) {
-        // Ambil semua jadwal dari tabel schedules
+        // Ambil jadwal dari schedules
         $querySchedules = "SELECT * FROM schedules ORDER BY departure_date ASC";
         $stmtSchedules = $pdo->prepare($querySchedules);
         $stmtSchedules->execute();
         $schedules = $stmtSchedules->fetchAll();
+        
+        // Ambil harga-harga untuk paket ini
+        $queryPrices = "SELECT * FROM package_prices 
+                       WHERE package_id = ? AND is_active = 1 
+                       ORDER BY FIELD(type, 'bronze', 'silver', 'gold', 'platinum')";
+        $stmtPrices = $pdo->prepare($queryPrices);
+        $stmtPrices->execute([$packageId]);
+        $packagePrices = $stmtPrices->fetchAll();
+        
+        // Ambil harga min dan max
+        $minPrice = null;
+        $maxPrice = null;
+        if (!empty($packagePrices)) {
+            $prices = array_column($packagePrices, 'price');
+            $minPrice = min($prices);
+            $maxPrice = max($prices);
+        }
     }
 }
+
+$errorMessage = (!$package) ? "Paket umroh tidak ditemukan atau tidak tersedia." : null;
 
 $errorMessage = (!$package) ? "Paket umroh tidak ditemukan atau tidak tersedia." : null;
 
@@ -94,12 +125,85 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                         <p class="text-neutral-700 mb-4"><?php echo nl2br(htmlspecialchars($package['description'])); ?></p>
                         
                         <!-- Price -->
-                        <div class="mb-4">
-                            <h4 class="package-price-modern mb-2">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?></h4>
-                            <small class="text-neutral-600">
-                                <i class="fas fa-user me-1"></i>Per Orang
-                            </small>
+<div class="mb-4">
+    <h5 class="text-green-800 fw-semibold mb-3">
+        <i class="fas fa-tag text-green-600 me-2"></i>Harga Paket:
+    </h5>
+    
+    <?php if (!empty($packagePrices)): ?>
+        <!-- Tampilkan range harga -->
+        <div class="d-flex align-items-center mb-4">
+            <h4 class="package-price-modern mb-0 me-3">
+                <?php if ($minPrice != $maxPrice): ?>
+                    Rp <?php echo number_format($minPrice, 0, ',', '.'); ?> - 
+                    Rp <?php echo number_format($maxPrice, 0, ',', '.'); ?>
+                <?php else: ?>
+                    Rp <?php echo number_format($minPrice, 0, ',', '.'); ?>
+                <?php endif; ?>
+            </h4>
+            <small class="text-neutral-600">
+                <i class="fas fa-user me-1"></i>Per Orang
+            </small>
+        </div>
+        
+        <!-- Pilihan Harga - Vertikal -->
+        <div class="price-options-vertical">
+            <?php foreach ($packagePrices as $price): 
+                $typeClass = '';
+                $typeIcon = '';
+                switch($price['type']) {
+                    case 'bronze': 
+                        $typeClass = 'bg-brown-100 text-brown-800';
+                        $typeIcon = 'fas fa-award';
+                        break;
+                    case 'silver': 
+                        $typeClass = 'bg-silver-100 text-silver-800';
+                        $typeIcon = 'fas fa-medal';
+                        break;
+                    case 'gold': 
+                        $typeClass = 'bg-yellow-100 text-yellow-800';
+                        $typeIcon = 'fas fa-crown';
+                        break;
+                    case 'platinum': 
+                        $typeClass = 'bg-blue-100 text-blue-800';
+                        $typeIcon = 'fas fa-gem';
+                        break;
+                }
+            ?>
+                <div class="price-option-vertical">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-3">
+                            <span class="price-type-badge <?php echo $typeClass; ?> d-flex align-items-center justify-content-center py-2 rounded">
+                                <i class="<?php echo $typeIcon; ?> me-2"></i>
+                                <?php echo ucfirst($price['type']); ?>
+                            </span>
                         </div>
+                        <div class="col-md-6">
+                            <div class="price-vertical-info">
+                                <h5 class="price-amount-vertical mb-1">Rp <?php echo number_format($price['price'], 0, ',', '.'); ?></h5>
+                                <small class="text-neutral-600">
+                                    <i class="fas fa-user me-1"></i>Per Orang
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="contact.php?package=<?php echo $packageId; ?>&type=<?php echo $price['type']; ?>" 
+                               class="btn-price-select-vertical w-100">
+                                <i class="fas fa-check me-1"></i>Pilih
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+                <?php else: ?>
+                    <div class="alert alert-warning rounded">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Hubungi kami untuk informasi harga dan ketersediaan paket ini.
+                    </div>
+                <?php endif; ?>
+            </div>
                         
                         <!-- Facilities -->
                         <div class="mb-4">
@@ -109,8 +213,8 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                             <?php
                             $jsonCheck = json_decode($package['facilities'], true);
                             $facilities = (json_last_error() === JSON_ERROR_NONE && is_array($jsonCheck))
-                                          ? $jsonCheck
-                                          : preg_split('/\r\n|\r|\n/', $package['facilities']);
+                                        ? $jsonCheck
+                                        : preg_split('/\r\n|\r|\n/', $package['facilities']);
                             ?>
                             <ul class="package-facilities">
                                 <?php foreach ($facilities as $facility):
@@ -122,6 +226,7 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                             </ul>
                         </div>
                         
+                       
                         <!-- CTA Button -->
                         <div class="mt-4">
                             <a href="contact.php" class="btn-modern-green primary w-100 with-icon">

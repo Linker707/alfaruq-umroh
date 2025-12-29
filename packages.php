@@ -3,14 +3,21 @@
 require_once 'config/database.php';
 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$params = []; // Inisialisasi array params
 
-$queryPackages = "SELECT * FROM packages WHERE is_active = 1";
-$params = [];
+$queryPackages = "SELECT p.*, 
+                         MIN(pp.price) as min_price,
+                         MAX(pp.price) as max_price
+                  FROM packages p 
+                  LEFT JOIN package_prices pp ON p.id = pp.package_id AND pp.is_active = 1
+                  WHERE p.is_active = 1";
+
 if (!empty($search)) {
-    $queryPackages .= " AND name LIKE ?";
+    $queryPackages .= " AND p.name LIKE ?";
     $params[] = '%' . $search . '%';
 }
-$queryPackages .= " ORDER BY id DESC";
+
+$queryPackages .= " GROUP BY p.id ORDER BY p.id DESC";
 
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute($params);
@@ -92,13 +99,24 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                     <?php endif; ?>
                                 </p>
                                 
+                                <!-- Price -->
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div>
-                                            <p class="package-price-modern mb-1">Rp <?php echo number_format($package['price'], 0, ',', '.'); ?></p>
+                                            <p class="package-price-modern mb-1 text-green-900">
+                                                <?php if (isset($package['min_price']) && isset($package['max_price'])): ?>
+                                                    <?php if ($package['min_price'] != $package['max_price']): ?>
+                                                        Rp <?php echo number_format($package['min_price'], 0, ',', '.'); ?> - 
+                                                        Rp <?php echo number_format($package['max_price'], 0, ',', '.'); ?>
+                                                    <?php else: ?>
+                                                        Rp <?php echo number_format($package['min_price'], 0, ',', '.'); ?>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    Hubungi Kami
+                                                <?php endif; ?>
+                                            </p>
                                             <small class="text-neutral-600">
-                                                <i class="fas fa-clock me-1 text-green-600"></i>
-                                                <?php echo (int)$package['duration']; ?> Hari
+                                                <i class="fas fa-user me-1 text-green-600"></i>Per Orang
                                             </small>
                                         </div>
                                         <div class="text-warning">
@@ -111,7 +129,7 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                     </div>
                                     
                                     <a href="package-detail.php?id=<?php echo (int)$package['id']; ?>" 
-                                       class="btn-modern-green primary w-100 with-icon">
+                                    class="btn-modern-green primary w-100 with-icon">
                                         <i class="fas fa-eye me-2"></i>Lihat Detail
                                     </a>
                                 </div>

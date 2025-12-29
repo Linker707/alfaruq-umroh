@@ -478,6 +478,8 @@ p {
     color: var(--green-900);
 }
 
+
+
 /* ============================================
    7. TESTIMONIAL STYLES
    ============================================ */
@@ -2029,4 +2031,171 @@ textarea.form-control-modern {
         max-width: none;
         white-space: normal;
     }
+}
+
+
+/* ============================================
+   20. PRICE CARD STYLES
+   ============================================ */
+
+.price-card {
+    background: white;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--neutral-200);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+}
+
+.price-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+}
+
+.price-card-header {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+}
+
+.price-type-badge {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-xl);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.price-card-body {
+    padding: 1.5rem;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.price-per {
+    color: var(--neutral-600);
+    font-size: 0.875rem;
+}
+
+.price-card-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+}
+
+.btn-price-select {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--gradient-green);
+    color: white;
+    text-align: center;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    border: none;
+}
+
+.btn-price-select:hover {
+    background: var(--gradient-green-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   21. VERTICAL PRICE OPTIONS
+   ============================================ */
+
+.price-options-vertical {
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    background: white;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.price-option-vertical {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--neutral-200);
+    transition: all var(--transition-normal);
+}
+
+.price-option-vertical:last-child {
+    border-bottom: none;
+}
+
+.price-option-vertical:hover {
+    background-color: var(--green-50);
+    transform: translateX(5px);
+}
+
+.price-type-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 100%;
+    transition: all var(--transition-normal);
+}
+
+.price-option-vertical:hover .price-type-badge {
+    transform: scale(1.05);
+}
+
+.price-vertical-info {
+    text-align: left;
+}
+
+.price-amount-vertical {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: 0.25rem;
+}
+
+.btn-price-select-vertical {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background: var(--gradient-green);
+    color: white;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    border: none;
+    text-align: center;
+}
+
+.btn-price-select-vertical:hover {
+    background: var(--gradient-green-dark);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
