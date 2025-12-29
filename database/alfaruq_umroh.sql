@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 29, 2025 at 04:17 AM
+-- Generation Time: Dec 29, 2025 at 10:17 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -110,11 +110,11 @@ CREATE TABLE `packages` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `price` decimal(10,2) NOT NULL,
   `duration` int(11) NOT NULL,
   `facilities` text DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
+  `is_popular` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -123,10 +123,35 @@ CREATE TABLE `packages` (
 -- Dumping data for table `packages`
 --
 
-INSERT INTO `packages` (`id`, `name`, `description`, `price`, `duration`, `facilities`, `image`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'PAKET LIBUR SEKOLAH', 'Paket yang cocok untuk perjalanan umroh dengan fasilitas bagus, bersama keluarga dan anak-anak diliburan sekolah.', '31000000.00', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x Sehari FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/libursekolah.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:26:15'),
-(2, 'UMROH AWAL RAMADHAN', 'Mulai Ramadhan Anda dengan pengalaman ibadah paling istimewa! Umroh Awal Ramadhan menawarkan suasana ibadah yang lebih tenang, kesempatan pahala berlipat, serta layanan premium yang membuat perjalanan semakin nyaman.\r\nNikmati hotel dekat Masjidil Haram & Nabawi, fasilitas mewah, dan pendampingan jamaah yang profesional. Tempat terbatas amankan kursi Anda sekarang dan sambut Ramadhan langsung dari Tanah Suci!', '29500000.00', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohawalramadhan.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:30:33'),
-(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', '37500000.00', 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, '2025-11-19 09:17:03', '2025-12-01 07:41:41');
+INSERT INTO `packages` (`id`, `name`, `description`, `duration`, `facilities`, `image`, `is_active`, `is_popular`, `created_at`, `updated_at`) VALUES
+(2, 'UMROH AWAL RAMADHAN', 'Mulai Ramadhan Anda dengan pengalaman ibadah paling istimewa! Umroh Awal Ramadhan menawarkan suasana ibadah yang lebih tenang, kesempatan pahala berlipat, serta layanan premium yang membuat perjalanan semakin nyaman.\r\nNikmati hotel dekat Masjidil Haram & Nabawi, fasilitas mewah, dan pendampingan jamaah yang profesional. Tempat terbatas amankan kursi Anda sekarang dan sambut Ramadhan langsung dari Tanah Suci!', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohawalramadhan.png', 1, 1, '2025-11-19 09:17:03', '2025-12-29 08:08:13'),
+(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, 0, '2025-11-19 09:17:03', '2025-12-29 08:11:44'),
+(4, 'UMROH MARET', 'Tutup musim umroh Anda dengan pengalaman ibadah yang penuh makna melalui Paket Umroh Maret, momen istimewa menjelang berakhirnya musim umroh sebelum memasuki musim haji. Suasana Tanah Suci di periode ini menghadirkan nuansa haru dan keistimewaan tersendiri, menjadikan setiap rangkaian ibadah terasa lebih berkesan dan mendalam.\r\n\r\nDengan dukungan hotel strategis dekat Masjidil Haram dan Masjid Nabawi, fasilitas perjalanan yang nyaman, serta pendampingan pembimbing ibadah yang profesional, jamaah dapat menjalankan umroh dengan tenang dan optimal. Kesempatan umroh terakhir sebelum musim haji ini sangat terbatas, segera amankan keberangkatan Anda dan raih pengalaman ibadah yang tak terlupakan di Tanah Suci.', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik\r\n', 'assets/img/umrohmaret.png\r\n', 1, 1, '2025-12-29 07:38:02', '2025-12-29 08:10:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `package_prices`
+--
+
+CREATE TABLE `package_prices` (
+  `id` int(11) NOT NULL,
+  `package_id` int(11) NOT NULL,
+  `type` enum('bronze','silver','gold','platinum','') NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `package_prices`
+--
+
+INSERT INTO `package_prices` (`id`, `package_id`, `type`, `price`, `is_active`, `created_at`) VALUES
+(2, 2, '', '29500000.00', 1, '2025-12-29 07:25:36'),
+(3, 3, '', '37500000.00', 1, '2025-12-29 07:25:36'),
+(4, 4, 'bronze', '26500000.00', 1, '2025-12-29 07:39:19'),
+(5, 4, 'silver', '29500000.00', 1, '2025-12-29 07:39:19');
 
 -- --------------------------------------------------------
 
@@ -185,8 +210,7 @@ INSERT INTO `schedules` (`id`, `package_id`, `departure_date`, `return_date`, `a
 (9, 1, '2025-12-20', '2025-12-31', 24, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
 (10, 1, '2026-01-17', '2026-01-27', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
 (11, 1, '2026-02-21', '2026-03-04', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(12, 1, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(13, 1, '2025-01-15', '2025-01-25', 10, 'available', 'TEST AIR', 'BTH JED BTH', 'SENIN', 10, NULL, NULL, NULL);
+(12, 1, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -299,6 +323,13 @@ ALTER TABLE `packages`
   ADD KEY `idx_created` (`created_at`);
 
 --
+-- Indexes for table `package_prices`
+--
+ALTER TABLE `package_prices`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_package_type` (`package_id`,`type`);
+
+--
 -- Indexes for table `schedules`
 --
 ALTER TABLE `schedules`
@@ -331,7 +362,13 @@ ALTER TABLE `galleries`
 -- AUTO_INCREMENT for table `packages`
 --
 ALTER TABLE `packages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `package_prices`
+--
+ALTER TABLE `package_prices`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `schedules`
@@ -350,6 +387,16 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `testimonials`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `package_prices`
+--
+ALTER TABLE `package_prices`
+  ADD CONSTRAINT `package_prices_ibfk_1` FOREIGN KEY (`package_id`) REFERENCES `packages` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
