@@ -304,6 +304,62 @@
                 console.log('Image Optimization initialized');
             },
 
+            ScheduleTable: {
+                init: function() {
+                    this.makeTableResponsive();
+                    console.log('Schedule Table initialized');
+                },
+
+                makeTableResponsive: function() {
+                    const tables = document.querySelectorAll('#schedules table');
+                    
+                    tables.forEach(table => {
+                        if (window.innerWidth < 768) {
+                            this.convertToCards(table);
+                        }
+                        
+                        // Update on resize
+                        window.addEventListener('resize', () => {
+                            if (window.innerWidth < 768) {
+                                this.convertToCards(table);
+                            } else {
+                                this.convertToTable(table);
+                            }
+                        });
+                    });
+                },
+
+                convertToCards: function(table) {
+                    const headers = [];
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    // Get headers
+                    table.querySelectorAll('thead th').forEach((th, index) => {
+                        headers[index] = th.textContent.trim();
+                    });
+                    
+                    // Convert each row to card
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach((cell, index) => {
+                            if (headers[index]) {
+                                cell.setAttribute('data-label', headers[index]);
+                            }
+                        });
+                    });
+                },
+
+                convertToTable: function(table) {
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach(cell => {
+                            cell.removeAttribute('data-label');
+                        });
+                    });
+                }
+            },
+
             initLazyLoading: function() {
                 const images = document.querySelectorAll('img[data-src]');
                 
@@ -778,6 +834,10 @@
             Modules.WhatsApp.init();
 
             // Conditional modules
+            if (document.querySelector('#schedules table')) {
+                Modules.ScheduleTable.init();
+            }
+            
             if (document.querySelector('#testimonialCarousel')) {
                 Modules.TestimonialCarousel.init();
             }

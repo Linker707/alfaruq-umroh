@@ -12,9 +12,10 @@ if ($packageId > 0) {
     $package = $stmtPackage->fetch();
 
     if ($package) {
-        $querySchedules = "SELECT * FROM schedules WHERE package_id = ? AND status = 'available' AND departure_date >= CURDATE() ORDER BY departure_date ASC";
+        // Ambil semua jadwal dari tabel schedules
+        $querySchedules = "SELECT * FROM schedules ORDER BY departure_date ASC";
         $stmtSchedules = $pdo->prepare($querySchedules);
-        $stmtSchedules->execute([$packageId]);
+        $stmtSchedules->execute();
         $schedules = $stmtSchedules->fetchAll();
     }
 }
@@ -137,89 +138,88 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 </section>
 
     <!-- Section Jadwal Keberangkatan - Style modern -->
-    <section id="schedules" class="py-5 bg-white">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="text-green-900 mb-3">Jadwal Keberangkatan</h2>
-                <p class="lead text-neutral-700 mb-0">Pilih jadwal yang sesuai dengan rencana Anda</p>
-            </div>
-            
-            <?php if (!empty($schedules)): ?>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="bg-green-100">
-                            <tr>
-                                <th class="text-green-900">Tanggal Keberangkatan</th>
-                                <th class="text-green-900">Tanggal Kembali</th>
-                                <th class="text-green-900">Maskapai</th>
-                                <th class="text-green-900">Rute</th>
-                                <th class="text-green-900">Hari Keberangkatan</th>
-                                <th class="text-green-900">Slot Tersedia</th>
-                                <th class="text-green-900">Status</th>
-                                <th class="text-green-900">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($schedules as $schedule): ?>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-calendar-alt text-green-600 me-2"></i>
-                                            <?php echo date('d M Y', strtotime($schedule['departure_date'])); ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-calendar-check text-green-600 me-2"></i>
-                                            <?php echo date('d M Y', strtotime($schedule['return_date'])); ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-plane text-green-600 me-2"></i>
-                                            <?php echo htmlspecialchars($schedule['airline']); ?>
-                                        </div>
-                                    </td>
-                                    <td><small class="text-neutral-600"><?php echo htmlspecialchars($schedule['route']); ?></small></td>
-                                    <td><?php echo htmlspecialchars($schedule['departure_day']); ?></td>
-                                    <td>
-                                        <?php if ($schedule['available_slots'] > 0): ?>
-                                            <span class="badge bg-green-100 text-green-800">
-                                                <?php echo (int)$schedule['available_slots']; ?> slot
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge bg-red-100 text-red-800">Habis</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-<?php echo $schedule['status'] === 'available' ? 'green' : 'red'; ?>-100 text-<?php echo $schedule['status'] === 'available' ? 'green' : 'red'; ?>-800">
-                                            <?php echo htmlspecialchars($schedule['status']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="contact.php" class="btn-modern-green primary sm">
-                                            <i class="fas fa-check me-1"></i>Pilih
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <div class="text-center py-5">
-                    <div class="empty-state-modern">
-                        <i class="fas fa-calendar-times text-green-300" style="font-size: 4rem;"></i>
-                        <h5 class="mt-3 text-green-800">Belum ada jadwal keberangkatan tersedia</h5>
-                        <p class="text-neutral-700 mb-4">Hubungi kami untuk informasi jadwal terbaru</p>
-                        <a href="contact.php" class="btn-modern-green primary with-icon">
-                            <i class="fas fa-phone-alt me-2"></i>Hubungi Kami
-                        </a>
-                    </div>
-                </div>
-            <?php endif; ?>
+<!-- Section Jadwal Keberangkatan - Style modern -->
+<section id="schedules" class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="text-green-900 mb-3">Jadwal Keberangkatan</h2>
+            <p class="lead text-neutral-700 mb-0">Daftar jadwal keberangkatan yang tersedia</p>
         </div>
-    </section>
+        
+        <?php if (!empty($schedules)): ?>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-green-100">
+                        <tr>
+                            <th class="text-green-900">Tanggal Keberangkatan</th>
+                            <th class="text-green-900">Tanggal Kembali</th>
+                            <th class="text-green-900">Maskapai</th>
+                            <th class="text-green-900">Rute</th>
+                            <th class="text-green-900">Hari</th>
+                            <th class="text-green-900">Slot</th>
+                            <th class="text-green-900">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($schedules as $schedule): ?>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar-alt text-green-600 me-2"></i>
+                                        <?php echo date('d M Y', strtotime($schedule['departure_date'])); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar-check text-green-600 me-2"></i>
+                                        <?php echo date('d M Y', strtotime($schedule['return_date'])); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-plane text-green-600 me-2"></i>
+                                        <?php echo htmlspecialchars($schedule['airline']); ?>
+                                    </div>
+                                </td>
+                                <td><small class="text-neutral-600"><?php echo htmlspecialchars($schedule['route']); ?></small></td>
+                                <td><?php echo htmlspecialchars($schedule['departure_day']); ?></td>
+                                <td>
+                                    <?php if ($schedule['available_slots'] > 0): ?>
+                                        <span class="badge bg-green-100 text-green-800">
+                                            <?php echo (int)$schedule['available_slots']; ?> slot
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-red-100 text-red-800">Habis</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($schedule['status'] === 'available'): ?>
+                                        <span class="badge bg-green-100 text-green-800">Tersedia</span>
+                                    <?php elseif ($schedule['status'] === 'full'): ?>
+                                        <span class="badge bg-red-100 text-red-800">Penuh</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-gray-100 text-gray-800"><?php echo htmlspecialchars($schedule['status']); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-5">
+                <div class="empty-state-modern">
+                    <i class="fas fa-calendar-times text-green-300" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3 text-green-800">Belum ada jadwal keberangkatan tersedia</h5>
+                    <p class="text-neutral-700 mb-4">Hubungi kami untuk informasi jadwal terbaru</p>
+                    <a href="contact.php" class="btn-modern-green primary with-icon">
+                        <i class="fas fa-phone-alt me-2"></i>Hubungi Kami
+                    </a>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
    
 <?php else: ?>
     <section class="py-5 bg-green-50">
@@ -255,3 +255,49 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 </section>
 
 <?php include 'views/footer.php'; ?>
+
+<script>
+$(document).ready(function() {
+    // Handle schedule selection
+    $('.schedule-select-btn').click(function(e) {
+        e.preventDefault();
+        
+        const scheduleId = $(this).data('schedule-id');
+        const departureDate = $(this).data('departure-date');
+        const returnDate = $(this).data('return-date');
+        const airline = $(this).data('airline');
+        
+        // Format dates
+        const formattedDeparture = new Date(departureDate).toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        const formattedReturn = new Date(returnDate).toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Show confirmation modal or redirect
+        if (confirm(`Pilih jadwal ini?\n\nKeberangkatan: ${formattedDeparture}\nKembali: ${formattedReturn}\nMaskapai: ${airline}`)) {
+            window.location.href = `contact.php?schedule_id=${scheduleId}`;
+        }
+    });
+    
+    // Add tooltips for route info
+    $('.route-info').each(function() {
+        const routeText = $(this).text().trim();
+        if (routeText.length > 20) {
+            $(this).attr('title', routeText);
+            $(this).tooltip({
+                placement: 'top',
+                trigger: 'hover'
+            });
+        }
+    });
+});
+</script>

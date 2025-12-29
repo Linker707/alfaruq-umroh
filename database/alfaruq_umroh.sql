@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 10:13 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Dec 29, 2025 at 04:17 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -124,9 +124,9 @@ CREATE TABLE `packages` (
 --
 
 INSERT INTO `packages` (`id`, `name`, `description`, `price`, `duration`, `facilities`, `image`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'PAKET LIBUR SEKOLAH', 'Paket yang cocok untuk perjalanan umroh dengan fasilitas bagus, bersama keluarga dan anak-anak diliburan sekolah.', 31000000.00, 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x Sehari FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/libursekolah.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:26:15'),
-(2, 'UMROH AWAL RAMADHAN', 'Mulai Ramadhan Anda dengan pengalaman ibadah paling istimewa! Umroh Awal Ramadhan menawarkan suasana ibadah yang lebih tenang, kesempatan pahala berlipat, serta layanan premium yang membuat perjalanan semakin nyaman.\r\nNikmati hotel dekat Masjidil Haram & Nabawi, fasilitas mewah, dan pendampingan jamaah yang profesional. Tempat terbatas amankan kursi Anda sekarang dan sambut Ramadhan langsung dari Tanah Suci!', 29500000.00, 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohawalramadhan.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:30:33'),
-(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', 37500000.00, 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, '2025-11-19 09:17:03', '2025-12-01 07:41:41');
+(1, 'PAKET LIBUR SEKOLAH', 'Paket yang cocok untuk perjalanan umroh dengan fasilitas bagus, bersama keluarga dan anak-anak diliburan sekolah.', '31000000.00', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x Sehari FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/libursekolah.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:26:15'),
+(2, 'UMROH AWAL RAMADHAN', 'Mulai Ramadhan Anda dengan pengalaman ibadah paling istimewa! Umroh Awal Ramadhan menawarkan suasana ibadah yang lebih tenang, kesempatan pahala berlipat, serta layanan premium yang membuat perjalanan semakin nyaman.\r\nNikmati hotel dekat Masjidil Haram & Nabawi, fasilitas mewah, dan pendampingan jamaah yang profesional. Tempat terbatas amankan kursi Anda sekarang dan sambut Ramadhan langsung dari Tanah Suci!', '29500000.00', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohawalramadhan.png', 1, '2025-11-19 09:17:03', '2025-12-01 07:30:33'),
+(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', '37500000.00', 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, '2025-11-19 09:17:03', '2025-12-01 07:41:41');
 
 -- --------------------------------------------------------
 
@@ -163,27 +163,30 @@ CREATE TABLE `schedules` (
   `airline` varchar(100) DEFAULT NULL,
   `route` varchar(100) DEFAULT NULL,
   `departure_day` varchar(20) DEFAULT NULL,
-  `duration_days` int(11) DEFAULT NULL
+  `duration_days` int(11) DEFAULT NULL,
+  `package_name` varchar(255) DEFAULT NULL,
+  `package_description` text DEFAULT NULL,
+  `package_price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `schedules`
 --
 
-INSERT INTO `schedules` (`id`, `package_id`, `departure_date`, `return_date`, `available_slots`, `status`, `airline`, `route`, `departure_day`, `duration_days`) VALUES
-(1, 1, '2025-07-12', '2025-07-22', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(2, 1, '2025-07-26', '2025-08-05', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SABTU', 12),
-(3, 1, '2025-08-04', '2025-08-14', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SENIN', 12),
-(4, 1, '2025-08-09', '2025-08-20', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(5, 1, '2025-08-23', '2025-09-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(6, 1, '2025-09-27', '2025-10-08', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(7, 1, '2025-10-18', '2025-10-28', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(8, 1, '2025-11-22', '2025-12-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(9, 1, '2025-12-20', '2025-12-31', 24, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(10, 1, '2026-01-17', '2026-01-27', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(11, 1, '2026-02-21', '2026-03-04', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(12, 1, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12),
-(13, 1, '2025-01-15', '2025-01-25', 10, 'available', 'TEST AIR', 'BTH JED BTH', 'SENIN', 10);
+INSERT INTO `schedules` (`id`, `package_id`, `departure_date`, `return_date`, `available_slots`, `status`, `airline`, `route`, `departure_day`, `duration_days`, `package_name`, `package_description`, `package_price`) VALUES
+(1, 1, '2025-07-12', '2025-07-22', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(2, 1, '2025-07-26', '2025-08-05', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SABTU', 12, NULL, NULL, NULL),
+(3, 1, '2025-08-04', '2025-08-14', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SENIN', 12, NULL, NULL, NULL),
+(4, 1, '2025-08-09', '2025-08-20', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(5, 1, '2025-08-23', '2025-09-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(6, 1, '2025-09-27', '2025-10-08', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(7, 1, '2025-10-18', '2025-10-28', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(8, 1, '2025-11-22', '2025-12-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(9, 1, '2025-12-20', '2025-12-31', 24, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(10, 1, '2026-01-17', '2026-01-27', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(11, 1, '2026-02-21', '2026-03-04', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(12, 1, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(13, 1, '2025-01-15', '2025-01-25', 10, 'available', 'TEST AIR', 'BTH JED BTH', 'SENIN', 10, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
