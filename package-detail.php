@@ -152,23 +152,27 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                 $typeClass = '';
                 $typeIcon = '';
                 switch($price['type']) {
-                    case 'bronze': 
-                        $typeClass = 'bg-brown-100 text-brown-800';
-                        $typeIcon = 'fas fa-award';
-                        break;
-                    case 'silver': 
-                        $typeClass = 'bg-silver-100 text-silver-800';
-                        $typeIcon = 'fas fa-medal';
-                        break;
-                    case 'gold': 
-                        $typeClass = 'bg-yellow-100 text-yellow-800';
-                        $typeIcon = 'fas fa-crown';
-                        break;
-                    case 'platinum': 
-                        $typeClass = 'bg-blue-100 text-blue-800';
-                        $typeIcon = 'fas fa-gem';
-                        break;
-                }
+                case 'bronze': 
+                    $typeClass = 'bg-brown-100 text-brown-800';
+                    $typeIcon = 'fas fa-award';
+                    break;
+                case 'silver': 
+                    $typeClass = 'bg-silver-100 text-silver-800';
+                    $typeIcon = 'fas fa-medal';
+                    break;
+                case 'gold': 
+                    $typeClass = 'bg-yellow-100 text-yellow-800';
+                    $typeIcon = 'fas fa-crown';
+                    break;
+                case 'platinum': 
+                    $typeClass = 'bg-blue-100 text-blue-800';
+                    $typeIcon = 'fas fa-gem';
+                    break;
+                default: // TAMBAHKAN DEFAULT
+                    $typeClass = 'bg-green-100 text-green-800';
+                    $typeIcon = 'fas fa-tag';
+                    break;
+            }
             ?>
                 <div class="price-option-vertical">
                     <div class="row align-items-center g-3">

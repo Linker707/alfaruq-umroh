@@ -1,9 +1,18 @@
 <?php
-// packages.php - Hanya update style CSS
+// packages.php - TAMBAHKAN DEBUGGING
 require_once 'config/database.php';
 
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$params = []; // Inisialisasi array params
+$params = [];
+
+// DEBUG: Tampilkan semua paket tanpa filter
+echo "<!-- DEBUG MODE: Checking packages -->";
+
+$queryAll = "SELECT COUNT(*) as total FROM packages WHERE is_active = 1";
+$stmtAll = $pdo->prepare($queryAll);
+$stmtAll->execute();
+$total = $stmtAll->fetch()['total'];
+echo "<!-- Total active packages in DB: $total -->";
 
 $queryPackages = "SELECT p.*, 
                          MIN(pp.price) as min_price,
@@ -19,9 +28,18 @@ if (!empty($search)) {
 
 $queryPackages .= " GROUP BY p.id ORDER BY p.id DESC";
 
+// DEBUG: Tampilkan query
+echo "<!-- Query: $queryPackages -->";
+
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute($params);
 $packages = $stmtPackages->fetchAll();
+
+// DEBUG: Tampilkan hasil
+echo "<!-- Packages found: " . count($packages) . " -->";
+foreach($packages as $idx => $pkg) {
+    echo "<!-- Package $idx: ID=" . $pkg['id'] . ", Name=" . $pkg['name'] . ", Active=" . $pkg['is_active'] . " -->";
+}
 
 $querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2')";
 $stmtSettings = $pdo->prepare($querySettings);

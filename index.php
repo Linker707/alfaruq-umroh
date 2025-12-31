@@ -27,31 +27,15 @@ $queryPackages = "SELECT p.*,
                          MAX(pp.price) as max_price
                   FROM packages p 
                   LEFT JOIN package_prices pp ON p.id = pp.package_id AND pp.is_active = 1
-                  WHERE p.is_active = 1 AND p.is_popular = 1
+                  WHERE p.is_active = 1
                   GROUP BY p.id 
-                  ORDER BY p.id DESC 
+                  ORDER BY p.is_popular DESC, p.id DESC  -- Paket populer diutamakan
                   LIMIT 3";
 
 // Jika tidak ada paket populer, ambil paket terbaru
 $stmtPackages = $pdo->prepare($queryPackages);
 $stmtPackages->execute();
 $packages = $stmtPackages->fetchAll();
-
-if (empty($packages)) {
-    // Fallback: ambil 3 paket terbaru
-    $queryFallback = "SELECT p.*, 
-                             MIN(pp.price) as min_price,
-                             MAX(pp.price) as max_price
-                      FROM packages p 
-                      LEFT JOIN package_prices pp ON p.id = pp.package_id AND pp.is_active = 1
-                      WHERE p.is_active = 1 
-                      GROUP BY p.id 
-                      ORDER BY p.id DESC 
-                      LIMIT 3";
-    $stmtFallback = $pdo->prepare($queryFallback);
-    $stmtFallback->execute();
-    $packages = $stmtFallback->fetchAll();
-}
 
 // Ambil semua testimoni yang approved
 $queryTestimonials = "SELECT * FROM testimonials WHERE is_approved = 1 ORDER BY created_at DESC";
@@ -60,7 +44,12 @@ $stmtTestimonials->execute();
 $testimonials = $stmtTestimonials->fetchAll();
 
 // Ambil galeri 8 foto aktif
-$queryGalleries = "SELECT * FROM galleries WHERE type = 'image' AND is_active = 1 ORDER BY created_at DESC LIMIT 8";
+// Di index.php, ubah query gallery:
+$queryGalleries = "SELECT g.*, d.name as destination_name 
+                   FROM galleries g 
+                   LEFT JOIN destinations d ON g.destination_id = d.id
+                   WHERE g.type = 'image' AND g.is_active = 1 
+                   ORDER BY g.created_at DESC LIMIT 8";
 $stmtGalleries = $pdo->prepare($queryGalleries);
 $stmtGalleries->execute();
 $galleries = $stmtGalleries->fetchAll();

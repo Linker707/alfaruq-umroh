@@ -1,16 +1,34 @@
 <?php
-// gallery.php - Hanya update style CSS
 require_once 'config/database.php';
 
 $filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'all';
 
-$queryGalleries = "SELECT * FROM galleries WHERE type = 'image' AND is_active = 1";
+// 1. AMBIL DESTINASI DARI DATABASE
+$queryDestinations = "SELECT d.*, 
+                             (SELECT COUNT(*) FROM galleries g 
+                              WHERE g.destination_id = d.id OR g.destination = d.slug) as gallery_count
+                      FROM destinations d 
+                      WHERE d.is_active = 1 
+                      ORDER BY d.name ASC";
+$stmtDestinations = $pdo->prepare($queryDestinations);
+$stmtDestinations->execute();
+$destinations = $stmtDestinations->fetchAll();
+
+// 2. QUERY GALLERY DENGAN FILTER DINAMIS
+$queryGalleries = "SELECT g.*, d.name as destination_name, d.slug as destination_slug
+                   FROM galleries g 
+                   LEFT JOIN destinations d ON (g.destination_id = d.id OR g.destination = d.slug)
+                   WHERE g.type = 'image' AND g.is_active = 1";
+
 $params = [];
 if ($filter !== 'all') {
-    $queryGalleries .= " AND destination = ?";
+    // Cari destinasi berdasarkan slug
+    $queryGalleries .= " AND (d.slug = ? OR g.destination = ?)";
+    $params[] = $filter;
     $params[] = $filter;
 }
-$queryGalleries .= " ORDER BY created_at DESC LIMIT 12";
+
+$queryGalleries .= " ORDER BY g.created_at DESC LIMIT 12";
 
 $stmtGalleries = $pdo->prepare($queryGalleries);
 $stmtGalleries->execute($params);
@@ -23,51 +41,39 @@ $settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR);
 $tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
 $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 ?>
+
 <?php include 'views/header.php'; ?>
 
-<!-- Hero Section Kecil - Style modern -->
-<section class="py-5 bg-green-gradient text-white text-center">
-    <div class="container">
-        <h1 class="display-4 fw-bold text-white">Gallery Alfaruq Team</h1>
-        <p class="lead text-white opacity-90"><?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?></p>
-    </div>
-</section>
+<!-- ... Hero Section ... -->
 
-<!-- Section Pembuka -->
-<section id="gallery-intro" class="py-5 bg-green-50">
-    <div class="container text-center">
-        <h2 class="text-green-900 fw-bold mb-4">Kenangan Perjalanan Ibadah Bersama Kami</h2>
-        <p class="text-neutral-700 mb-0 mx-auto" style="max-width: 800px;">
-            Jelajahi momen-momen indah dari perjalanan umroh dan wisata religi bersama ALFARUQ TEAM. 
-            Dari kota suci Makkah dan Madinah hingga destinasi menarik di Thaif dan Turki, setiap gambar menceritakan kisah spiritual yang tak terlupakan.
-        </p>
-    </div>
-</section>
-
-<!-- Section Filter Button - Style modern -->
+<!-- Section Filter Button - DYNAMIC -->
 <section id="gallery-filter" class="py-4 bg-white">
     <div class="container text-center">
         <h5 class="text-green-900 fw-bold mb-4">Filter Berdasarkan Destinasi</h5>
         <div class="d-flex justify-content-center flex-wrap gap-2">
-            <?php
-            $filters = [
-                'all' => 'Semua',
-                'makkah' => 'Makkah',
-                'madinah' => 'Madinah',
-                'thaif' => 'Thaif',
-                'turki' => 'Turki'
-            ];
-            foreach ($filters as $key => $label): ?>
-                <a href="gallery.php?filter=<?php echo urlencode($key); ?>" 
-                   class="btn-modern-green <?php echo ($filter === $key) ? 'primary' : 'outline-green'; ?>">
-                    <?php echo htmlspecialchars($label); ?>
-                </a>
-            <?php endforeach; ?>
+            <!-- Semua -->
+            <a href="gallery.php?filter=all" 
+               class="btn-modern-green <?php echo ($filter === 'all') ? 'primary' : 'outline-green'; ?>">
+                Semua
+            </a>
+            
+            <!-- Dinamis dari database -->
+            <?php foreach ($destinations as $dest): 
+                if ($dest['gallery_count'] > 0): ?>
+                    <a href="gallery.php?filter=<?php echo urlencode($dest['slug']); ?>" 
+                       class="btn-modern-green <?php echo ($filter === $dest['slug']) ? 'primary' : 'outline-green'; ?>">
+                        <?php echo htmlspecialchars($dest['name']); ?>
+                        <span class="badge bg-green-100 text-green-800 ms-1">
+                            <?php echo $dest['gallery_count']; ?>
+                        </span>
+                    </a>
+                <?php endif; 
+            endforeach; ?>
         </div>
     </div>
 </section>
 
-<!-- Section Galeri Gambar - Style modern -->
+<!-- Section Galeri Gambar -->
 <section id="gallery-grid" class="py-5 bg-green-50">
     <div class="container">
         <?php if (!empty($galleries)): ?>
@@ -89,7 +95,7 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                     <h6 class="text-white mb-1"><?php echo htmlspecialchars($gallery['title']); ?></h6>
                                     <small class="text-white opacity-75">
                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                        <?php echo htmlspecialchars($gallery['destination'] ?? 'Umroh'); ?>
+                                        <?php echo htmlspecialchars($gallery['destination_name'] ?? $gallery['destination'] ?? 'Umroh'); ?>
                                     </small>
                                 </div>
                             </div>

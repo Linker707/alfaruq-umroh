@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 29, 2025 at 10:17 AM
+-- Generation Time: Dec 31, 2025 at 08:01 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -20,6 +20,44 @@ SET time_zone = "+00:00";
 --
 -- Database: `alfaruq_umroh`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_logs`
+--
+
+CREATE TABLE `activity_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `activity_logs`
+--
+
+INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:23:09'),
+(2, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:53:25'),
+(3, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:57:06'),
+(4, 1, 'ADD_USER', 'Menambahkan user baru: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:57:54'),
+(5, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:12:22'),
+(6, 1, 'CHANGE_PASSWORD', 'Mengubah password user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:58:56'),
+(7, 1, 'UPDATE_USER', 'Memperbarui user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:02'),
+(8, 1, 'DELETE_USER', 'Menghapus user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:06'),
+(9, 1, 'ADD_USER', 'Menambahkan user baru: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:16'),
+(10, 1, 'LOGOUT', 'User logout: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:19'),
+(11, 5, 'LOGIN', 'User: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:29'),
+(12, 5, 'LOGOUT', 'User logout: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:40'),
+(13, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:52'),
+(14, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:14:15'),
+(15, 1, 'LOGOUT', 'User logout: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:14:28'),
+(16, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:44:11');
 
 -- --------------------------------------------------------
 
@@ -66,6 +104,33 @@ CREATE TABLE `contacts` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `destinations`
+--
+
+CREATE TABLE `destinations` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `slug` varchar(100) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `destinations`
+--
+
+INSERT INTO `destinations` (`id`, `name`, `slug`, `icon`, `is_active`, `created_at`) VALUES
+(1, 'Makkah', 'makkah', '🕋', 1, '2025-12-30 06:40:25'),
+(2, 'Madinah', 'madinah', '🕌', 1, '2025-12-30 06:40:25'),
+(3, 'Turki', 'turki', '🇹🇷', 1, '2025-12-30 06:40:25'),
+(4, 'Thaif', 'thaif', '⛰️', 1, '2025-12-30 06:40:25'),
+(5, 'Lainnya', 'lainnya', '📍', 1, '2025-12-30 06:40:25'),
+(6, 'Badar', 'badar', '⛰️', 1, '2025-12-30 06:44:37');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `galleries`
 --
 
@@ -76,6 +141,7 @@ CREATE TABLE `galleries` (
   `image` varchar(255) NOT NULL,
   `type` enum('image','video') DEFAULT 'image',
   `destination` enum('makkah','madinah','thaif','turki') DEFAULT NULL,
+  `destination_id` int(11) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -84,21 +150,21 @@ CREATE TABLE `galleries` (
 -- Dumping data for table `galleries`
 --
 
-INSERT INTO `galleries` (`id`, `title`, `description`, `image`, `type`, `destination`, `is_active`, `created_at`) VALUES
-(1, 'Keberangkatan dari Bandara Hang Nadim Batam', 'Moment keberangkatan jamaah umroh dari bandara.', 'assets/img/bandara1.jpeg', 'image', NULL, 1, '2025-11-19 09:17:03'),
-(3, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, '2025-11-19 09:17:03'),
-(4, 'Ziarah di Madinah', 'Kunjungan ke makam Rasulullah SAW.', 'assets/img/raudah1.jpeg', 'image', 'madinah', 1, '2025-11-19 09:17:03'),
-(5, '', '', 'assets/img/makkah5.jpeg', 'image', NULL, 1, '2025-11-19 09:17:03'),
-(7, 'Grup Jamaah', 'Foto bersama seluruh jamaah.', 'assets/img/jamaah1.jpeg', 'image', NULL, 1, '2025-11-19 09:17:03'),
-(8, 'Sampai di Tanah Air', 'Kembali dengan penuh berkah.', 'assets/img/galeri-kembali.jpg', 'image', NULL, 1, '2025-11-19 09:17:03'),
-(10, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram, Makkah.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, '2025-11-24 07:57:18'),
-(11, 'Ziarah Di Madinah', 'Kunjungan ke Masjid Nabawi', 'assets/img/madinah1.jpeg', 'image', 'madinah', 1, '2025-11-24 07:57:18'),
-(12, 'Perjalanan di Madinah', 'Mengunjungi Masjid Quba yaitu masjid pertama yang dibangun oleh Nabi Muhammad SAW saat hijrah ke Madinah', 'assets/img/madinah2.jpeg', 'image', 'madinah', 1, '2025-11-24 07:57:18'),
-(13, 'Wisata di Thaif', 'Eksplorasi keindahan Thaif setelah umroh.', 'assets/img/thaif1.jpeg', 'image', 'thaif', 1, '2025-11-24 07:57:18'),
-(15, 'Kota Tua di Turki', 'Kunjungan ke situs bersejarah di Turki.', 'assets/img/turki3.jpeg', 'image', 'turki', 1, '2025-11-24 07:57:18'),
-(16, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki1.jpeg', 'image', 'turki', 1, '2025-11-24 07:57:18'),
-(18, 'Tour Leader', 'Profesionalitas para tour leader', 'assets/img/madinah4.jpeg', 'image', 'madinah', 1, '2025-11-24 07:57:18'),
-(19, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki2.jpeg', 'image', 'turki', 1, '2025-11-24 07:57:18');
+INSERT INTO `galleries` (`id`, `title`, `description`, `image`, `type`, `destination`, `destination_id`, `is_active`, `created_at`) VALUES
+(1, 'Keberangkatan dari Bandara Hang Nadim Batam', 'Moment keberangkatan jamaah umroh dari bandara.', 'assets/img/bandara1.jpeg', 'image', NULL, NULL, 1, '2025-11-19 09:17:03'),
+(3, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, 1, '2025-11-19 09:17:03'),
+(4, 'Ziarah di Madinah', 'Kunjungan ke makam Rasulullah SAW.', 'assets/img/raudah1.jpeg', 'image', 'madinah', 2, 1, '2025-11-19 09:17:03'),
+(7, 'Grup Jamaah', 'Foto bersama seluruh jamaah.', 'assets/img/jamaah1.jpeg', 'image', NULL, NULL, 1, '2025-11-19 09:17:03'),
+(8, 'Sampai di Tanah Air', 'Kembali dengan penuh berkah.', 'assets/img/galeri-kembali.jpg', 'image', NULL, NULL, 1, '2025-11-19 09:17:03'),
+(10, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram, Makkah.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, 1, '2025-11-24 07:57:18'),
+(11, 'Ziarah Di Madinah', 'Kunjungan ke Masjid Nabawi', 'assets/img/madinah1.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
+(12, 'Perjalanan di Madinah', 'Mengunjungi Masjid Quba yaitu masjid pertama yang dibangun oleh Nabi Muhammad SAW saat hijrah ke Madinah', 'assets/img/madinah2.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
+(13, 'Wisata di Thaif', 'Eksplorasi keindahan Thaif setelah umroh.', 'assets/img/thaif1.jpeg', 'image', 'thaif', 4, 1, '2025-11-24 07:57:18'),
+(15, 'Kota Tua di Turki', 'Kunjungan ke situs bersejarah di Turki.', 'assets/img/turki3.jpeg', 'image', 'turki', 3, 1, '2025-11-24 07:57:18'),
+(16, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki1.jpeg', 'image', 'turki', 3, 1, '2025-11-24 07:57:18'),
+(18, 'Tour Leader', 'Profesionalitas para tour leader', 'assets/img/madinah4.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
+(19, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki2.jpeg', 'image', 'turki', 3, 1, '2025-11-24 07:57:18'),
+(20, 'city tour mekkah', NULL, 'assets/img/gallery/1767163502_6954c66ec59ee.jpeg', 'image', '', 5, 1, '2025-12-31 06:45:02');
 
 -- --------------------------------------------------------
 
@@ -125,8 +191,8 @@ CREATE TABLE `packages` (
 
 INSERT INTO `packages` (`id`, `name`, `description`, `duration`, `facilities`, `image`, `is_active`, `is_popular`, `created_at`, `updated_at`) VALUES
 (2, 'UMROH AWAL RAMADHAN', 'Mulai Ramadhan Anda dengan pengalaman ibadah paling istimewa! Umroh Awal Ramadhan menawarkan suasana ibadah yang lebih tenang, kesempatan pahala berlipat, serta layanan premium yang membuat perjalanan semakin nyaman.\r\nNikmati hotel dekat Masjidil Haram & Nabawi, fasilitas mewah, dan pendampingan jamaah yang profesional. Tempat terbatas amankan kursi Anda sekarang dan sambut Ramadhan langsung dari Tanah Suci!', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohawalramadhan.png', 1, 1, '2025-11-19 09:17:03', '2025-12-29 08:08:13'),
-(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, 0, '2025-11-19 09:17:03', '2025-12-29 08:11:44'),
-(4, 'UMROH MARET', 'Tutup musim umroh Anda dengan pengalaman ibadah yang penuh makna melalui Paket Umroh Maret, momen istimewa menjelang berakhirnya musim umroh sebelum memasuki musim haji. Suasana Tanah Suci di periode ini menghadirkan nuansa haru dan keistimewaan tersendiri, menjadikan setiap rangkaian ibadah terasa lebih berkesan dan mendalam.\r\n\r\nDengan dukungan hotel strategis dekat Masjidil Haram dan Masjid Nabawi, fasilitas perjalanan yang nyaman, serta pendampingan pembimbing ibadah yang profesional, jamaah dapat menjalankan umroh dengan tenang dan optimal. Kesempatan umroh terakhir sebelum musim haji ini sangat terbatas, segera amankan keberangkatan Anda dan raih pengalaman ibadah yang tak terlupakan di Tanah Suci.', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik\r\n', 'assets/img/umrohmaret.png\r\n', 1, 1, '2025-12-29 07:38:02', '2025-12-29 08:10:55');
+(3, 'UMROH AKHIR RAMADHAN', 'Raih kesempatan merasakan malam paling mulia langsung di Tanah Suci! Umroh Akhir Ramadhan memberi Anda peluang besar untuk mendapatkan keberkahan Lailatul Qadr, malam yang lebih baik dari seribu bulan.\r\nDengan suasana ibadah yang penuh ketenangan, hotel dekat Masjid, dan pendampingan ibadah yang profesional, Anda dapat fokus berdoa, bertawaf, dan memperbanyak amalan di malam-malam terakhir Ramadhan.\r\nTempat sangat terbatas wujudkan impian meraih Lailatul Qadr di Tanah Haram dan pulang dengan hati yang lebih bersih serta keberkahan yang tak ternilai.', 16, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 2 x 1 (Sahur & Iftar)\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik', 'assets/img/umrohakhirramadhan.jpg', 1, 0, '2025-11-19 09:17:03', '2025-12-31 06:46:48'),
+(4, 'UMROH MARET', 'Tutup musim umroh Anda dengan pengalaman ibadah yang penuh makna melalui Paket Umroh Maret, momen istimewa menjelang berakhirnya musim umroh sebelum memasuki musim haji. Suasana Tanah Suci di periode ini menghadirkan nuansa haru dan keistimewaan tersendiri, menjadikan setiap rangkaian ibadah terasa lebih berkesan dan mendalam.\r\n\r\nDengan dukungan hotel strategis dekat Masjidil Haram dan Masjid Nabawi, fasilitas perjalanan yang nyaman, serta pendampingan pembimbing ibadah yang profesional, jamaah dapat menjalankan umroh dengan tenang dan optimal. Kesempatan umroh terakhir sebelum musim haji ini sangat terbatas, segera amankan keberangkatan Anda dan raih pengalaman ibadah yang tak terlupakan di Tanah Suci.', 12, 'Tiket Pesawat PP\r\nHotel\r\nVisa + Bus + Tasreh \r\nRaudhah\r\nMakan 3x FB\r\nPerlengkapan\r\nHandling\r\nTL & Mutowif\r\nUmroh 3x\r\nSiskopatuh + Asuransi\r\nZiarah Madinah & Mekkah\r\nKurma 1 Kardus\r\nAir Zam-Zam 5 liter\r\nSertifikat Umroh\r\nAyam Albaik\r\n', 'assets/img/umrohmaret.png\r\n', 1, 0, '2025-12-29 07:38:02', '2025-12-31 06:46:48');
 
 -- --------------------------------------------------------
 
@@ -180,7 +246,6 @@ CREATE TABLE `registrations` (
 
 CREATE TABLE `schedules` (
   `id` int(11) NOT NULL,
-  `package_id` int(11) NOT NULL,
   `departure_date` date NOT NULL,
   `return_date` date NOT NULL,
   `available_slots` int(11) NOT NULL,
@@ -198,19 +263,19 @@ CREATE TABLE `schedules` (
 -- Dumping data for table `schedules`
 --
 
-INSERT INTO `schedules` (`id`, `package_id`, `departure_date`, `return_date`, `available_slots`, `status`, `airline`, `route`, `departure_day`, `duration_days`, `package_name`, `package_description`, `package_price`) VALUES
-(1, 1, '2025-07-12', '2025-07-22', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(2, 1, '2025-07-26', '2025-08-05', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SABTU', 12, NULL, NULL, NULL),
-(3, 1, '2025-08-04', '2025-08-14', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SENIN', 12, NULL, NULL, NULL),
-(4, 1, '2025-08-09', '2025-08-20', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(5, 1, '2025-08-23', '2025-09-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(6, 1, '2025-09-27', '2025-10-08', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(7, 1, '2025-10-18', '2025-10-28', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(8, 1, '2025-11-22', '2025-12-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(9, 1, '2025-12-20', '2025-12-31', 24, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(10, 1, '2026-01-17', '2026-01-27', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(11, 1, '2026-02-21', '2026-03-04', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
-(12, 1, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL);
+INSERT INTO `schedules` (`id`, `departure_date`, `return_date`, `available_slots`, `status`, `airline`, `route`, `departure_day`, `duration_days`, `package_name`, `package_description`, `package_price`) VALUES
+(1, '2025-07-12', '2025-07-22', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(2, '2025-07-26', '2025-08-05', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SABTU', 12, NULL, NULL, NULL),
+(3, '2025-08-04', '2025-08-14', 0, 'full', 'BATIK AIR', 'BTH KUL JED KUL BTH', 'SENIN', 12, NULL, NULL, NULL),
+(4, '2025-08-09', '2025-08-20', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(5, '2025-08-23', '2025-09-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(6, '2025-09-27', '2025-10-08', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(7, '2025-10-18', '2025-10-28', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(8, '2025-11-22', '2025-12-02', 0, 'full', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(9, '2025-12-20', '2025-12-31', 24, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(10, '2026-01-17', '2026-01-27', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(11, '2026-02-21', '2026-03-04', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL),
+(12, '2026-03-21', '2026-04-01', 45, 'available', 'LION AIR', 'BTH JED BTH', 'SABTU', 12, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -303,16 +368,65 @@ INSERT INTO `testimonials` (`id`, `name`, `email`, `message`, `rating`, `image`,
 (9, 'Doni Saputra', 'doni@example.com', 'Alfaruq Team memberikan pengalaman umroh yang luar biasa bagi saya. Seluruh rangkaian ibadah terasa sangat terarah dan mendalam karena pembimbing ibadah memberikan penjelasan yang sangat membantu.', 4, 'assets/img/comment-photo.jpg', 1, '2025-12-01 02:35:47', 'Doni Saputra', '081200334455', 'Sendiri', 'Dari website + rating Google Maps', 'Karena reputasinya yang baik dan banyak rating positif.', 'Puas', 'Informasi cukup jelas meskipun penyampaian agak cepat.', 'Puas', 'Manasik cukup lengkap dan mendetail.', 'Puas', 'Tour berjalan lancar tanpa ada masalah berarti.', 'Puas', 'Makanan cukup enak meskipun ada beberapa menu yang kurang cocok.', 'Puas', 'Tour Leader cukup baik dan membantu.', 'Puas', 'Muthawif informatif namun terkadang terlalu cepat menjelaskan.', 'Puas', 'Itinerary cukup baik.', 'Ya', 'Karena saya puas dengan sebagian besar pelayanannya.', 'Perlu sedikit peningkatan pada makanan.', 'Secara keseluruhan perjalanan ini membawa ketenangan.', '2025-03-11'),
 (10, 'Karina Zahra', 'karina@example.com', 'Saya benar-benar merasa dimudahkan dan dibimbing sepanjang perjalanan umroh bersama Alfaruq Team. Tim sangat ramah dan sabar dalam menjawab pertanyaan jamaah. Saya sebagai jamaah perempuan merasa sangat aman dan nyaman.', 5, 'assets/img/comment-photo.jpg', 1, '2025-12-01 02:35:47', 'Karina Zahra', '082278889900', 'Sendiri', 'Dari TikTok dan rekomendasi saudara', 'Karena terlihat profesional dan komunikatif sejak awal saya menghubungi admin.', 'Sangat puas', 'Informasi yang diberikan sangat lengkap dan disusun dengan rapi.', 'Sangat puas', 'Manasik sangat mudah diikuti dan disampaikan dengan lembut.', 'Sangat puas', 'Tour terasa sangat menyenangkan, tidak melelahkan, dan penuh edukasi.', 'Sangat puas', 'Makanannya sangat cocok dan tidak membuat perut bermasalah.', 'Sangat puas', 'Pembimbing ibadah sangat perhatian, terutama pada jamaah perempuan.', 'Sangat puas', 'Muthawif sangat ramah dan memiliki suara yang menenangkan.', 'Sangat puas', 'Itinerary berjalan dengan sempurna tanpa hambatan.', 'Ya', 'Saya ingin kembali menggunakan travel ini karena sangat nyaman.', 'Tidak ada saran tambahan.', 'Perjalanan ini sangat berkesan dan memberikan banyak ketenangan spiritual.', '2025-07-26');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `role` varchar(20) DEFAULT 'admin',
+  `is_active` tinyint(1) DEFAULT 1,
+  `failed_attempts` int(11) DEFAULT 0,
+  `is_locked` tinyint(1) DEFAULT 0,
+  `lock_until` datetime DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`, `role`, `is_active`, `failed_attempts`, `is_locked`, `lock_until`, `last_login`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'admin', '$2y$10$FO6A8CI9cPDRVD4/6K6Z3O0ZhvsrH6knEpVWCqa8YNDcVAUb.WNNS', 'Administrator Utama', NULL, NULL, 'master_admin', 1, 0, 0, NULL, '2025-12-31 13:44:11', NULL, '2025-12-30 02:01:07', '2025-12-31 06:44:11'),
+(5, 'admin1', '$2y$10$10rW0.XCwrVLOz5YIlrIDOt4dpMy0GQC9dDNRhGuWvmuy.ZQVLmbS', 'bella', '', '', 'admin', 1, 0, 0, NULL, '2025-12-31 11:59:29', 1, '2025-12-31 04:59:16', '2025-12-31 04:59:29');
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_action` (`action`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `destinations`
+--
+ALTER TABLE `destinations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `slug` (`slug`);
 
 --
 -- Indexes for table `galleries`
 --
 ALTER TABLE `galleries`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_active_type` (`is_active`,`type`);
+  ADD KEY `idx_active_type` (`is_active`,`type`),
+  ADD KEY `fk_destination_id` (`destination_id`);
 
 --
 -- Indexes for table `packages`
@@ -349,14 +463,33 @@ ALTER TABLE `testimonials`
   ADD KEY `idx_approved_created` (`is_approved`,`created_at`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `destinations`
+--
+ALTER TABLE `destinations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `galleries`
 --
 ALTER TABLE `galleries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `packages`
@@ -387,6 +520,12 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `testimonials`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
