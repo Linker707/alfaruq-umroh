@@ -1,87 +1,78 @@
 <?php
-// gallery.php - Halaman galeri ALFARUQ TEAM, menampilkan gambar perjalanan dengan filter destinasi
-require_once 'config/database.php'; // Memuat file koneksi database PDO untuk interaksi dengan MySQL
+require_once 'config/database.php';
+require_once 'config/api-local.php'; // Gunakan API lokal
 
-// Ambil filter dari URL (GET) - default 'all'
-$filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'all';
+// Inisialisasi API
+$api = new LocalAPI();
 
-// Query galeri: hanya image aktif, urutkan berdasarkan created_at DESC, dengan filter destinasi jika bukan 'all'
-$queryGalleries = "SELECT * FROM galleries WHERE type = 'image' AND is_active = 1";
-$params = [];
-if ($filter !== 'all') {
-    $queryGalleries .= " AND destination = ?";
-    $params[] = $filter;
+// Coba ambil dari API, jika gagal ambil dari database
+try {
+    $galleries = $api->getGalleries(12);
+    
+    // Debug: Tampilkan jumlah gallery dari API
+    // echo "<!-- Gallery dari API: " . count($galleries) . " items -->";
+    
+} catch (Exception $e) {
+    // Jika API error, fallback ke database
+    $queryGalleries = "SELECT * FROM galleries WHERE is_active = 1 ORDER BY created_at DESC LIMIT 12";
+    $stmtGalleries = $pdo->prepare($queryGalleries);
+    $stmtGalleries->execute();
+    $galleries = $stmtGalleries->fetchAll(PDO::FETCH_ASSOC);
 }
-$queryGalleries .= " ORDER BY created_at DESC LIMIT 12"; // Limit 12 untuk performa, bisa tambah pagination nanti
 
-$stmtGalleries = $pdo->prepare($queryGalleries);
-$stmtGalleries->execute($params);
-$galleries = $stmtGalleries->fetchAll();
+// Filter jika ada
+$filter = $_GET['filter'] ?? 'all';
+if ($filter !== 'all') {
+    $galleries = array_filter($galleries, function($gallery) use ($filter) {
+        return ($gallery['destination'] ?? '') === $filter;
+    });
+}
 
-// Ambil settings untuk tagline (opsional)
-$querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('tagline1', 'tagline2')";
-$stmtSettings = $pdo->prepare($querySettings);
-$stmtSettings->execute();
-$settings = $stmtSettings->fetchAll(PDO::FETCH_KEY_PAIR);
-$tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
-$tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
+// Ambil destinasi untuk filter
+$queryDestinations = "SELECT * FROM destinations WHERE is_active = 1";
+$stmtDestinations = $pdo->prepare($queryDestinations);
+$stmtDestinations->execute();
+$destinations = $stmtDestinations->fetchAll();
 ?>
-<?php include 'views/header.php'; // Include file header (navbar, meta tags, dll.) ?>
 
-<!-- Hero Section Kecil - Dengan judul dan tagline -->
-<section class="py-5 bg-success text-white text-center">
+<?php include 'views/header.php'; ?>
+
+<!-- ... hero section ... -->
+
+<section id="gallery-grid" class="py-5 bg-green-50">
     <div class="container">
-        <h1 class="display-4 fw-bold">Gallery Alfaruq Team</h1>
-        <p class="lead"><?php echo htmlspecialchars($tagline1); ?> - <?php echo htmlspecialchars($tagline2); ?></p>
-    </div>
-</section>
-
-<!-- Section Pembuka - Teks singkat tentang galeri -->
-<section id="gallery-intro" class="py-5 bg-light">
-    <div class="container text-center">
-        <h2 class="text-success fw-bold mb-4">Kenangan Perjalanan Ibadah Bersama Kami</h2>
-        <p class="text-muted mb-0">Jelajahi momen-momen indah dari perjalanan umroh dan wisata religi bersama ALFARUQ TEAM. Dari kota suci Makkah dan Madinah hingga destinasi menarik di Thaif dan Turki, setiap gambar menceritakan kisah spiritual yang tak terlupakan.</p>
-    </div>
-</section>
-
-<!-- Section Filter Button - Button untuk filter destinasi -->
-<section id="gallery-filter" class="py-4 bg-white">
-    <div class="container text-center">
-        <h5 class="text-success fw-bold mb-4">Filter Berdasarkan Destinasi</h5>
-        <div class="d-flex justify-content-center flex-wrap gap-2">
-            <?php
-            // Array filter destinasi
-            $filters = [
-                'all' => 'Semua',
-                'makkah' => 'Makkah',
-                'madinah' => 'Madinah',
-                'thaif' => 'Thaif',
-                'turki' => 'Turki'
-            ];
-            foreach ($filters as $key => $label): ?>
-                <a href="gallery.php?filter=<?php echo urlencode($key); ?>" class="btn <?php echo ($filter === $key) ? 'btn-success' : 'btn-outline-success'; ?> rounded-pill px-4 py-2 fw-bold" style="transition: all 0.3s ease;">
-                    <?php echo htmlspecialchars($label); ?>
-                </a>
-            <?php endforeach; ?>
+        <div class="mb-4">
+            <small class="text-muted">
+                <?php 
+                echo "Menampilkan " . count($galleries) . " gallery";
+                if ($filter !== 'all') {
+                    echo " (filter: $filter)";
+                }
+                ?>
+            </small>
         </div>
-    </div>
-</section>
-
-<!-- Section Galeri Gambar - Grid responsif dengan efek hover -->
-<section id="gallery-grid" class="py-5 bg-light">
-    <div class="container">
+        
         <?php if (!empty($galleries)): ?>
-            <div class="row g-4"> <!-- Gap 4 untuk spacing rapi -->
+            <div class="row g-4">
                 <?php foreach ($galleries as $gallery): ?>
-                    <div class="col-lg-3 col-md-4 col-sm-6"> <!-- Grid responsif: 4 di lg, 3 di md, 2 di sm -->
-                        <div class="card border-0 shadow-sm rounded overflow-hidden position-relative" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                            <!-- Gambar dengan efek hover zoom -->
-                            <img src="<?php echo htmlspecialchars($gallery['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($gallery['title']); ?>" style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
-                            <!-- Overlay teks saat hover -->
-                            <div class="card-img-overlay d-flex align-items-end p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); opacity: 0; transition: opacity 0.3s ease;">
-                                <div class="text-white">
-                                    <h6 class="card-title fw-bold mb-1"><?php echo htmlspecialchars($gallery['title']); ?></h6>
-                                    <p class="card-text small mb-0"><?php echo htmlspecialchars($gallery['description']); ?></p>
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="gallery-item-modern-light">
+                            <!-- Gambar dari API -->
+                            <img src="<?php echo htmlspecialchars($gallery['image'] ?? 'assets/img/default.jpg'); ?>" 
+                                 class="gallery-img-modern" 
+                                 alt="<?php echo htmlspecialchars($gallery['title'] ?? ''); ?>"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='assets/img/default.jpg';">
+                            
+                            <div class="gallery-overlay-modern-light">
+                                <div class="gallery-info-modern">
+                                    <h6 class="text-white mb-1">
+                                        <?php echo htmlspecialchars($gallery['title'] ?? 'Gallery'); ?>
+                                    </h6>
+                                    <small class="text-white opacity-75">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <?php echo htmlspecialchars($gallery['destination'] ?? 'Umroh'); ?>
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -89,21 +80,71 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div class="text-center">
-                <p class="text-muted">Tidak ada gambar ditemukan untuk filter ini. Coba filter lain.</p>
+            <div class="text-center py-5">
+                <div class="empty-state-modern">
+                    <i class="fas fa-image text-green-300" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3 text-green-800">Belum ada gallery</h5>
+                    <p class="text-neutral-700 mb-4">Gallery akan muncul setelah diupload via admin panel</p>
+                    
+                    <!-- Test Upload dari Gallery -->
+                    <div class="mt-4">
+                        <h6 class="text-green-700 mb-3">Test Upload API Lokal:</h6>
+                        <form id="testUploadForm" enctype="multipart/form-data" class="mb-3">
+                            <input type="file" name="image" accept="image/*" class="form-control mb-2">
+                            <button type="submit" class="btn-modern-green primary sm">
+                                <i class="fas fa-upload me-2"></i>Test Upload
+                            </button>
+                        </form>
+                        <div id="uploadResult"></div>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
     </div>
 </section>
 
-<!-- CTA Section - Call to action untuk lihat paket atau hubungi -->
-<section id="cta-gallery" class="py-5 bg-warning text-dark text-center">
-    <div class="container">
-        <h2 class="mb-3 fw-bold">Ingin Pengalaman Serupa?</h2>
-        <p class="mb-4">Bergabunglah dengan perjalanan ibadah kami dan buat kenangan tak terlupakan.</p>
-        <a href="packages.php" class="btn btn-success btn-lg rounded-pill px-4 me-2">Lihat Paket</a>
-        <a href="contact.php" class="btn btn-outline-success btn-lg rounded-pill px-4">Hubungi Kami</a>
-    </div>
-</section>
+<script>
+// Script untuk test upload langsung dari gallery
+document.getElementById('testUploadForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('http://localhost/alfaroq-admin-api/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        const resultDiv = document.getElementById('uploadResult');
+        
+        if (result.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Success!</strong> Gambar berhasil diupload.<br>
+                    URL: <a href="${result.url}" target="_blank">${result.url}</a><br>
+                    <img src="${result.url}" style="max-width: 200px; margin-top: 10px;">
+                </div>
+            `;
+            
+            // Auto refresh setelah 3 detik
+            setTimeout(() => location.reload(), 3000);
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> ${result.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('uploadResult').innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Network Error:</strong> ${error.message}
+            </div>
+        `;
+    }
+});
+</script>
 
-<?php include 'views/footer.php'; // Include file footer (script, dll.) ?>
+<?php include 'views/footer.php'; ?>

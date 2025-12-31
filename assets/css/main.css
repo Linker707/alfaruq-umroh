@@ -1,191 +1,986 @@
-/* Font Families - Mengatur font global untuk konsistensi brand */
-body, button, input, select, textarea {
-    font-family: 'Poppins', sans-serif; /* Font utama untuk teks body */
-}
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif; /* Font untuk heading */
+/* =================================================================
+   MAIN STYLES - ALFARUQ TRAVEL (MODERN GREEN THEME)
+   ================================================================= */
+
+/* ============================================
+   1. MODERN COLOR SYSTEM (GREEN DOMINANT)
+   ============================================ */
+
+:root {
+    /* ========== PRIMARY GREEN PALETTE ========== */
+    --green-50: #E8F5E9;    /* Lightest green untuk background sections */
+    --green-100: #C8E6C9;   /* Light green untuk hover states */
+    --green-200: #A5D6A7;   /* Medium light green */
+    --green-300: #81C784;   /* Medium green untuk borders */
+    --green-400: #66BB6A;   /* Primary green - lebih soft */
+    --green-500: #4CAF50;   /* Brand green - utama */
+    --green-600: #43A047;   /* Darker green untuk hover */
+    --green-700: #388E3C;   /* Dark green untuk text/buttons */
+    --green-800: #2E7D32;   /* Darkest green untuk headings */
+    --green-900: #1B5E20;   /* Very dark green untuk strong accents */
+    
+    /* ========== ACCENT COLORS ========== */
+    --accent-50: #FFFDE7;   /* Light yellow */
+    --accent-100: #FFF9C4;  /* Light accent */
+    --accent-200: #FFF59D;  /* Medium light */
+    --accent-300: #FFF176;  /* Medium yellow */
+    --accent-400: #FFEE58;  /* Primary accent */
+    --accent-500: #FFEB3B;  /* Brand yellow */
+    --accent-600: #FDD835;  /* Darker yellow */
+    --accent-700: #FBC02D;  /* Gold-ish untuk premium feel */
+    --accent-800: #F9A825;  /* Dark gold */
+    --accent-900: #F57F17;  /* Orange-yellow untuk highlights */
+    
+    /* ========== NEUTRAL COLORS ========== */
+    --neutral-50: #FAFAFA;   /* Background light */
+    --neutral-100: #F5F5F5;  /* Card background */
+    --neutral-200: #EEEEEE;  /* Borders light */
+    --neutral-300: #E0E0E0;  /* Borders medium */
+    --neutral-400: #BDBDBD;  /* Text disabled */
+    --neutral-500: #9E9E9E;  /* Text secondary */
+    --neutral-600: #757575;  /* Text primary */
+    --neutral-700: #616161;  /* Text dark - UNTUK BODY TEXT */
+    --neutral-800: #424242;  /* Headings secondary */
+    --neutral-900: #212121;  /* Headings dark */
+    
+    /* ========== GRADIENTS MODERN ========== */
+    --gradient-green: linear-gradient(135deg, var(--green-400) 0%, var(--green-700) 100%);
+    --gradient-green-light: linear-gradient(135deg, var(--green-300) 0%, var(--green-500) 100%);
+    --gradient-green-dark: linear-gradient(135deg, var(--green-600) 0%, var(--green-900) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-700) 100%);
+    --gradient-green-accent: linear-gradient(135deg, var(--green-500) 0%, var(--accent-500) 100%);
+    
+    /* ========== SHADOWS MODERN ========== */
+    --shadow-xs: 0 1px 3px rgba(76, 175, 80, 0.05);
+    --shadow-sm: 0 2px 8px rgba(76, 175, 80, 0.08);
+    --shadow-md: 0 4px 16px rgba(76, 175, 80, 0.12);
+    --shadow-lg: 0 8px 28px rgba(76, 175, 80, 0.16);
+    --shadow-xl: 0 12px 40px rgba(76, 175, 80, 0.2);
+    --shadow-green: 0 4px 20px rgba(76, 175, 80, 0.15);
+    --shadow-accent: 0 4px 20px rgba(255, 235, 59, 0.15);
+    
+    /* ========== BORDER RADIUS MODERN ========== */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 40px;
+    --radius-circle: 50%;
+    
+    /* ========== TRANSITIONS & ANIMATIONS ========== */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+    
+    /* ========== SPACING SYSTEM ========== */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
 }
 
-/* Navbar Putih (style awal - di atas hero/slider) */
-.navbar-light-cstm {
-    background-color: #fff !important; /* Background putih solid */
-    box-shadow: 0 2px 8px rgba(22, 73, 36, 0.15); /* Shadow ringan untuk efek depth */
-    transition: all 0.3s ease; /* Transisi smooth untuk perubahan */
+/* ============================================
+   2. BASE STYLES & TYPOGRAPHY
+   ============================================ */
+
+/* Font Families */
+body, button, input, select, textarea {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-.navbar-light-cstm .navbar-nav .nav-link {
-    color: #000 !important; /* Tulisan hitam untuk kontras di putih */
-    font-weight: 600 !important; /* Semibold untuk ketebalan */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 700;
+    color: var(--green-900);
+    line-height: 1.2;
+    margin-bottom: var(--space-md);
 }
-.navbar-light-cstm .navbar-nav .nav-link:hover,
-.navbar-light-cstm .navbar-nav .nav-link.active {
-    color: #33a661 !important; /* Hover hijau cerah */
+
+h1 {
+    font-size: 2.5rem;
 }
-.navbar-light-cstm .navbar-toggler-icon {
-    /* Filter untuk membuat ikon toggle terlihat di putih */
-    filter: invert(31%) sepia(52%) saturate(962%) hue-rotate(98deg) brightness(85%) contrast(83%);
+
+h2 {
+    font-size: 2rem;
+    position: relative;
+    display: inline-block;
 }
-.navbar-light-cstm .btn-outline-success {
-    border-color: rgb(22, 73, 36); /* Outline hijau tua */
-    color: #164924; /* Tulisan hijau tua */
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--gradient-green);
+    border-radius: 2px;
+}
+
+p {
+    font-size: 1rem;
+    color: var(--neutral-700);
+    margin-bottom: var(--space-md);
+    line-height: 1.6;
+}
+
+.lead {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--neutral-800);
+}
+
+/* ============================================
+   3. NAVBAR STYLES
+   ============================================ */
+
+.navbar-modern-green {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+    box-shadow: var(--shadow-sm);
+    padding: 0.75rem 0;
+    transition: all var(--transition-normal);
+}
+
+.navbar-modern-green.scrolled {
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: var(--shadow-md);
+    padding: 0.5rem 0;
+}
+
+/* Brand */
+.navbar-modern-green .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.navbar-modern-green .navbar-brand img {
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 2px 4px rgba(76, 175, 80, 0.2));
+    transition: transform var(--transition-normal);
+}
+
+.navbar-modern-green .navbar-brand:hover img {
+    transform: scale(1.05) rotate(5deg);
+}
+
+.navbar-modern-green .navbar-brand-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+/* Nav Links */
+.navbar-modern-green .nav-link {
+    color: var(--neutral-800) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.25rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.navbar-modern-green .nav-link:hover {
+    color: var(--green-700) !important;
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.navbar-modern-green .nav-link.active {
+    color: var(--green-700) !important;
+    background: rgba(76, 175, 80, 0.1);
     font-weight: 600;
 }
-.navbar-light-cstm .btn-outline-success:hover {
-    background-color: #33a661; /* Background hijau saat hover */
-    border-color: #33a661;
-    color: #fff; /* Tulisan putih saat hover */
-}
-/* Styling untuk tulisan brand/logo di navbar putih - mengikuti warna link */
-.navbar-light-cstm .navbar-brand-text {
-    color: #000 !important; /* Tulisan hitam, sama dengan link navbar */
+
+.navbar-modern-green .nav-link.active::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 3px;
+    background: var(--gradient-green);
+    border-radius: 1.5px;
 }
 
-/* Navbar Transparan (saat scroll melewati hero) - Sekarang hijau solid seperti update Anda */
-.navbar-transparent {
-    background-color: #33a661 !important; /* Background hijau solid (bukan transparan) */
-    backdrop-filter: blur(10px); /* Efek blur untuk readability tanpa solid background */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow ringan */
-    font-weight: 600 !important;
-    color: #ffffff !important;
-}
-.navbar-transparent .navbar-nav .nav-link {
-    color: #ffffff !important; /* Tulisan putih untuk kontras di hijau */
-    font-weight: 600 !important; /* Semibold */
-}
-.navbar-transparent .navbar-nav .nav-link:hover,
-.navbar-transparent .navbar-nav .nav-link.active {
-    color: #fae314 !important; /* Hover kuning terang */
-}
-.navbar-transparent .navbar-toggler-icon {
-    filter: invert(100%); /* Ikon putih untuk kontras */
-}
-.navbar-transparent .btn-outline-success {
-    background-color: #fff !important; /* Background putih solid untuk tombol */
-    border-color: #ffffff; /* Border putih */
-    color: #164924 !important; /* Tulisan hijau tua untuk kontras */
-    font-weight: 600 !important;
-}
-.navbar-transparent .btn-outline-success:hover {
-    background-color: #fae314 !important; /* Hover kuning terang */
-    border-color: #fae314;
-    color: #164924 !important; /* Tulisan tetap kontras */
-}
-/* Styling untuk tulisan brand/logo di navbar transparan - mengikuti warna link */
-.navbar-transparent .navbar-brand-text {
-    color: #ffffff !important; /* Tulisan putih, sama dengan link navbar */
+/* Dropdown Menu */
+.navbar-modern-green .dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0;
 }
 
-/* Hero Slider - Styling untuk carousel gambar */
-header .overlay {
-    position: relative;
+.navbar-modern-green .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: var(--neutral-700);
+    transition: all var(--transition-fast);
+}
+
+.navbar-modern-green .dropdown-item:hover {
+    background-color: var(--green-50);
+    color: var(--green-700);
+}
+
+.navbar-modern-green .dropdown-item.active {
+    background-color: var(--green-100);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+/* ============================================
+   4. HERO CAROUSEL
+   ============================================ */
+
+.hero-overlay-modern {
+    background: linear-gradient(
+        to bottom,
+        rgba(27, 94, 32, 0.7) 0%,
+        rgba(46, 125, 50, 0.6) 50%,
+        rgba(76, 175, 80, 0.5) 100%
+    );
+    backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     height: 100%;
+    padding: 0 1rem;
 }
+
+.hero-overlay-modern h1,
+.hero-overlay-modern .lead,
+.hero-overlay-modern .badge,
+.hero-overlay-modern .btn-modern-green {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-overlay-modern h1 {
+    color: white !important;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: var(--space-md);
+}
+
+.hero-overlay-modern .lead {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 1.25rem;
+    margin-bottom: var(--space-xl);
+}
+
+/* Carousel Controls */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-    /* Filter untuk membuat kontrol carousel hijau */
-    filter: invert(40%) sepia(100%) saturate(600%) hue-rotate(80deg) brightness(90%) contrast(85%);
-}
-
-/* Text shadow untuk readability di hero */
-header h1,
-header h6,
-header p {
-    text-shadow: 0 0 8px rgba(0,0,0,0.7);
-}
-
-/* Button shadow di hero */
-header .btn-success.shadow {
-    box-shadow: 0 4px 12px rgba(51,166,97,0.5);
-}
-
-/* Cards - Styling untuk paket dan testimoni */
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animasi hover */
-    border-radius: 0.75rem; /* Rounded corners */
-}
-.card:hover {
-    transform: translateY(-5px); /* Efek lift */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Buttons umum - Styling untuk tombol sukses dan warning */
-.btn-success {
-    background-color: #33a661;
-    border-color: #33a661;
-}
-.btn-success:hover {
-    background-color: #164924;
-    border-color: #164924;
-}
-.btn-warning {
-    background-color: #fae314;
-    border-color: #fae314;
-    color: #164924;
-}
-.btn-warning:hover {
-    background-color: #d5ae29;
-    border-color: #d5ae29;
-}
-
-/* Carousel gallery controls - Styling untuk kontrol galeri */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: #33a661 !important;
+    background-color: var(--green-500) !important;
     border-radius: 50% !important;
-    padding: 10px !important;
+    padding: 15px !important;
+    width: 50px !important;
+    height: 50px !important;
+    background-size: 60% !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Gallery Styles - Efek hover dan responsif untuk galeri */
-/* Efek hover pada card galeri */
-#gallery-grid .card:hover {
-    transform: scale(1.05); /* Zoom ringan */
-    box-shadow: 0 8px 25px rgba(51, 166, 97, 0.3); /* Shadow hijau untuk kontras */
-}
-#gallery-grid .card:hover .card-img-top {
-    transform: scale(1.1); /* Zoom gambar */
-}
-#gallery-grid .card:hover .card-img-overlay {
-    opacity: 1; /* Tampilkan overlay teks */
-}
-/* Button filter hover */
-#gallery-filter .btn-outline-success:hover {
-    background-color: #33a661;
-    border-color: #33a661;
-    color: #fff;
-}
-/* Responsif untuk mobile */
-@media (max-width: 768px) {
-    #gallery-grid .card-img-top {
-        height: 200px; /* Tinggi gambar lebih kecil di mobile */
-    }
-    #gallery-filter .d-flex {
-        flex-direction: column; /* Button filter vertikal di mobile */
-        align-items: center;
-    }
+.carousel-indicators button {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    border: 2px solid transparent !important;
+    margin: 0 5px !important;
 }
 
-.divider hr {
-    border: 1px solid #33a661;
+.carousel-indicators button.active {
+    background-color: var(--green-500) !important;
+    border-color: white !important;
+    transform: scale(1.2);
+}
+
+/* ============================================
+   5. BUTTON STYLES
+   ============================================ */
+
+.btn-modern-green {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none !important;
+    outline: none;
+}
+
+/* Button Sizes */
+.btn-modern-green.sm {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-modern-green.lg {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+}
+
+/* Button Variants */
+.btn-modern-green.primary {
+    background: var(--gradient-green);
+    color: white;
+    box-shadow: var(--shadow-green);
+}
+
+.btn-modern-green.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    background: var(--gradient-green-dark);
+}
+
+.btn-modern-green.accent {
+    background: var(--gradient-accent);
+    color: var(--neutral-900);
+    box-shadow: var(--shadow-accent);
+}
+
+.btn-modern-green.accent:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    color: var(--neutral-900);
+}
+
+.btn-modern-green.outline {
+    background: transparent;
+    border: 2px solid var(--green-400);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.btn-modern-green.outline:hover {
+    background: rgba(76, 175, 80, 0.05);
+    border-color: var(--green-600);
+    color: var(--green-800);
+    transform: translateY(-2px);
+}
+
+.btn-modern-green.outline-green {
+    background: transparent;
+    border: 2px solid var(--green-400);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+.btn-modern-green.outline-green:hover {
+    background: rgba(76, 175, 80, 0.05);
+    border-color: var(--green-600);
+    color: var(--green-800);
+    transform: translateY(-2px);
+}
+
+.btn-modern-green.with-icon {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* ============================================
+   6. CARD STYLES
+   ============================================ */
+
+.card-modern-green-light {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--neutral-200);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+}
+
+.card-modern-green-light:hover {
+    transform: translateY(-8px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-img-modern {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.card-modern-green-light:hover .card-img-modern {
+    transform: scale(1.05);
+}
+
+.card-body-modern {
+    padding: var(--space-xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: var(--space-sm);
+    line-height: 1.3;
+}
+
+.card-text-modern {
+    color: var(--neutral-700);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+.card-badge-popular {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    background: var(--gradient-accent);
+    color: var(--neutral-900);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-xl);
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    z-index: 1;
+    border: 1px solid rgba(255, 235, 59, 0.3);
+}
+
+.package-price-modern {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green-900);
+}
+
+
+
+/* ============================================
+   7. TESTIMONIAL STYLES
+   ============================================ */
+
+.testimonial-clean-modern {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 2px solid var(--green-100);
+    position: relative;
+    transition: all var(--transition-normal);
+    height: 100%;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.testimonial-clean-modern:hover {
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
+}
+
+/* Quote Mark */
+.testimonial-clean-modern::before {
+    content: '"';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 4rem;
+    color: var(--green-100);
+    font-family: Georgia, serif;
+    line-height: 1;
     opacity: 0.5;
+    z-index: 0;
 }
-.divider i {
+
+/* Content */
+.testimonial-content-clean {
+    position: relative;
+    z-index: 1;
+    margin-bottom: var(--space-lg);
+}
+
+.testimonial-content-clean p {
+    color: var(--neutral-800);
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Rating */
+.testimonial-rating-clean {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: var(--space-md);
+}
+
+.testimonial-rating-clean i {
+    color: var(--accent-500);
+    font-size: 0.9rem;
+}
+
+.rating-badge-clean {
+    background: var(--green-50);
+    color: var(--green-800);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    border: 1px solid var(--green-200);
+}
+
+/* Author */
+.testimonial-author-clean {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--neutral-200);
+}
+
+.testimonial-author-img-clean {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--green-300);
+}
+
+.testimonial-author-info-clean h6 {
+    color: var(--green-900);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.testimonial-author-info-clean small {
+    color: var(--neutral-600);
+    font-size: 0.85rem;
+}
+
+.testimonial-date-clean {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--neutral-500);
+    font-size: 0.8rem;
+}
+
+/* Departure Info */
+.testimonial-departure-clean {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--neutral-100);
+}
+
+.testimonial-departure-clean small {
+    color: var(--green-700);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Testimonial Grid */
+.testimonial-grid-clean {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+/* ============================================
+   8. GALLERY STYLES
+   ============================================ */
+
+.gallery-item-modern {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+}
+
+.gallery-item-modern:hover {
+    transform: translateY(-5px);
+}
+
+.gallery-item-modern:hover .gallery-img-modern {
+    transform: scale(1.05);
+}
+
+.gallery-overlay-modern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item-modern:hover .gallery-overlay-modern {
+    opacity: 1;
+}
+
+.gallery-item-modern-light {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    border: 2px solid var(--neutral-200);
+    background: white;
+}
+
+.gallery-item-modern-light:hover {
+    transform: translateY(-5px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+}
+
+.gallery-img-modern {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.gallery-overlay-modern-light {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(27, 94, 32, 0.8));
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item-modern-light:hover .gallery-overlay-modern-light {
+    opacity: 1;
+}
+
+.gallery-info-modern {
+    color: white;
+}
+
+/* ============================================
+   9. PARTNER STYLES
+   ============================================ */
+
+.partner-card-modern {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--neutral-200);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.partner-card-modern:hover {
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.partner-logo-modern {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.partner-logo-modern img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.partner-info-modern h6 {
+    color: var(--green-900);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+/* ============================================
+   10. FORM STYLES - DIPERBAIKI
+   ============================================ */
+
+.form-control-modern {
+    border: 2px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    background: white;
+    color: var(--neutral-800);
+    width: 100%;
+    font-family: inherit;
+}
+
+.form-control-modern:focus {
+    border-color: var(--green-500);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+    outline: none;
+    background-color: var(--green-50);
+}
+
+.form-control-modern::placeholder {
+    color: var(--neutral-400);
+    opacity: 1;
+}
+
+/* Form Label */
+.form-label {
+    font-weight: 600;
+    color: var(--green-800);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+}
+
+/* Form Validation States */
+.form-control-modern.is-valid {
+    border-color: var(--green-500);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%234CAF50' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: 2.5rem;
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.form-control-modern.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: 2.5rem;
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.form-control-modern.is-valid:focus {
+    border-color: var(--green-600);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
+}
+
+.form-control-modern.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+/* Invalid Feedback */
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.375rem;
+    font-size: 0.8125rem;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.form-control-modern.is-invalid ~ .invalid-feedback,
+.form-control-modern:invalid:not(:focus):not(:placeholder-shown) ~ .invalid-feedback {
+    display: block;
+}
+
+/* Error Message */
+.error-message {
+    color: #dc3545;
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+    font-weight: 500;
+}
+
+/* Success Message */
+.success-message {
+    background-color: rgba(212, 237, 218, 0.9);
+    border: 1px solid rgba(195, 230, 203, 0.8);
+    color: var(--green-800);
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.5s ease-in;
+    margin-bottom: var(--space-md);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.success-message i {
+    color: var(--green-500);
+    font-size: 1.1rem;
+}
+
+/* Form Error Message */
+.form-error-message {
+    background-color: rgba(248, 215, 218, 0.9);
+    border: 1px solid rgba(245, 198, 203, 0.8);
+    color: #721c24;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    animation: fadeIn 0.3s ease-in;
+    margin-bottom: var(--space-md);
+    font-weight: 500;
+}
+
+.form-error-message i {
+    color: #dc3545;
+}
+
+/* Textarea Specific */
+textarea.form-control-modern {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.5;
+    padding: 1rem;
+}
+
+/* ============================================
+   11. PACKAGE DETAIL - FLYER LAYOUT
+   ============================================ */
+
+/* Container untuk card flyer */
+.card-body-flyer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Wrapper untuk flyer */
+.flyer-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 450px;
+    max-height: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--neutral-300);
+}
+
+/* Gambar flyer */
+.flyer-image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    padding: 1.5rem;
+    transition: all var(--transition-normal);
+}
+
+/* Hover effect untuk flyer */
+.flyer-wrapper:hover .flyer-image {
+    transform: scale(1.02);
+}
+
+/* Overlay untuk tombol zoom */
+.flyer-overlay {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all var(--transition-normal);
+    z-index: 10;
+}
+
+.flyer-wrapper:hover .flyer-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Tombol zoom */
+.flyer-zoom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--green-500);
+    color: white;
+    border-radius: var(--radius-circle);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
+    border: 2px solid white;
+}
+
+.flyer-zoom-btn:hover {
+    background: var(--green-600);
+    color: white;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: var(--shadow-lg);
+}
+
+.flyer-zoom-btn i {
+    font-size: 1.2rem;
+}
+
+/* Footer untuk card flyer */
+.card-footer-flyer {
+    background: var(--neutral-50);
+    border-top: 1px solid var(--neutral-200);
+    padding: 1rem var(--space-xl);
+}
+
+/* Price styling */
+.package-price-modern {
     font-size: 2rem;
-    color: #33a661;
+    font-weight: 700;
+    color: var(--green-900);
+    line-height: 1.2;
 }
 
-/* Efek hover untuk section partners */
-#partners .card:hover {
-    transform: scale(1.05); /* Zoom ringan */
-    box-shadow: 0 15px 40px rgba(51, 166, 97, 0.4); /* Shadow hijau lebih besar */
-}
-#partners .card:hover .card-overlay {
-    opacity: 1; /* Overlay muncul */
-}
-#partners .card:hover .card-img-top {
-    filter: none; /* Logo jadi color */
-    transform: scale(1.1); /* Zoom logo */
-}
-
-/* Fasilitas Premium – Tampilan mewah & rapat */
+/* Facilities list */
 .package-facilities {
     list-style: none;
     padding: 0;
@@ -196,35 +991,1211 @@ header .btn-success.shadow {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    padding: 4px 0;
-    font-size: 15px;
-    color: #333;
-    line-height: 1.4;
-    border-bottom: 1px solid #e6e6e6;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: var(--neutral-700);
+    line-height: 1.5;
+    border-bottom: 1px solid var(--neutral-100);
 }
 
 .package-facilities li:last-child {
-    border-bottom: none !important;
+    border-bottom: none;
 }
 
 .package-facilities li::before {
-    content: "✔";
-    color: #33a661;
+    content: "✓";
+    color: var(--green-500);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 1rem;
     margin-top: 2px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   12. FOOTER STYLES
+   ============================================ */
+
+.footer-modern-green {
+    background: var(--green-900);
+    color: white;
+    padding: var(--space-2xl) 0 var(--space-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-modern-green::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-green);
+}
+
+/* Social Links */
+.social-links-modern {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-link-modern {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.social-link-modern:hover {
+    background: var(--green-500);
+    transform: translateY(-3px);
+    color: white;
+}
+
+/* Footer Links */
+.footer-links-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links-modern li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links-modern a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.footer-links-modern a:hover {
+    color: white;
+    padding-left: 0.5rem;
+}
+
+/* Contact Info */
+.contact-info-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-info-modern li {
+    margin-bottom: 1rem;
+}
+
+/* Legal Info */
+.legal-info-modern p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.25rem;
+}
+
+.legal-info-modern small {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ============================================
+   13. UTILITY CLASSES
+   ============================================ */
+
+/* Background Colors */
+.bg-green-50 { background-color: var(--green-50) !important; }
+.bg-green-100 { background-color: var(--green-100) !important; }
+.bg-green-200 { background-color: var(--green-200) !important; }
+.bg-green-300 { background-color: var(--green-300) !important; }
+.bg-green-400 { background-color: var(--green-400) !important; }
+.bg-green-500 { background-color: var(--green-500) !important; }
+.bg-green-600 { background-color: var(--green-600) !important; }
+.bg-green-700 { background-color: var(--green-700) !important; }
+.bg-green-800 { background-color: var(--green-800) !important; }
+.bg-green-900 { background-color: var(--green-900) !important; }
+
+.bg-neutral-50 { background-color: var(--neutral-50) !important; }
+.bg-neutral-100 { background-color: var(--neutral-100) !important; }
+.bg-green-light { background-color: var(--green-50) !important; }
+
+/* Text Colors */
+.text-green-50 { color: var(--green-50) !important; }
+.text-green-100 { color: var(--green-100) !important; }
+.text-green-200 { color: var(--green-200) !important; }
+.text-green-300 { color: var(--green-300) !important; }
+.text-green-400 { color: var(--green-400) !important; }
+.text-green-500 { color: var(--green-500) !important; }
+.text-green-600 { color: var(--green-600) !important; }
+.text-green-700 { color: var(--green-700) !important; }
+.text-green-800 { color: var(--green-800) !important; }
+.text-green-900 { color: var(--green-900) !important; }
+.text-green-gradient { background: var(--gradient-green); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.text-neutral-50 { color: var(--neutral-50) !important; }
+.text-neutral-100 { color: var(--neutral-100) !important; }
+.text-neutral-200 { color: var(--neutral-200) !important; }
+.text-neutral-300 { color: var(--neutral-300) !important; }
+.text-neutral-400 { color: var(--neutral-400) !important; }
+.text-neutral-500 { color: var(--neutral-500) !important; }
+.text-neutral-600 { color: var(--neutral-600) !important; }
+.text-neutral-700 { color: var(--neutral-700) !important; }
+.text-neutral-800 { color: var(--neutral-800) !important; }
+.text-neutral-900 { color: var(--neutral-900) !important; }
+
+.text-accent-500 { color: var(--accent-500) !important; }
+
+/* Border Colors */
+.border-green-100 { border-color: var(--green-100) !important; }
+.border-green-200 { border-color: var(--green-200) !important; }
+.border-green-300 { border-color: var(--green-300) !important; }
+.border-neutral-200 { border-color: var(--neutral-200) !important; }
+
+/* Gradients */
+.bg-green-gradient { background: var(--gradient-green) !important; }
+.bg-accent-gradient { background: var(--gradient-accent) !important; }
+
+/* Badges */
+.badge.bg-green-gradient {
+    background: var(--gradient-green) !important;
+    color: white;
+    font-weight: 600;
+}
+
+.badge.bg-accent-gradient {
+    background: var(--gradient-accent) !important;
+    color: var(--neutral-900);
+    font-weight: 600;
+}
+
+/* ============================================
+   14. SPECIAL ELEMENTS
+   ============================================ */
+
+/* WhatsApp Float */
+.whatsapp-float-modern {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+}
+
+.whatsapp-float-modern:hover {
+    transform: scale(1.1);
+    color: white;
+    background: #128C7E;
+}
+
+.whatsapp-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #25D366;
+    border-radius: 50%;
+    animation: pulse-ring 2s infinite;
+    z-index: -1;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Back to Top */
+.back-to-top-modern {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-green);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.back-to-top-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Divider */
+.divider-modern {
+    padding: var(--space-xl) 0;
+    background: var(--neutral-100);
+}
+
+/* Icon Box */
+.icon-box-modern {
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    text-align: center;
+}
+
+.icon-box-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.icon-box-modern i {
+    font-size: 3rem;
+    background: var(--gradient-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* Empty State */
+.empty-state-modern {
+    padding: 3rem 2rem;
+    text-align: center;
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--neutral-300);
+}
+
+.empty-state-modern i {
+    font-size: 4rem;
+    color: var(--green-300);
+    margin-bottom: var(--space-md);
+}
+
+/* ============================================
+   15. CTA SECTIONS
+   ============================================ */
+
+.bg-green-gradient {
+    background: var(--gradient-green) !important;
+    color: white;
+}
+
+.bg-green-gradient .text-white {
+    color: white !important;
+}
+
+/* ============================================
+   16. RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet (768px - 992px) */
+@media (max-width: 992px) {
+    .flyer-wrapper {
+        min-height: 400px;
+        max-height: 550px;
+    }
+    
+    .card-body-flyer,
+    .card-body-modern {
+        padding: var(--space-lg) !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.875rem var(--space-lg);
+    }
+    
+    .package-price-modern {
+        font-size: 1.75rem;
+    }
+}
+
+/* Mobile Landscape (576px - 768px) */
+@media (max-width: 768px) {
+    /* Typography */
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .lead {
+        font-size: 1rem !important;
+    }
+    
+    /* Hero */
+    .carousel-item {
+        height: 70vh !important;
+    }
+    
+    .hero-overlay-modern h1 {
+        font-size: 2rem !important;
+    }
+    
+    .hero-overlay-modern .lead {
+        font-size: 1rem !important;
+        width: 90% !important;
+    }
+    
+    /* Flyer */
+    .flyer-wrapper {
+        min-height: 350px;
+        max-height: 480px;
+    }
+    
+    .flyer-image {
+        padding: 1rem;
+    }
+    
+    .flyer-overlay {
+        opacity: 1;
+        transform: translateY(0);
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .flyer-zoom-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .flyer-zoom-btn i {
+        font-size: 1.1rem;
+    }
+    
+    /* Cards */
+    .card-body-flyer,
+    .card-body-modern {
+        padding: var(--space-md) !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.75rem var(--space-md);
+    }
+    
+    .card-title-modern {
+        font-size: 1.125rem !important;
+    }
+    
+    .package-price-modern {
+        font-size: 1.5rem;
+    }
+    
+    /* Testimonials */
+    .testimonial-grid-clean {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .testimonial-clean-modern {
+        padding: var(--space-lg);
+    }
+    
+    .testimonial-clean-modern::before {
+        font-size: 3rem;
+        top: 15px;
+        right: 15px;
+    }
+    
+    /* Buttons */
+    .btn-modern-green.lg {
+        padding: 0.75rem 1.5rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Facilities */
+    .package-facilities li {
+        font-size: 0.9rem;
+        padding: 6px 0;
+    }
+    
+    /* Floating Elements */
+    .whatsapp-float-modern {
+        bottom: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .back-to-top-modern {
+        bottom: 5rem;
+        right: 1rem;
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Mobile Portrait (< 576px) */
+@media (max-width: 576px) {
+    .flyer-wrapper {
+        min-height: 300px;
+        max-height: 420px;
+    }
+    
+    .flyer-image {
+        padding: 0.75rem;
+    }
+    
+    .card-body-flyer,
+    .card-body-modern {
+        padding: 1rem !important;
+    }
+    
+    .card-footer-flyer {
+        padding: 0.625rem 1rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .package-price-modern {
+        font-size: 1.35rem;
+    }
+    
+    .package-facilities li {
+        font-size: 0.85rem;
+        padding: 5px 0;
+    }
+    
+    .form-control-modern {
+        font-size: 16px;
+    }
+    
+    .btn-modern-green {
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* Large Desktop (> 1200px) */
+@media (min-width: 1200px) {
+    .flyer-wrapper {
+        min-height: 500px;
+        max-height: 700px;
+    }
+    
+    .flyer-image {
+        padding: 2rem;
+    }
+}
+
+/* Extra Large Desktop (> 1400px) */
+@media (min-width: 1400px) {
+    .flyer-wrapper {
+        min-height: 550px;
+        max-height: 750px;
+    }
+}
+
+/* Tablet Landscape (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 95% !important;
+    }
+    
+    .hero-overlay-modern h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    .testimonial-grid-clean {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop (> 1025px) */
+@media (min-width: 1025px) {
+    .testimonial-grid-clean {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ============================================
+   17. ANIMATIONS & KEYFRAMES
+   ============================================ */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Loading state untuk flyer */
+.flyer-image.loading {
+    opacity: 0.7;
+    background: linear-gradient(90deg, var(--neutral-100) 25%, var(--neutral-200) 50%, var(--neutral-100) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+}
+
+/* Error state untuk flyer */
+.flyer-image.error {
+    padding: 3rem;
+    background: var(--neutral-100);
+    border: 2px dashed var(--neutral-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flyer-image.error::before {
+    content: "🖼️";
+    font-size: 3rem;
+    color: var(--neutral-400);
+}
+
+/* ============================================
+   18. PAGE SPECIFIC STYLES
+   ============================================ */
+
+/* Table Styles untuk schedules */
+.table-success thead {
+    background-color: var(--green-500) !important;
+    color: white;
+}
+
+/* Form Elements Enhancement */
+.form-check-modern {
+    padding: 0.75rem;
+    border: 2px solid var(--neutral-200);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.form-check-modern:hover {
+    border-color: var(--green-300);
+    background-color: var(--green-50);
+}
+
+.form-check-modern .form-check-input {
+    margin-top: 0.3rem;
+    border-color: var(--green-400);
+}
+
+.form-check-modern .form-check-input:checked {
+    background-color: var(--green-500);
+    border-color: var(--green-500);
+}
+
+.form-check-modern .form-check-label {
+    font-weight: 500;
+    color: var(--neutral-700);
+    margin-left: 0.5rem;
+}
+
+.form-select-modern {
+    border: 2px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+    background: white;
+    color: var(--neutral-800);
+    width: 100%;
+}
+
+.form-select-modern:focus {
+    border-color: var(--green-400);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    outline: none;
+}
+
+/* Icon Box Small */
+.icon-box-small {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+/* CTA Section Styles */
+#cta-packages, #cta-about, #cta-detail, #cta-gallery {
+    background-color: var(--accent-500);
+    color: var(--green-900);
+}
+
+/* Gallery Filter Buttons */
+#gallery-filter .btn-outline-success {
+    border-color: var(--green-500);
+    color: var(--green-700);
+    font-weight: 600;
+}
+
+#gallery-filter .btn-outline-success:hover {
+    background-color: var(--green-500);
+    color: white;
+}
+
+/* Mission & Vision Lists */
+.mission-list ul,
+.vision-list ul {
+    padding-left: 0;
+}
+
+.mission-list li,
+.vision-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    color: var(--neutral-800);
+    line-height: 1.5;
+}
+
+.mission-list .fa-check-circle,
+.vision-list .fa-star {
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.mission-list .fa-check-circle {
+    color: var(--green-600);
+}
+
+.vision-list .fa-star {
+    color: var(--green-600);
+}
+
+/* ============================================
+   19. CERTIFICATE STYLES
+   ============================================ */
+
+.certificate-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--neutral-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--neutral-200);
+}
+
+.certificate-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.certificate-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 400px;
+    text-align: center;
+    transition: transform var(--transition-normal);
+}
+
+.certificate-card:hover {
+    transform: translateY(-5px);
+}
+
+.certificate-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    height: 240px;
+    border: 1px solid var(--neutral-300);
+    background-color: white;
+}
+
+.certificate-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.certificate-image:hover .certificate-img {
+    transform: scale(1.03);
+}
+
+.certificate-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.certificate-image:hover .certificate-overlay {
+    opacity: 1;
+}
+
+.view-certificate {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: var(--green-600);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: background-color var(--transition-normal);
+}
+
+.view-certificate:hover {
+    background-color: var(--green-700);
+    color: white;
+}
+
+.certificate-label {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--neutral-900);
+    font-size: 1.1rem;
+}
+
+/* ============================================
+   20. PRINT STYLES
+   ============================================ */
+
+@media print {
+    .flyer-overlay,
+    .flyer-zoom-btn,
+    .card-footer-flyer,
+    .whatsapp-float-modern,
+    .back-to-top-modern {
+        display: none;
+    }
+    
+    .flyer-wrapper {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .card-modern-green-light {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* ============================================
+   END OF MAIN.CSS
+   ============================================ */
+
+   /* ============================================
+   19. SCHEDULE TABLE STYLES
+   ============================================ */
+
+/* Table Schedule Styles */
+#schedules .table {
+    margin-bottom: 0;
+}
+
+#schedules .table thead th {
+    font-weight: 600;
+    padding: 1rem;
+    background-color: var(--green-100);
+    border-bottom: 2px solid var(--green-300);
+    color: var(--green-900);
+    vertical-align: middle;
+}
+
+#schedules .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--neutral-200);
+    transition: all var(--transition-normal);
+}
+
+#schedules .table tbody tr:hover td {
+    background-color: rgba(76, 175, 80, 0.03);
+}
+
+/* Badge Styles for Schedule Table */
+.airline-badge {
+    padding: 0.25rem 0.75rem;
+    background-color: var(--neutral-100);
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--neutral-800);
+    display: inline-block;
+}
+
+.day-badge {
+    padding: 0.25rem 0.75rem;
+    background-color: var(--accent-50);
+    border: 1px solid var(--accent-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-900);
+    display: inline-block;
+    min-width: 70px;
+    text-align: center;
+}
+
+.slot-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.slot-badge.available {
+    background-color: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: var(--green-800);
+}
+
+.slot-badge.full {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    min-width: 100px;
+}
+
+.status-badge.status-available {
+    background-color: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: var(--green-800);
+}
+
+.status-badge.status-available i {
+    color: var(--green-600);
+    font-size: 0.6rem;
+}
+
+.status-badge.status-full {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.status-badge.status-full i {
+    color: #dc3545;
+    font-size: 0.6rem;
+}
+
+.duration-badge {
+    padding: 0.25rem 0.75rem;
+    background-color: var(--neutral-100);
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--neutral-800);
+    display: inline-flex;
+    align-items: center;
+    min-width: 70px;
+    justify-content: center;
+}
+
+/* Route Info */
+.route-info {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    cursor: help;
+}
+
+/* Table Responsive */
+@media (max-width: 992px) {
+    #schedules .table-responsive {
+        border: none;
+        box-shadow: none;
+    }
+    
+    #schedules .table {
+        font-size: 0.9rem;
+    }
+    
+    #schedules .table thead th,
+    #schedules .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .airline-badge,
+    .day-badge,
+    .slot-badge,
+    .status-badge,
+    .duration-badge {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    #schedules .table {
+        font-size: 0.85rem;
+    }
+    
+    #schedules .table thead {
+        display: none;
+    }
+    
+    #schedules .table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        background-color: white;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    #schedules .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border: none;
+        border-bottom: 1px solid var(--neutral-100);
+    }
+    
+    #schedules .table tbody td:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        justify-content: center;
+        padding-top: 1rem;
+    }
+    
+    #schedules .table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--green-800);
+        margin-right: 1rem;
+        flex: 0 0 40%;
+    }
+    
+    .route-info {
+        max-width: none;
+        white-space: normal;
+    }
 }
 
 
-/* Responsive adjustments - Penyesuaian untuk mobile */
-@media (max-width: 768px) {
-    header .carousel-item {
-        height: 60vh !important; /* Tinggi hero lebih kecil di mobile */
-    }
-    header h1 {
-        font-size: 1.8rem !important;
-    }
-    header p.lead {
-        font-size: 0.95rem !important;
-    }
+/* ============================================
+   20. PRICE CARD STYLES
+   ============================================ */
+
+.price-card {
+    background: white;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--neutral-200);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+}
+
+.price-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--green-300);
+    box-shadow: var(--shadow-md);
+}
+
+.price-card-header {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+}
+
+.price-type-badge {
+    display: inline-block;
+    padding: 0.25rem 1rem;
+    border-radius: var(--radius-xl);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.price-card-body {
+    padding: 1.5rem;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.price-per {
+    color: var(--neutral-600);
+    font-size: 0.875rem;
+}
+
+.price-card-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+}
+
+.btn-price-select {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--gradient-green);
+    color: white;
+    text-align: center;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    border: none;
+}
+
+.btn-price-select:hover {
+    background: var(--gradient-green-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   21. VERTICAL PRICE OPTIONS
+   ============================================ */
+
+.price-options-vertical {
+    border: 1px solid var(--neutral-300);
+    border-radius: var(--radius-md);
+    background: white;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.price-option-vertical {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--neutral-200);
+    transition: all var(--transition-normal);
+}
+
+.price-option-vertical:last-child {
+    border-bottom: none;
+}
+
+.price-option-vertical:hover {
+    background-color: var(--green-50);
+    transform: translateX(5px);
+}
+
+.price-type-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 100%;
+    transition: all var(--transition-normal);
+}
+
+.price-option-vertical:hover .price-type-badge {
+    transform: scale(1.05);
+}
+
+.price-vertical-info {
+    text-align: left;
+}
+
+.price-amount-vertical {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green-900);
+    margin-bottom: 0.25rem;
+}
+
+.btn-price-select-vertical {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background: var(--gradient-green);
+    color: white;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    border: none;
+    text-align: center;
+}
+
+.btn-price-select-vertical:hover {
+    background: var(--gradient-green-dark);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
