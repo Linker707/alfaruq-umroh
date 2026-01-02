@@ -333,6 +333,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'gallery') !== false ? 'active' : ''; ?>" href="gallery.php">
+                        <i class="fas fa-images"></i>
+                        <span>Kelola Galeri</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'testimonial') !== false ? 'active' : ''; ?>" href="testimonial.php">
+                        <i class="fas fa-comments"></i>
+                        <span>Kelola Testimoni</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link" href="../index.php" target="_blank">
                         <i class="fas fa-external-link-alt"></i>
                         <span>Lihat Website</span>
