@@ -307,6 +307,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span>Lihat Website</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'schedule') !== false ? 'active' : ''; ?>" href="schedule.php">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Kelola Jadwal</span>
+                    </a>
+                </li>
                 
                 <li class="nav-item mt-4">
                     <a class="nav-link text-warning" href="logout.php">
