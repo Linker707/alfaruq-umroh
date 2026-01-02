@@ -272,6 +272,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 margin-left: 0;
             }
         }
+
+        .bg-brown {
+            background: #8B4513 !important;
+            color: white !important;
+        }
+
+        .bg-light {
+            background: #f8f9fa !important;
+            color: #212529 !important;
+        }
     </style>
 </head>
 <body>
@@ -302,9 +312,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <?php endif; ?>
                 
                 <li class="nav-item">
-                    <a class="nav-link" href="../index.php" target="_blank">
-                        <i class="fas fa-external-link-alt"></i>
-                        <span>Lihat Website</span>
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'package') !== false ? 'active' : ''; ?>" href="package.php">
+                        <i class="fas fa-box-open"></i>
+                        <span>Kelola Paket</span>
                     </a>
                 </li>
 
@@ -312,6 +322,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'schedule') !== false ? 'active' : ''; ?>" href="schedule.php">
                         <i class="fas fa-calendar-alt"></i>
                         <span>Kelola Jadwal</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'price') !== false ? 'active' : ''; ?>" href="price.php">
+                        <i class="fas fa-tags"></i>
+                        <span>Kelola Harga</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../index.php" target="_blank">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>Lihat Website</span>
                     </a>
                 </li>
                 
