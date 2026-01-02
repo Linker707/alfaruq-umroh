@@ -9,58 +9,84 @@ if ($_SESSION['admin_role'] !== 'master_admin' && $_SESSION['admin_role'] !== 'a
 
 require_once '../config/database.php';
 
-// Default action
+// Default tab and action
+$tab = isset($_GET['tab']) ? $_GET['tab'] : 'testimonials';
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$status = isset($_GET['status']) ? $_GET['status'] : 'all';
 $message = '';
 $error = '';
 
-// Filter tanggal
-$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
-$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+// Sorting parameters
+$sort_by = isset($_GET['sort']) ? $_GET['sort'] : 'created_at';
+$sort_order = isset($_GET['order']) ? $_GET['order'] : 'desc';
 
-// Handle Export
-if (isset($_GET['export']) && $_GET['export'] == 'excel') {
-    exportTestimonialsToExcel();
-    exit;
-} elseif (isset($_GET['export']) && $_GET['export'] == 'csv') {
-    exportTestimonialsToCSV();
-    exit;
+// Filter parameters
+$filter_type = isset($_GET['filter_type']) ? $_GET['filter_type'] : 'none'; // none, range, month
+$date_from = isset($_GET['date_from']) ? $_GET['date_from'] : '';
+$date_to = isset($_GET['date_to']) ? $_GET['date_to'] : '';
+$filter_month = isset($_GET['filter_month']) ? (int)$_GET['filter_month'] : date('n');
+$filter_year = isset($_GET['filter_year']) ? (int)$_GET['filter_year'] : date('Y');
+
+// Validate sort parameters
+$allowed_sorts = ['created_at', 'departure_date', 'name', 'rating'];
+if (!in_array($sort_by, $allowed_sorts)) {
+    $sort_by = 'created_at';
+}
+if (!in_array($sort_order, ['asc', 'desc'])) {
+    $sort_order = 'desc';
+}
+
+// Validate filter month and year
+if ($filter_month < 1 || $filter_month > 12) {
+    $filter_month = date('n');
+}
+if ($filter_year < 2000 || $filter_year > 2100) {
+    $filter_year = date('Y');
 }
 
 // Process actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
+        case 'approve':
+            $process = processApproveTestimonial($id);
+            if ($process['success']) {
+                $_SESSION['success_message'] = $process['message'];
+                header('Location: testimonial.php');
+                exit;
+            } else {
+                $error = $process['message'];
+            }
+            break;
+            
         case 'update':
             $process = processUpdateTestimonial($id);
             if ($process['success']) {
                 $_SESSION['success_message'] = $process['message'];
                 header('Location: testimonial.php');
                 exit;
+            } else {
+                $error = $process['message'];
             }
-            $error = $process['message'];
             break;
     }
 }
 
 // Process GET actions
-if ($action == 'approve' && $id > 0) {
-    $process = processApproveTestimonial($id);
-    if ($process['success']) {
-        $_SESSION['success_message'] = $process['message'];
-        header('Location: testimonial.php');
-        exit;
-    }
-    $error = $process['message'];
-} elseif ($action == 'delete' && $id > 0) {
+if ($action == 'delete' && $id > 0 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $process = processDeleteTestimonial($id);
     if ($process['success']) {
         $_SESSION['success_message'] = $process['message'];
         header('Location: testimonial.php');
         exit;
+    } else {
+        $error = $process['message'];
     }
-    $error = $process['message'];
+}
+
+// Process export action
+if (isset($_GET['export']) && ($_GET['export'] == 'csv')) {
+    exportTestimonials($_GET['export']);
+    exit;
 }
 
 // Get message from session
@@ -69,9 +95,9 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']);
 }
 
-// Get testimonial data for edit/view
+// Get testimonial data for edit
 $testimonial = null;
-if ($id > 0 && ($action == 'edit' || $action == 'view')) {
+if ($id > 0 && $action == 'edit') {
     $stmt = $pdo->prepare("SELECT * FROM testimonials WHERE id = ?");
     $stmt->execute([$id]);
     $testimonial = $stmt->fetch();
@@ -82,260 +108,67 @@ if ($id > 0 && ($action == 'edit' || $action == 'view')) {
     }
 }
 
-// Build query based on filters
-$where = [];
+// Build query with filters
+$query = "SELECT * FROM testimonials WHERE 1=1";
 $params = [];
 
-// Filter by status
-if ($status == 'approved') {
-    $where[] = "is_approved = 1";
-} elseif ($status == 'pending') {
-    $where[] = "is_approved = 0";
-} elseif ($status == 'featured') {
-    $where[] = "rating = 5 AND is_approved = 1";
+// Apply filters
+if ($filter_type === 'range' && !empty($date_from) && !empty($date_to)) {
+    $query .= " AND DATE(created_at) BETWEEN ? AND ?";
+    $params[] = $date_from;
+    $params[] = $date_to;
+} elseif ($filter_type === 'month') {
+    $query .= " AND YEAR(created_at) = ? AND MONTH(created_at) = ?";
+    $params[] = $filter_year;
+    $params[] = $filter_month;
 }
 
-// Filter by start date
-if (!empty($start_date)) {
-    $where[] = "DATE(created_at) >= ?";
-    $params[] = $start_date;
-}
+// Add sorting
+$order_by = $sort_by . ' ' . strtoupper($sort_order);
+$query .= " ORDER BY $order_by";
 
-// Filter by end date
-if (!empty($end_date)) {
-    $where[] = "DATE(created_at) <= ?";
-    $params[] = $end_date;
-}
-
-// Build WHERE clause
-$where_clause = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
-
-// Get all testimonials for list with filters
-$sql = "SELECT * FROM testimonials $where_clause ORDER BY created_at DESC";
-$stmt = $pdo->prepare($sql);
+// Get all testimonials for list
+$stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $testimonials = $stmt->fetchAll();
 
-// Get statistics with filters
-$stats_sql = "SELECT 
-    COUNT(*) as total,
-    SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved,
-    SUM(CASE WHEN is_approved = 0 THEN 1 ELSE 0 END) as pending,
-    SUM(CASE WHEN rating = 5 AND is_approved = 1 THEN 1 ELSE 0 END) as featured,
-    AVG(CASE WHEN is_approved = 1 THEN rating ELSE NULL END) as avg_rating
-    FROM testimonials";
+// Get count by filter type for stats
+$count_all = $pdo->query("SELECT COUNT(*) FROM testimonials")->fetchColumn();
 
-if (!empty($where_clause)) {
-    $stats_sql .= " $where_clause";
-}
+// Get monthly stats for dropdown
+$monthly_stats = $pdo->query("
+    SELECT YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count 
+    FROM testimonials 
+    GROUP BY YEAR(created_at), MONTH(created_at) 
+    ORDER BY year DESC, month DESC
+")->fetchAll();
 
-$stats_stmt = $pdo->prepare($stats_sql);
-$stats_stmt->execute($params);
-$stats = $stats_stmt->fetch();
-
-// Function: Export to Excel
-function exportTestimonialsToExcel() {
-    global $pdo, $start_date, $end_date, $status;
+// Function: Approve Testimonial
+function processApproveTestimonial($id) {
+    global $pdo;
     
-    // Build query with filters
-    $where = [];
-    $params = [];
+    $stmt = $pdo->prepare("UPDATE testimonials SET is_approved = 1 WHERE id = ?");
+    $stmt->execute([$id]);
     
-    if ($status == 'approved') {
-        $where[] = "is_approved = 1";
-    } elseif ($status == 'pending') {
-        $where[] = "is_approved = 0";
-    } elseif ($status == 'featured') {
-        $where[] = "rating = 5 AND is_approved = 1";
-    }
+    // Log activity
+    $log_stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, details) VALUES (?, 'APPROVE_TESTIMONIAL', ?)");
+    $log_stmt->execute([$_SESSION['admin_id'], "Menyetujui testimonial ID: $id"]);
     
-    if (!empty($start_date)) {
-        $where[] = "DATE(created_at) >= ?";
-        $params[] = $start_date;
-    }
-    
-    if (!empty($end_date)) {
-        $where[] = "DATE(created_at) <= ?";
-        $params[] = $end_date;
-    }
-    
-    $where_clause = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
-    
-    // Get all data
-    $sql = "SELECT * FROM testimonials $where_clause ORDER BY created_at DESC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $testimonials = $stmt->fetchAll();
-    
-    // Set headers for Excel file
-    header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment; filename="testimonials_' . date('Y-m-d_H-i-s') . '.xls"');
-    header('Pragma: no-cache');
-    header('Expires: 0');
-    
-    // Start Excel content
-    echo "<table border='1'>";
-    echo "<tr>";
-    echo "<th>ID</th>";
-    echo "<th>Nama</th>";
-    echo "<th>Email</th>";
-    echo "<th>Telepon</th>";
-    echo "<th>Rating</th>";
-    echo "<th>Testimoni</th>";
-    echo "<th>Status</th>";
-    echo "<th>Tanggal Dibuat</th>";
-    echo "<th>Tanggal Keberangkatan</th>";
-    echo "<th>Q1 (Nama Lengkap)</th>";
-    echo "<th>Q2 (Telepon)</th>";
-    echo "<th>Q3 (Berangkat dengan)</th>";
-    echo "<th>Q4 (Info dari)</th>";
-    echo "<th>Q5 (Alasan pilih)</th>";
-    echo "<th>Q6 (Kepuasan penjelasan admin)</th>";
-    echo "<th>Q7 (Alasan rating admin)</th>";
-    echo "<th>Q8 (Kepuasan manasik)</th>";
-    echo "<th>Q9 (Alasan rating manasik)</th>";
-    echo "<th>Q10 (Kepuasan tour)</th>";
-    echo "<th>Q11 (Alasan rating tour)</th>";
-    echo "<th>Q12 (Kepuasan makanan)</th>";
-    echo "<th>Q13 (Alasan rating makanan)</th>";
-    echo "<th>Q14 (Kepuasan pembimbing ibadah)</th>";
-    echo "<th>Q15 (Alasan rating pembimbing)</th>";
-    echo "<th>Q16 (Kepuasan muthawif)</th>";
-    echo "<th>Q17 (Alasan rating muthawif)</th>";
-    echo "<th>Q18 (Kepuasan itinerary)</th>";
-    echo "<th>Q19 (Alasan rating itinerary)</th>";
-    echo "<th>Q20 (Rekomendasi ke orang lain)</th>";
-    echo "<th>Q21 (Alasan rekomendasi)</th>";
-    echo "<th>Q22 (Kesan pesan)</th>";
-    echo "<th>Q23 (Saran perbaikan)</th>";
-    echo "</tr>";
-    
-    foreach ($testimonials as $item) {
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($item['id']) . "</td>";
-        echo "<td>" . htmlspecialchars($item['name']) . "</td>";
-        echo "<td>" . htmlspecialchars($item['email']) . "</td>";
-        echo "<td>" . htmlspecialchars($item['q2'] ?? '') . "</td>";
-        echo "<td>" . htmlspecialchars($item['rating']) . "/5</td>";
-        echo "<td>" . htmlspecialchars($item['message']) . "</td>";
-        echo "<td>" . ($item['is_approved'] ? 'Disetujui' : 'Menunggu') . "</td>";
-        echo "<td>" . date('d-m-Y H:i', strtotime($item['created_at'])) . "</td>";
-        echo "<td>" . ($item['departure_date'] ? date('d-m-Y', strtotime($item['departure_date'])) : '') . "</td>";
-        
-        // Q1-Q23
-        for ($i = 1; $i <= 23; $i++) {
-            echo "<td>" . htmlspecialchars($item['q' . $i] ?? '') . "</td>";
-        }
-        
-        echo "</tr>";
-    }
-    
-    echo "</table>";
-    exit;
-}
-
-// Function: Export to CSV
-function exportTestimonialsToCSV() {
-    global $pdo, $start_date, $end_date, $status;
-    
-    // Build query with filters
-    $where = [];
-    $params = [];
-    
-    if ($status == 'approved') {
-        $where[] = "is_approved = 1";
-    } elseif ($status == 'pending') {
-        $where[] = "is_approved = 0";
-    } elseif ($status == 'featured') {
-        $where[] = "rating = 5 AND is_approved = 1";
-    }
-    
-    if (!empty($start_date)) {
-        $where[] = "DATE(created_at) >= ?";
-        $params[] = $start_date;
-    }
-    
-    if (!empty($end_date)) {
-        $where[] = "DATE(created_at) <= ?";
-        $params[] = $end_date;
-    }
-    
-    $where_clause = count($where) > 0 ? 'WHERE ' . implode(' AND ', $where) : '';
-    
-    // Get all data
-    $sql = "SELECT * FROM testimonials $where_clause ORDER BY created_at DESC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $testimonials = $stmt->fetchAll();
-    
-    // Set headers for CSV file
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="testimonials_' . date('Y-m-d_H-i-s') . '.csv"');
-    
-    // Create output stream
-    $output = fopen('php://output', 'w');
-    
-    // Add BOM for UTF-8
-    fputs($output, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
-    
-    // Headers
-    $headers = [
-        'ID', 'Nama', 'Email', 'Telepon', 'Rating', 'Testimoni', 'Status',
-        'Tanggal Dibuat', 'Tanggal Keberangkatan', 'Nama Lengkap', 'Telepon',
-        'Berangkat dengan', 'Info dari', 'Alasan pilih', 'Kepuasan penjelasan admin',
-        'Alasan rating admin', 'Kepuasan manasik', 'Alasan rating manasik',
-        'Kepuasan tour', 'Alasan rating tour', 'Kepuasan makanan',
-        'Alasan rating makanan', 'Kepuasan pembimbing ibadah',
-        'Alasan rating pembimbing', 'Kepuasan muthawif', 'Alasan rating muthawif',
-        'Kepuasan itinerary', 'Alasan rating itinerary', 'Rekomendasi ke orang lain',
-        'Alasan rekomendasi', 'Kesan pesan', 'Saran perbaikan'
-    ];
-    
-    fputcsv($output, $headers);
-    
-    // Data rows
-    foreach ($testimonials as $item) {
-        $row = [
-            $item['id'],
-            $item['name'],
-            $item['email'],
-            $item['q2'] ?? '',
-            $item['rating'] . '/5',
-            $item['message'],
-            $item['is_approved'] ? 'Disetujui' : 'Menunggu',
-            date('d-m-Y H:i', strtotime($item['created_at'])),
-            $item['departure_date'] ? date('d-m-Y', strtotime($item['departure_date'])) : '',
-        ];
-        
-        // Add Q1-Q23
-        for ($i = 1; $i <= 23; $i++) {
-            $row[] = $item['q' . $i] ?? '';
-        }
-        
-        fputcsv($output, $row);
-    }
-    
-    fclose($output);
-    exit;
+    return ['success' => true, 'message' => 'Testimonial telah disetujui'];
 }
 
 // Function: Update Testimonial
 function processUpdateTestimonial($id) {
     global $pdo;
     
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        return ['success' => false, 'message' => 'Invalid request'];
-    }
-    
     $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $message_text = trim($_POST['message'] ?? '');
-    $rating = (int)($_POST['rating'] ?? 0);
+    $message = trim($_POST['message'] ?? '');
+    $rating = (int)($_POST['rating'] ?? 5);
     $is_approved = isset($_POST['is_approved']) ? 1 : 0;
     
     // Validation
-    if (empty($name) || empty($message_text)) {
-        return ['success' => false, 'message' => 'Nama dan testimoni harus diisi'];
+    if (empty($name) || empty($message)) {
+        return ['success' => false, 'message' => 'Nama dan pesan harus diisi'];
     }
     
     if ($rating < 1 || $rating > 5) {
@@ -346,50 +179,16 @@ function processUpdateTestimonial($id) {
         $pdo->beginTransaction();
         
         // Update testimonial
-        $stmt = $pdo->prepare("UPDATE testimonials SET name = ?, email = ?, message = ?, rating = ?, is_approved = ? WHERE id = ?");
-        $stmt->execute([$name, $email, $message_text, $rating, $is_approved, $id]);
+        $stmt = $pdo->prepare("UPDATE testimonials SET name = ?, message = ?, rating = ?, is_approved = ? WHERE id = ?");
+        $stmt->execute([$name, $message, $rating, $is_approved, $id]);
         
         // Log activity
         $log_stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, details) VALUES (?, 'UPDATE_TESTIMONIAL', ?)");
-        $log_stmt->execute([$_SESSION['admin_id'], "Memperbarui testimoni dari: $name"]);
+        $log_stmt->execute([$_SESSION['admin_id'], "Memperbarui testimonial: $name"]);
         
         $pdo->commit();
         
-        return ['success' => true, 'message' => 'Testimoni berhasil diperbarui'];
-        
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        return ['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()];
-    }
-}
-
-// Function: Approve Testimonial
-function processApproveTestimonial($id) {
-    global $pdo;
-    
-    // Get testimonial info for log
-    $stmt = $pdo->prepare("SELECT name FROM testimonials WHERE id = ?");
-    $stmt->execute([$id]);
-    $testimonial = $stmt->fetch();
-    
-    if (!$testimonial) {
-        return ['success' => false, 'message' => 'Testimoni tidak ditemukan'];
-    }
-    
-    try {
-        $pdo->beginTransaction();
-        
-        // Approve testimonial
-        $stmt = $pdo->prepare("UPDATE testimonials SET is_approved = 1 WHERE id = ?");
-        $stmt->execute([$id]);
-        
-        // Log activity
-        $log_stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, details) VALUES (?, 'APPROVE_TESTIMONIAL', ?)");
-        $log_stmt->execute([$_SESSION['admin_id'], "Menyetujui testimoni dari: {$testimonial['name']}"]);
-        
-        $pdo->commit();
-        
-        return ['success' => true, 'message' => 'Testimoni berhasil disetujui'];
+        return ['success' => true, 'message' => 'Testimonial berhasil diperbarui'];
         
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -407,7 +206,7 @@ function processDeleteTestimonial($id) {
     $testimonial = $stmt->fetch();
     
     if (!$testimonial) {
-        return ['success' => false, 'message' => 'Testimoni tidak ditemukan'];
+        return ['success' => false, 'message' => 'Testimonial tidak ditemukan'];
     }
     
     try {
@@ -417,18 +216,123 @@ function processDeleteTestimonial($id) {
         $stmt = $pdo->prepare("DELETE FROM testimonials WHERE id = ?");
         $stmt->execute([$id]);
         
+        // Delete image file if exists
+        if ($testimonial['image'] && file_exists(dirname(dirname(__FILE__)) . '/' . $testimonial['image'])) {
+            @unlink(dirname(dirname(__FILE__)) . '/' . $testimonial['image']);
+        }
+        
         // Log activity
         $log_stmt = $pdo->prepare("INSERT INTO activity_logs (user_id, action, details) VALUES (?, 'DELETE_TESTIMONIAL', ?)");
-        $log_stmt->execute([$_SESSION['admin_id'], "Menghapus testimoni dari: {$testimonial['name']}"]);
+        $log_stmt->execute([$_SESSION['admin_id'], "Menghapus testimonial: {$testimonial['name']}"]);
         
         $pdo->commit();
         
-        return ['success' => true, 'message' => 'Testimoni berhasil dihapus'];
+        return ['success' => true, 'message' => 'Testimonial berhasil dihapus'];
         
     } catch (Exception $e) {
         $pdo->rollBack();
         return ['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()];
     }
+}
+
+// Function: Export Testimonials
+function exportTestimonials($format) {
+    global $pdo;
+    
+    // Rebuild query with current filters for export
+    $query = "SELECT * FROM testimonials WHERE 1=1";
+    $params = [];
+    
+    $filter_type = $_GET['filter_type'] ?? 'none';
+    $date_from = $_GET['date_from'] ?? '';
+    $date_to = $_GET['date_to'] ?? '';
+    $filter_month = $_GET['filter_month'] ?? date('n');
+    $filter_year = $_GET['filter_year'] ?? date('Y');
+    
+    if ($filter_type === 'range' && !empty($date_from) && !empty($date_to)) {
+        $query .= " AND DATE(created_at) BETWEEN ? AND ?";
+        $params[] = $date_from;
+        $params[] = $date_to;
+    } elseif ($filter_type === 'month') {
+        $query .= " AND YEAR(created_at) = ? AND MONTH(created_at) = ?";
+        $params[] = $filter_year;
+        $params[] = $filter_month;
+    }
+    
+    $query .= " ORDER BY created_at DESC";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    $testimonials = $stmt->fetchAll();
+    
+    if ($format == 'csv') {
+        // Export to CSV
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=testimonials_' . date('Y-m-d') . '.csv');
+        
+        $output = fopen('php://output', 'w');
+        
+        // Add BOM for UTF-8
+        fwrite($output, "\xEF\xBB\xBF");
+        
+        // CSV headers
+        $headers = [
+            'ID', 'Nama', 'Email', 'Pesan', 'Rating', 'Foto',
+            'Status Disetujui', 'Tanggal Dibuat', 'Tanggal Keberangkatan',
+            'Q1 (Nama)', 'Q2 (Telepon)', 'Q3 (Berangkat Dengan)', 
+            'Q4 (Tahu dari)', 'Q5 (Alasan Memilih)', 'Q6 (Kepuasan Admin)',
+            'Q7 (Komentar Admin)', 'Q8 (Kepuasan Manasik)', 'Q9 (Komentar Manasik)',
+            'Q10 (Kepuasan Tour)', 'Q11 (Komentar Tour)', 'Q12 (Kepuasan Makanan)',
+            'Q13 (Komentar Makanan)', 'Q14 (Kepuasan Tour Leader)', 'Q15 (Komentar Tour Leader)',
+            'Q16 (Kepuasan Muthawif)', 'Q17 (Komentar Muthawif)', 'Q18 (Kepuasan Itinerary)',
+            'Q19 (Komentar Itinerary)', 'Q20 (Rekomendasi)', 'Q21 (Alasan Rekomendasi)',
+            'Q22 (Saran/Kritik)', 'Q23 (Kesan/Pesan)'
+        ];
+        
+        fputcsv($output, $headers);
+        
+        foreach ($testimonials as $item) {
+            $row = [
+                $item['id'],
+                $item['name'],
+                $item['email'],
+                $item['message'],
+                $item['rating'],
+                $item['image'],
+                $item['is_approved'] ? 'Disetujui' : 'Belum Disetujui',
+                date('d/m/Y H:i', strtotime($item['created_at'])),
+                $item['departure_date'] ? date('d/m/Y', strtotime($item['departure_date'])) : '',
+                $item['q1'] ?? '',
+                $item['q2'] ?? '',
+                $item['q3'] ?? '',
+                $item['q4'] ?? '',
+                $item['q5'] ?? '',
+                $item['q6'] ?? '',
+                $item['q7'] ?? '',
+                $item['q8'] ?? '',
+                $item['q9'] ?? '',
+                $item['q10'] ?? '',
+                $item['q11'] ?? '',
+                $item['q12'] ?? '',
+                $item['q13'] ?? '',
+                $item['q14'] ?? '',
+                $item['q15'] ?? '',
+                $item['q16'] ?? '',
+                $item['q17'] ?? '',
+                $item['q18'] ?? '',
+                $item['q19'] ?? '',
+                $item['q20'] ?? '',
+                $item['q21'] ?? '',
+                $item['q22'] ?? '',
+                $item['q23'] ?? ''
+            ];
+            
+            fputcsv($output, $row);
+        }
+        
+        fclose($output);
+        exit;
+    } 
 }
 ?>
 <!DOCTYPE html>
@@ -438,260 +342,348 @@ function processDeleteTestimonial($id) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Testimoni - Admin ALFARUQ TEAM</title>
     <style>
-        .testimonial-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
+        .sort-arrow {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+        
+        .sortable {
+            cursor: pointer;
+        }
+        
+        .sortable:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-export-csv {
+            background: linear-gradient(135deg, #2196F3 0%, #0D47A1 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-export-csv:hover {
+            background: linear-gradient(135deg, #0D47A1 0%, #2196F3 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        .sort-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
             margin-bottom: 20px;
-            background: #f9f9f9;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .filter-section {
+            flex: 1;
+        }
+        
+        .sort-select, .filter-select, .filter-input {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-weight: 500;
+            color: #333;
+            min-width: 200px;
+        }
+        
+        .filter-input {
+            min-width: 150px;
+        }
+        
+        .sort-select:focus, .filter-select:focus, .filter-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .btn-apply-sort, .btn-apply-filter {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
             transition: all 0.3s;
         }
         
-        .testimonial-card:hover {
-            border-color: #4CAF50;
-            background: #f0f9f0;
+        .btn-apply-sort:hover, .btn-apply-filter:hover {
+            background: #2E7D32;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         
-        .testimonial-header {
+        .btn-reset-filter {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-reset-filter:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .filter-type-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
             margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
         }
         
-        .user-info {
+        .filter-type-btn {
+            padding: 8px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-type-btn.active {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .filter-type-btn:hover:not(.active) {
+            border-color: #bdbdbd;
+            background: #f8f9fa;
+        }
+        
+        .filter-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .filter-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .date-range-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .month-year-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .stats-badges {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-badge {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        .user-avatar {
-            width: 60px;
-            height: 60px;
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #E8F5E9;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .user-details h6 {
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .user-details small {
-            color: #666;
-        }
-        
-        .stars {
-            color: #FFD700;
+            color: #2E7D32;
             font-size: 1.2rem;
         }
         
-        .testimonial-body {
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 15px;
+        .stat-info h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
         }
         
-        .testimonial-footer {
+        .stat-info small {
+            color: #666;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .testimonial-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
+        }
+        
+        .testimonial-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .testimonial-header {
+            padding: 15px;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e9 100%);
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .testimonial-body {
+            padding: 15px;
+        }
+        
+        .rating-stars {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .testimonial-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #e0e0e0;
-        }
-        
-        .testimonial-meta {
-            color: #888;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            color: #666;
         }
         
         .qa-section {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
             margin-top: 15px;
-            border: 1px solid #e0e0e0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-size: 0.9rem;
         }
         
         .qa-item {
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #e0e0e0;
+            margin-bottom: 8px;
         }
         
-        .qa-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .qa-question {
+        .qa-label {
             font-weight: 600;
             color: #2E7D32;
-            margin-bottom: 5px;
         }
         
-        .qa-answer {
-            color: #555;
-        }
-        
-        .rating-badge {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        .qa-value {
             color: #333;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
         
-        /* Filter section */
-        .filter-section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .filter-row {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-        
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-tab {
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            color: #666;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        
-        .filter-tab:hover,
-        .filter-tab.active {
-            background: #4CAF50;
-            border-color: #4CAF50;
-            color: white;
-        }
-        
-        .filter-tab .badge {
-            margin-left: 5px;
-            font-size: 0.7rem;
-        }
-        
-        /* Stats cards */
-        .stats-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .stats-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .stats-number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .stats-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-left: auto;
-        }
-        
-        .btn-export-excel {
-            background: linear-gradient(135deg, #217346 0%, #185A37 100%);
-            color: white;
+        .full-view-btn {
+            background: transparent;
+            color: #4CAF50;
             border: none;
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-weight: 500;
-            transition: all 0.3s;
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
         }
         
-        .btn-export-excel:hover {
-            background: linear-gradient(135deg, #185A37 0%, #0F4527 100%);
-            color: white;
-            transform: translateY(-2px);
+        .full-view-btn:hover {
+            color: #2E7D32;
         }
         
-        .btn-export-csv {
-            background: linear-gradient(135deg, #007BFF 0%, #0056B3 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-weight: 500;
-            transition: all 0.3s;
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #e0e0e0;
         }
         
-        .btn-export-csv:hover {
-            background: linear-gradient(135deg, #0056B3 0%, #004085 100%);
-            color: white;
-            transform: translateY(-2px);
+        .no-results i {
+            font-size: 3rem;
+            color: #bdbdbd;
+            margin-bottom: 15px;
         }
         
-        .date-filter-info {
-            background: #E8F5E9;
-            border: 1px solid #C8E6C9;
-            border-radius: 8px;
-            padding: 10px 15px;
-            margin-top: 15px;
+        .monthly-stats-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .month-stat-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .month-stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .month-stat-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .month-name {
+            font-weight: 500;
+        }
+        
+        .month-count {
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -715,555 +707,515 @@ function processDeleteTestimonial($id) {
         </div>
         <?php endif; ?>
         
-        <!-- Stats Overview -->
-        <div class="row mb-4">
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-light-green mx-auto">
-                        <i class="fas fa-comments text-primary-green"></i>
-                    </div>
-                    <div class="stats-number"><?php echo $stats['total']; ?></div>
-                    <div class="stats-label">Total Testimoni</div>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-success mx-auto">
-                        <i class="fas fa-check-circle text-white"></i>
-                    </div>
-                    <div class="stats-number"><?php echo $stats['approved']; ?></div>
-                    <div class="stats-label">Disetujui</div>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-warning mx-auto">
-                        <i class="fas fa-clock text-white"></i>
-                    </div>
-                    <div class="stats-number"><?php echo $stats['pending']; ?></div>
-                    <div class="stats-label">Menunggu</div>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-warning mx-auto">
-                        <i class="fas fa-star text-white"></i>
-                    </div>
-                    <div class="stats-number"><?php echo $stats['featured']; ?></div>
-                    <div class="stats-label">Ulasan Bintang 5</div>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-info mx-auto">
-                        <i class="fas fa-chart-line text-white"></i>
-                    </div>
-                    <div class="stats-number"><?php echo number_format($stats['avg_rating'] ?? 0, 1); ?></div>
-                    <div class="stats-label">Rata-rata Rating</div>
-                </div>
-            </div>
-            <div class="col-xl-2 col-md-4 col-6 mb-3">
-                <div class="stats-card text-center">
-                    <div class="stats-icon bg-light-green mx-auto">
-                        <i class="fas fa-percentage text-primary-green"></i>
-                    </div>
-                    <div class="stats-number"><?php echo $stats['total'] > 0 ? round(($stats['approved'] / $stats['total']) * 100) : 0; ?>%</div>
-                    <div class="stats-label">Persetujuan</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Filter Section -->
-        <div class="admin-card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Testimoni</h5>
-                    <p class="text-white mb-0 opacity-75">Filter berdasarkan status dan tanggal</p>
-                </div>
-                <div class="export-buttons">
-                    <a href="?export=excel&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                       class="btn-export-excel">
-                        <i class="fas fa-file-excel me-2"></i>Export Excel
-                    </a>
-                    <a href="?export=csv&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                       class="btn-export-csv">
-                        <i class="fas fa-file-csv me-2"></i>Export CSV
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                <!-- Filter Tabs -->
-                <div class="mb-4">
-                    <h6 class="mb-3">Filter Status</h6>
-                    <div class="filter-tabs">
-                        <a href="?status=all<?php echo !empty($start_date) ? '&start_date=' . $start_date : ''; echo !empty($end_date) ? '&end_date=' . $end_date : ''; ?>" 
-                           class="filter-tab <?php echo $status == 'all' ? 'active' : ''; ?>">
-                            Semua
-                            <span class="badge bg-light-green"><?php echo $stats['total']; ?></span>
-                        </a>
-                        <a href="?status=approved<?php echo !empty($start_date) ? '&start_date=' . $start_date : ''; echo !empty($end_date) ? '&end_date=' . $end_date : ''; ?>" 
-                           class="filter-tab <?php echo $status == 'approved' ? 'active' : ''; ?>">
-                            Disetujui
-                            <span class="badge bg-success"><?php echo $stats['approved']; ?></span>
-                        </a>
-                        <a href="?status=pending<?php echo !empty($start_date) ? '&start_date=' . $start_date : ''; echo !empty($end_date) ? '&end_date=' . $end_date : ''; ?>" 
-                           class="filter-tab <?php echo $status == 'pending' ? 'active' : ''; ?>">
-                            Menunggu
-                            <span class="badge bg-warning"><?php echo $stats['pending']; ?></span>
-                        </a>
-                        <a href="?status=featured<?php echo !empty($start_date) ? '&start_date=' . $start_date : ''; echo !empty($end_date) ? '&end_date=' . $end_date : ''; ?>" 
-                           class="filter-tab <?php echo $status == 'featured' ? 'active' : ''; ?>">
-                            Bintang 5
-                            <span class="badge bg-warning"><?php echo $stats['featured']; ?></span>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Date Filter -->
-                <form method="GET" action="" class="filter-section">
-                    <input type="hidden" name="status" value="<?php echo $status; ?>">
-                    
-                    <h6 class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Filter Tanggal</h6>
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="form-label">Dari Tanggal</label>
-                            <input type="date" class="form-control" name="start_date" 
-                                   value="<?php echo htmlspecialchars($start_date); ?>">
-                        </div>
-                        <div class="filter-group">
-                            <label class="form-label">Sampai Tanggal</label>
-                            <input type="date" class="form-control" name="end_date" 
-                                   value="<?php echo htmlspecialchars($end_date); ?>">
-                        </div>
-                    </div>
-                    
-                    <div class="filter-actions">
-                        <button type="submit" class="btn-admin-primary">
-                            <i class="fas fa-search me-2"></i>Terapkan Filter
-                        </button>
-                        <a href="?status=<?php echo $status; ?>" class="btn btn-secondary">
-                            <i class="fas fa-times me-2"></i>Reset Filter
-                        </a>
-                    </div>
-                    
-                    <?php if (!empty($start_date) || !empty($end_date)): ?>
-                    <div class="date-filter-info">
-                        <div>
-                            <i class="fas fa-info-circle me-2 text-success"></i>
-                            <strong>Filter aktif:</strong>
-                            <?php if (!empty($start_date) && !empty($end_date)): ?>
-                                <?php echo date('d M Y', strtotime($start_date)); ?> - <?php echo date('d M Y', strtotime($end_date)); ?>
-                            <?php elseif (!empty($start_date)): ?>
-                                Dari tanggal <?php echo date('d M Y', strtotime($start_date)); ?>
-                            <?php elseif (!empty($end_date)): ?>
-                                Sampai tanggal <?php echo date('d M Y', strtotime($end_date)); ?>
-                            <?php endif; ?>
-                        </div>
-                        <small class="text-muted"><?php echo count($testimonials); ?> data ditemukan</small>
-                    </div>
-                    <?php endif; ?>
-                </form>
-            </div>
-        </div>
-        
         <?php if ($action == 'list'): ?>
         <!-- LIST TESTIMONIALS -->
         <div class="admin-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>
-                        <?php 
-                        $titles = [
-                            'all' => 'Semua Testimoni',
-                            'approved' => 'Testimoni Disetujui',
-                            'pending' => 'Testimoni Menunggu',
-                            'featured' => 'Testimoni Bintang 5'
-                        ];
-                        echo $titles[$status];
-                        ?>
-                    </h5>
-                    <p class="text-white mb-0 opacity-75">Menampilkan <?php echo count($testimonials); ?> testimoni</p>
+                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Daftar Testimoni Jamaah</h5>
+                    <p class="text-white mb-0 opacity-75">Total <?php echo count($testimonials); ?> testimoni ditemukan</p>
+                </div>
+                <div class="export-buttons">
+                    <a href="?export=csv<?php 
+                        echo $filter_type !== 'none' ? '&filter_type=' . $filter_type : '';
+                        echo $date_from ? '&date_from=' . $date_from : '';
+                        echo $date_to ? '&date_to=' . $date_to : '';
+                        echo ($filter_type === 'month') ? '&filter_month=' . $filter_month . '&filter_year=' . $filter_year : '';
+                    ?>" class="btn-export-csv">
+                        <i class="fas fa-file-csv me-1"></i> Export CSV
+                    </a>
                 </div>
             </div>
             <div class="card-body">
+                <!-- Stats Badges -->
+                <div class="stats-badges">
+                    <div class="stat-badge">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6><?php echo $count_all; ?></h6>
+                            <small>Total Testimoni</small>
+                        </div>
+                    </div>
+                    
+                    <?php if ($filter_type === 'range' && $date_from && $date_to): ?>
+                    <div class="stat-badge">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6><?php echo count($testimonials); ?></h6>
+                            <small>Filter: <?php echo date('d M Y', strtotime($date_from)); ?> - <?php echo date('d M Y', strtotime($date_to)); ?></small>
+                        </div>
+                    </div>
+                    <?php elseif ($filter_type === 'month'): ?>
+                    <div class="stat-badge">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6><?php echo count($testimonials); ?></h6>
+                            <small>Filter: <?php echo date('F Y', mktime(0, 0, 0, $filter_month, 1, $filter_year)); ?></small>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php 
+                    $approved_count = $pdo->query("SELECT COUNT(*) FROM testimonials WHERE is_approved = 1")->fetchColumn();
+                    $pending_count = $pdo->query("SELECT COUNT(*) FROM testimonials WHERE is_approved = 0")->fetchColumn();
+                    ?>
+                    <div class="stat-badge">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6><?php echo $approved_count; ?></h6>
+                            <small>Disetujui</small>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-badge">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6><?php echo $pending_count; ?></h6>
+                            <small>Menunggu</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filter Controls -->
+                <div class="filter-controls">
+                    <div class="filter-section">
+                        <label class="form-label mb-2 d-block">Filter Berdasarkan Tanggal:</label>
+                        
+                        <div class="filter-type-buttons">
+                            <button type="button" class="filter-type-btn <?php echo $filter_type === 'none' ? 'active' : ''; ?>" data-type="none">
+                                <i class="fas fa-times me-1"></i> Tanpa Filter
+                            </button>
+                            <button type="button" class="filter-type-btn <?php echo $filter_type === 'range' ? 'active' : ''; ?>" data-type="range">
+                                <i class="fas fa-calendar-range me-1"></i> Rentang Tanggal
+                            </button>
+                            <button type="button" class="filter-type-btn <?php echo $filter_type === 'month' ? 'active' : ''; ?>" data-type="month">
+                                <i class="fas fa-calendar-month me-1"></i> Bulan & Tahun
+                            </button>
+                        </div>
+                        
+                        <!-- Range Date Filter -->
+                        <div id="filter-range" class="filter-content <?php echo $filter_type === 'range' ? 'active' : ''; ?>">
+                            <form method="GET" action="" class="d-flex gap-2 align-items-end">
+                                <input type="hidden" name="filter_type" value="range">
+                                <input type="hidden" name="sort" value="<?php echo $sort_by; ?>">
+                                <input type="hidden" name="order" value="<?php echo $sort_order; ?>">
+                                
+                                <div>
+                                    <label class="form-label mb-1">Dari Tanggal:</label>
+                                    <input type="date" name="date_from" class="filter-input" value="<?php echo $date_from; ?>">
+                                </div>
+                                
+                                <div>
+                                    <label class="form-label mb-1">Sampai Tanggal:</label>
+                                    <input type="date" name="date_to" class="filter-input" value="<?php echo $date_to; ?>">
+                                </div>
+                                
+                                <button type="submit" class="btn-apply-filter">
+                                    <i class="fas fa-filter me-1"></i> Terapkan Filter
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Month-Year Filter -->
+                        <div id="filter-month" class="filter-content <?php echo $filter_type === 'month' ? 'active' : ''; ?>">
+                            <form method="GET" action="" class="d-flex gap-2 align-items-end">
+                                <input type="hidden" name="filter_type" value="month">
+                                <input type="hidden" name="sort" value="<?php echo $sort_by; ?>">
+                                <input type="hidden" name="order" value="<?php echo $sort_order; ?>">
+                                
+                                <div>
+                                    <label class="form-label mb-1">Bulan:</label>
+                                    <select name="filter_month" class="filter-select">
+                                        <?php for ($i = 1; $i <= 12; $i++): ?>
+                                            <option value="<?php echo $i; ?>" <?php echo $filter_month == $i ? 'selected' : ''; ?>>
+                                                <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="form-label mb-1">Tahun:</label>
+                                    <select name="filter_year" class="filter-select">
+                                        <?php for ($i = date('Y'); $i >= 2020; $i--): ?>
+                                            <option value="<?php echo $i; ?>" <?php echo $filter_year == $i ? 'selected' : ''; ?>>
+                                                <?php echo $i; ?>
+                                            </option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="btn-apply-filter">
+                                    <i class="fas fa-filter me-1"></i> Terapkan Filter
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- No Filter -->
+                        <div id="filter-none" class="filter-content <?php echo $filter_type === 'none' ? 'active' : ''; ?>">
+                            <p class="text-muted mb-0">Menampilkan semua testimoni tanpa filter tanggal.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sorting Controls -->
+                <div class="sort-controls">
+                    <div>
+                        <label class="form-label mb-1">Urutkan Berdasarkan:</label>
+                        <form method="GET" action="" class="d-flex gap-2 align-items-center">
+                            <input type="hidden" name="filter_type" value="<?php echo $filter_type; ?>">
+                            <input type="hidden" name="date_from" value="<?php echo $date_from; ?>">
+                            <input type="hidden" name="date_to" value="<?php echo $date_to; ?>">
+                            <input type="hidden" name="filter_month" value="<?php echo $filter_month; ?>">
+                            <input type="hidden" name="filter_year" value="<?php echo $filter_year; ?>">
+                            
+                            <select name="sort" class="sort-select">
+                                <option value="created_at" <?php echo $sort_by == 'created_at' ? 'selected' : ''; ?>>Tanggal Dibuat</option>
+                                <option value="departure_date" <?php echo $sort_by == 'departure_date' ? 'selected' : ''; ?>>Tanggal Keberangkatan</option>
+                                <option value="name" <?php echo $sort_by == 'name' ? 'selected' : ''; ?>>Nama Jamaah</option>
+                                <option value="rating" <?php echo $sort_by == 'rating' ? 'selected' : ''; ?>>Rating</option>
+                            </select>
+                            
+                            <select name="order" class="sort-select">
+                                <option value="desc" <?php echo $sort_order == 'desc' ? 'selected' : ''; ?>>Terbaru ke Terlama</option>
+                                <option value="asc" <?php echo $sort_order == 'asc' ? 'selected' : ''; ?>>Terlama ke Terbaru</option>
+                            </select>
+                            
+                            <button type="submit" class="btn-apply-sort">
+                                <i class="fas fa-sort me-1"></i> Terapkan
+                            </button>
+                            
+                            <a href="testimonial.php" class="btn-reset-filter">
+                                <i class="fas fa-redo me-1"></i> Reset Semua
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                
                 <?php if (empty($testimonials)): ?>
-                    <div class="text-center py-5">
-                        <i class="fas fa-comments fa-4x text-muted mb-4"></i>
-                        <h5 class="text-muted">Belum ada testimoni</h5>
-                        <p class="text-muted">Testimoni dari pelanggan akan muncul di sini</p>
-                        <?php if (!empty($start_date) || !empty($end_date)): ?>
-                        <a href="?status=<?php echo $status; ?>" class="btn-admin-primary mt-3">
-                            <i class="fas fa-times me-2"></i>Reset Filter
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h5 class="text-muted">Tidak ada testimoni ditemukan</h5>
+                        <p class="text-muted mb-3">
+                            <?php if ($filter_type !== 'none'): ?>
+                                Tidak ada testimoni yang sesuai dengan filter yang diterapkan.
+                            <?php else: ?>
+                                Belum ada testimoni di database.
+                            <?php endif; ?>
+                        </p>
+                        <a href="testimonial.php" class="btn-admin-primary">
+                            <i class="fas fa-redo me-2"></i>Reset Filter
                         </a>
-                        <?php endif; ?>
                     </div>
                 <?php else: ?>
+                    <!-- Monthly Stats Sidebar -->
                     <div class="row">
-                        <?php foreach ($testimonials as $item): ?>
-                        <div class="col-lg-6 mb-4">
-                            <div class="testimonial-card">
-                                <div class="testimonial-header">
-                                    <div class="user-info">
+                        <div class="col-lg-9">
+                            <div class="testimonial-grid">
+                                <?php foreach ($testimonials as $item): 
+                                    $stars = str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']);
+                                ?>
+                                <div class="testimonial-item">
+                                    <div class="testimonial-header">
+                                        <div>
+                                            <h6 class="fw-bold mb-1"><?php echo htmlspecialchars($item['name']); ?></h6>
+                                            <div class="rating-stars"><?php echo $stars; ?></div>
+                                        </div>
+                                        <span class="status-badge <?php echo $item['is_approved'] ? 'status-active' : 'status-inactive'; ?>">
+                                            <i class="fas fa-<?php echo $item['is_approved'] ? 'check-circle' : 'clock'; ?> me-1"></i>
+                                            <?php echo $item['is_approved'] ? 'Disetujui' : 'Menunggu'; ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="testimonial-body">
                                         <?php if ($item['image']): ?>
+                                        <div class="text-center mb-3">
                                             <img src="../<?php echo htmlspecialchars($item['image']); ?>" 
-                                                 alt="<?php echo htmlspecialchars($item['name']); ?>" 
-                                                 class="user-avatar">
-                                        <?php else: ?>
-                                            <div class="user-avatar">
-                                                <?php echo strtoupper(substr($item['name'], 0, 1)); ?>
+                                                 alt="Foto <?php echo htmlspecialchars($item['name']); ?>" 
+                                                 class="img-fluid rounded" 
+                                                 style="max-height: 150px;">
+                                        </div>
+                                        <?php endif; ?>
+                                        
+                                        <p class="mb-3"><?php echo nl2br(htmlspecialchars($item['message'])); ?></p>
+                                        
+                                        <!-- Q&A Section -->
+                                        <div class="qa-section">
+                                            <?php 
+                                            $qa_pairs = [
+                                                'q1' => 'Nama',
+                                                'q2' => 'Telepon',
+                                                'q3' => 'Berangkat Dengan',
+                                                'q4' => 'Tahu dari',
+                                                'q5' => 'Alasan Memilih',
+                                                'q6' => 'Kepuasan Admin',
+                                                'q7' => 'Komentar Admin',
+                                                'q8' => 'Kepuasan Manasik',
+                                                'q9' => 'Komentar Manasik',
+                                                'q10' => 'Kepuasan Tour',
+                                                'q11' => 'Komentar Tour',
+                                                'q12' => 'Kepuasan Makanan',
+                                                'q13' => 'Komentar Makanan',
+                                                'q14' => 'Kepuasan Tour Leader',
+                                                'q15' => 'Komentar Tour Leader',
+                                                'q16' => 'Kepuasan Muthawif',
+                                                'q17' => 'Komentar Muthawif',
+                                                'q18' => 'Kepuasan Itinerary',
+                                                'q19' => 'Komentar Itinerary',
+                                                'q20' => 'Rekomendasi',
+                                                'q21' => 'Alasan Rekomendasi',
+                                                'q22' => 'Saran/Kritik',
+                                                'q23' => 'Kesan/Pesan'
+                                            ];
+                                            
+                                            foreach ($qa_pairs as $key => $label):
+                                                if (!empty($item[$key])):
+                                            ?>
+                                            <div class="qa-item">
+                                                <span class="qa-label"><?php echo $label; ?>:</span>
+                                                <span class="qa-value"><?php echo htmlspecialchars($item[$key]); ?></span>
                                             </div>
-                                        <?php endif; ?>
-                                        <div class="user-details">
-                                            <h6><?php echo htmlspecialchars($item['name']); ?></h6>
-                                            <small><?php echo htmlspecialchars($item['email']); ?></small>
+                                            <?php 
+                                                endif;
+                                            endforeach; 
+                                            ?>
                                         </div>
-                                    </div>
-                                    <div class="rating-badge">
-                                        <i class="fas fa-star"></i>
-                                        <?php echo $item['rating']; ?>/5
-                                    </div>
-                                </div>
-                                
-                                <div class="testimonial-body">
-                                    <?php echo nl2br(htmlspecialchars($item['message'])); ?>
-                                </div>
-                                
-                                <?php if ($item['q1'] || $item['q2'] || $item['q3']): ?>
-                                <div class="qa-section">
-                                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-question-circle me-2"></i>Detail Survey</h6>
-                                    <?php if ($item['q1']): ?>
-                                    <div class="qa-item">
-                                        <div class="qa-question">Nama:</div>
-                                        <div class="qa-answer"><?php echo htmlspecialchars($item['q1']); ?></div>
-                                    </div>
-                                    <?php endif; ?>
-                                    
-                                    <?php if ($item['q3']): ?>
-                                    <div class="qa-item">
-                                        <div class="qa-question">Tanggal Keberangkatan:</div>
-                                        <div class="qa-answer">
-                                            <?php echo $item['departure_date'] ? date('d M Y', strtotime($item['departure_date'])) : htmlspecialchars($item['q3']); ?>
-                                        </div>
-                                    </div>
-                                    <?php endif; ?>
-                                    
-                                    <?php if ($item['q22']): ?>
-                                    <div class="qa-item">
-                                        <div class="qa-question">Kesan:</div>
-                                        <div class="qa-answer"><?php echo htmlspecialchars($item['q22']); ?></div>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <div class="testimonial-footer">
-                                    <div class="testimonial-meta">
-                                        <i class="far fa-calendar me-1"></i>
-                                        <?php echo date('d M Y', strtotime($item['created_at'])); ?>
                                         
-                                        <?php if ($item['departure_date']): ?>
-                                        <span class="ms-3">
-                                            <i class="fas fa-plane me-1"></i>
-                                            <?php echo date('M Y', strtotime($item['departure_date'])); ?>
-                                        </span>
-                                        <?php endif; ?>
+                                        <div class="testimonial-meta">
+                                            <div>
+                                                <i class="fas fa-calendar me-1"></i>
+                                                <?php echo date('d M Y', strtotime($item['created_at'])); ?>
+                                                <?php if ($item['departure_date']): ?>
+                                                <br>
+                                                <i class="fas fa-plane-departure me-1"></i>
+                                                <?php echo date('d M Y', strtotime($item['departure_date'])); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div>
+                                                <?php echo htmlspecialchars($item['email']); ?>
+                                            </div>
+                                        </div>
                                     </div>
                                     
-                                    <div class="action-buttons">
+                                    <div class="card-footer bg-light d-flex justify-content-between">
                                         <?php if (!$item['is_approved']): ?>
-                                        <a href="?action=approve&id=<?php echo $item['id']; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                                           class="btn btn-success btn-sm" 
+                                        <a href="?action=approve&id=<?php echo $item['id']; ?>" 
+                                           class="btn btn-success btn-sm"
                                            onclick="return confirm('Setujui testimoni ini?')">
-                                            <i class="fas fa-check me-1"></i>Setujui
+                                            <i class="fas fa-check me-1"></i> Setujui
                                         </a>
                                         <?php else: ?>
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i>Disetujui
+                                        <span class="text-muted small">
+                                            <i class="fas fa-check-circle text-success me-1"></i>
+                                            Disetujui
                                         </span>
                                         <?php endif; ?>
                                         
-                                        <a href="?action=view&id=<?php echo $item['id']; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                                           class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Detail
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="?action=edit&id=<?php echo $item['id']; ?>" 
+                                               class="btn btn-outline-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    onclick="confirmDelete(<?php echo $item['id']; ?>, '<?php echo addslashes($item['name']); ?>')"
+                                                    class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3">
+                            <!-- Monthly Stats -->
+                            <div class="admin-card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistik per Bulan</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="monthly-stats-list">
+                                        <?php if (empty($monthly_stats)): ?>
+                                            <p class="text-muted text-center mb-0">Belum ada data</p>
+                                        <?php else: ?>
+                                            <?php foreach ($monthly_stats as $stat): 
+                                                $month_name = date('F Y', mktime(0, 0, 0, $stat['month'], 1, $stat['year']));
+                                                $is_active = ($filter_type === 'month' && $filter_month == $stat['month'] && $filter_year == $stat['year']);
+                                            ?>
+                                            <a href="?filter_type=month&filter_month=<?php echo $stat['month']; ?>&filter_year=<?php echo $stat['year']; ?>" 
+                                               class="month-stat-item <?php echo $is_active ? 'active' : ''; ?>"
+                                               style="text-decoration: none; color: inherit;">
+                                                <span class="month-name"><?php echo $month_name; ?></span>
+                                                <span class="month-count"><?php echo $stat['count']; ?></span>
+                                            </a>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Actions -->
+                            <div class="admin-card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="?filter_type=month&filter_month=<?php echo date('n'); ?>&filter_year=<?php echo date('Y'); ?>" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-calendar-week me-1"></i> Bulan Ini
                                         </a>
-                                        
-                                        <button type="button" 
-                                                onclick="confirmDelete(<?php echo $item['id']; ?>, '<?php echo addslashes($item['name']); ?>', '<?php echo $status; ?>', '<?php echo $start_date; ?>', '<?php echo $end_date; ?>')"
-                                                class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash me-1"></i>Hapus
-                                        </button>
+                                        <a href="?filter_type=range&date_from=<?php echo date('Y-m-01'); ?>&date_to=<?php echo date('Y-m-t'); ?>" 
+                                           class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-calendar-alt me-1"></i> Bulan Berjalan
+                                        </a>
+                                        <a href="?filter_type=none" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-eye me-1"></i> Tampilkan Semua
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </div>
         </div>
         
-        <?php elseif ($action == 'view' || $action == 'edit'): ?>
-        <!-- VIEW/EDIT TESTIMONIAL -->
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="admin-card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-0">
-                                <i class="fas fa-<?php echo $action == 'view' ? 'eye' : 'edit'; ?> me-2"></i>
-                                <?php echo $action == 'view' ? 'Detail Testimoni' : 'Edit Testimoni'; ?>: <?php echo htmlspecialchars($testimonial['name']); ?>
-                            </h5>
-                        </div>
-                        <div>
-                            <?php if ($action == 'view'): ?>
-                            <a href="?action=edit&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                               class="btn-admin-primary btn-sm">
-                                <i class="fas fa-edit me-1"></i>Edit
-                            </a>
-                            <?php endif; ?>
-                        </div>
+        <?php elseif ($action == 'edit'): ?>
+        <!-- EDIT TESTIMONIAL FORM -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Edit Testimoni: <?php echo htmlspecialchars($testimonial['name']); ?>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <?php if ($action == 'edit'): ?>
-                        <form method="POST" action="?action=update&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>">
-                        <?php endif; ?>
-                        
-                        <!-- Basic Info -->
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nama *</label>
-                                <?php if ($action == 'view'): ?>
-                                    <div class="form-control bg-light"><?php echo htmlspecialchars($testimonial['name']); ?></div>
-                                <?php else: ?>
-                                    <input type="text" class="form-control" name="name" 
+                        <form method="POST" action="?action=update&id=<?php echo $id; ?>">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Nama Jamaah *</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
                                            value="<?php echo htmlspecialchars($testimonial['name']); ?>" required>
-                                <?php endif; ?>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="rating" class="form-label">Rating (1-5) *</label>
+                                    <select class="form-control" id="rating" name="rating" required>
+                                        <option value="5" <?php echo $testimonial['rating'] == 5 ? 'selected' : ''; ?>>★★★★★ (5)</option>
+                                        <option value="4" <?php echo $testimonial['rating'] == 4 ? 'selected' : ''; ?>>★★★★☆ (4)</option>
+                                        <option value="3" <?php echo $testimonial['rating'] == 3 ? 'selected' : ''; ?>>★★★☆☆ (3)</option>
+                                        <option value="2" <?php echo $testimonial['rating'] == 2 ? 'selected' : ''; ?>>★★☆☆☆ (2)</option>
+                                        <option value="1" <?php echo $testimonial['rating'] == 1 ? 'selected' : ''; ?>>★☆☆☆☆ (1)</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <?php if ($action == 'view'): ?>
-                                    <div class="form-control bg-light"><?php echo htmlspecialchars($testimonial['email']); ?></div>
-                                <?php else: ?>
-                                    <input type="email" class="form-control" name="email" 
-                                           value="<?php echo htmlspecialchars($testimonial['email']); ?>">
-                                <?php endif; ?>
+                            
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Pesan Testimoni *</label>
+                                <textarea class="form-control" id="message" name="message" 
+                                          rows="4" required><?php echo htmlspecialchars($testimonial['message']); ?></textarea>
                             </div>
-                        </div>
-                        
-                        <!-- Rating -->
-                        <div class="mb-4">
-                            <label class="form-label">Rating</label>
-                            <?php if ($action == 'view'): ?>
-                                <div class="d-flex align-items-center">
-                                    <div class="stars me-3">
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fas fa-star<?php echo $i <= $testimonial['rating'] ? '' : '-o'; ?>"></i>
-                                        <?php endfor; ?>
-                                    </div>
-                                    <span class="rating-badge"><?php echo $testimonial['rating']; ?>/5</span>
-                                </div>
-                            <?php else: ?>
-                                <div class="star-rating">
-                                    <input type="hidden" name="rating" id="rating-value" value="<?php echo $testimonial['rating']; ?>">
-                                    <div class="stars" id="star-selector">
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fas fa-star<?php echo $i <= $testimonial['rating'] ? '' : '-o'; ?>" 
-                                               data-value="<?php echo $i; ?>"
-                                               style="cursor: pointer; font-size: 1.5rem; color: #FFD700; margin-right: 5px;"></i>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <!-- Status -->
-                        <div class="mb-4">
-                            <label class="form-label">Status</label>
-                            <?php if ($action == 'view'): ?>
-                                <div class="form-control bg-light">
-                                    <?php if ($testimonial['is_approved']): ?>
-                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Disetujui</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Menunggu</span>
-                                    <?php endif; ?>
-                                </div>
-                            <?php else: ?>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Status</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="is_approved" name="is_approved" 
                                            value="1" <?php echo $testimonial['is_approved'] ? 'checked' : ''; ?>>
                                     <label class="form-check-label" for="is_approved">
-                                        Setujui testimoni ini
+                                        Setujui untuk ditampilkan di website
                                     </label>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <!-- Testimonial Message -->
-                        <div class="mb-4">
-                            <label class="form-label">Testimoni *</label>
-                            <?php if ($action == 'view'): ?>
-                                <div class="form-control bg-light" style="min-height: 100px;">
-                                    <?php echo nl2br(htmlspecialchars($testimonial['message'])); ?>
-                                </div>
-                            <?php else: ?>
-                                <textarea class="form-control" name="message" rows="5" required><?php echo htmlspecialchars($testimonial['message']); ?></textarea>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <!-- Survey Questions -->
-                        <?php if ($testimonial['q1']): ?>
-                        <div class="admin-card mb-4">
-                            <div class="card-header">
-                                <h6 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Data Survey</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <?php for ($i = 1; $i <= 23; $i++): 
-                                        $question = $testimonial['q' . $i];
-                                        if (!empty($question)):
-                                    ?>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Q<?php echo $i; ?>:</label>
-                                        <div class="form-control bg-light">
-                                            <?php echo htmlspecialchars($question); ?>
+                            
+                            <!-- Display Q&A Data (Read-only) -->
+                            <div class="admin-card mb-4">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-list-check me-2"></i>Data Formulir Jamaah</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <?php 
+                                        $qa_fields = [
+                                            'q1' => 'Nama Lengkap',
+                                            'q2' => 'Nomor Telepon',
+                                            'q3' => 'Berangkat Dengan',
+                                            'q4' => 'Mengetahui ALFARUQ TEAM Dari',
+                                            'q5' => 'Alasan Memilih ALFARUQ TEAM',
+                                            'q6' => 'Kepuasan Pelayanan Admin',
+                                            'q7' => 'Komentar Pelayanan Admin',
+                                            'q8' => 'Kepuasan Pelaksanaan Manasik',
+                                            'q9' => 'Komentar Pelaksanaan Manasik',
+                                            'q10' => 'Kepuasan Pelaksanaan Tour',
+                                            'q11' => 'Komentar Pelaksanaan Tour',
+                                            'q12' => 'Kepuasan Kualitas Makanan',
+                                            'q13' => 'Komentar Kualitas Makanan',
+                                            'q14' => 'Kepuasan Pelayanan Tour Leader',
+                                            'q15' => 'Komentar Pelayanan Tour Leader',
+                                            'q16' => 'Kepuasan Pelayanan Muthawif',
+                                            'q17' => 'Komentar Pelayanan Muthawif',
+                                            'q18' => 'Kepuasan Pelaksanaan Itinerary',
+                                            'q19' => 'Komentar Pelaksanaan Itinerary',
+                                            'q20' => 'Apakah Anda Merekomendasikan?',
+                                            'q21' => 'Alasan Merekomendasikan',
+                                            'q22' => 'Saran/Kritik untuk ALFARUQ TEAM',
+                                            'q23' => 'Kesan & Pesan untuk Perjalanan Ini'
+                                        ];
+                                        
+                                        foreach ($qa_fields as $key => $label):
+                                            if (!empty($testimonial[$key])):
+                                        ?>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label"><?php echo $label; ?></label>
+                                            <div class="form-control bg-light">
+                                                <?php echo htmlspecialchars($testimonial[$key]); ?>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <?php endif; endfor; ?>
-                                    
-                                    <?php if ($testimonial['departure_date']): ?>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Tanggal Keberangkatan:</label>
-                                        <div class="form-control bg-light">
-                                            <?php echo date('d M Y', strtotime($testimonial['departure_date'])); ?>
+                                        <?php 
+                                            endif;
+                                        endforeach; 
+                                        ?>
+                                        
+                                        <?php if ($testimonial['departure_date']): ?>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Tanggal Keberangkatan</label>
+                                            <div class="form-control bg-light">
+                                                <?php echo date('d M Y', strtotime($testimonial['departure_date'])); ?>
+                                            </div>
                                         </div>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($testimonial['email']): ?>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Email</label>
+                                            <div class="form-control bg-light">
+                                                <?php echo htmlspecialchars($testimonial['email']); ?>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
-                                    <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <!-- Meta Info -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Dibuat Pada:</label>
-                                <div class="form-control bg-light">
-                                    <?php echo date('d M Y H:i', strtotime($testimonial['created_at'])); ?>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <?php if ($action == 'edit'): ?>
-                        <div class="d-flex justify-content-between">
-                            <a href="?action=view&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" class="btn btn-secondary">Batal</a>
-                            <button type="submit" class="btn-admin-primary">
-                                <i class="fas fa-save me-2"></i>Simpan Perubahan
-                            </button>
-                        </div>
-                        </form>
-                        <?php else: ?>
-                        <div class="d-flex justify-content-between">
-                            <a href="testimonial.php?status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" class="btn btn-secondary">Kembali</a>
-                            <div>
-                                <?php if (!$testimonial['is_approved']): ?>
-                                <a href="?action=approve&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                                   class="btn btn-success" 
-                                   onclick="return confirm('Setujui testimoni ini?')">
-                                    <i class="fas fa-check me-2"></i>Setujui
-                                </a>
-                                <?php endif; ?>
-                                
-                                <button type="button" 
-                                        onclick="confirmDelete(<?php echo $id; ?>, '<?php echo addslashes($testimonial['name']); ?>', '<?php echo $status; ?>', '<?php echo $start_date; ?>', '<?php echo $end_date; ?>')"
-                                        class="btn btn-danger">
-                                    <i class="fas fa-trash me-2"></i>Hapus
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="testimonial.php" class="btn btn-secondary">Batal</a>
+                                <button type="submit" class="btn-admin-primary">
+                                    <i class="fas fa-save me-2"></i>Update Testimoni
                                 </button>
                             </div>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4">
-                <!-- Quick Actions -->
-                <div class="admin-card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <?php if (!$testimonial['is_approved']): ?>
-                            <a href="?action=approve&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" 
-                               class="btn btn-success" 
-                               onclick="return confirm('Setujui testimoni ini?')">
-                                <i class="fas fa-check-circle me-2"></i>Setujui Testimoni
-                            </a>
-                            <?php else: ?>
-                            <a href="?action=edit&id=<?php echo $id; ?>&status=<?php echo $status; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>" class="btn-admin-primary">
-                                <i class="fas fa-edit me-2"></i>Edit Testimoni
-                            </a>
-                            <?php endif; ?>
-                            
-                            <a href="mailto:<?php echo htmlspecialchars($testimonial['email']); ?>" 
-                               class="btn btn-outline-info">
-                                <i class="fas fa-envelope me-2"></i>Kirim Email
-                            </a>
-                            
-                            <button type="button" 
-                                    onclick="confirmDelete(<?php echo $id; ?>, '<?php echo addslashes($testimonial['name']); ?>', '<?php echo $status; ?>', '<?php echo $start_date; ?>', '<?php echo $end_date; ?>')"
-                                    class="btn btn-outline-danger">
-                                <i class="fas fa-trash me-2"></i>Hapus Testimoni
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Stats -->
-                <div class="admin-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistik</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Rating</span>
-                                <span><?php echo $testimonial['rating']; ?>/5</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" 
-                                     style="width: <?php echo ($testimonial['rating'] / 5) * 100; ?>%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Status</span>
-                                <span>
-                                    <?php if ($testimonial['is_approved']): ?>
-                                        <span class="badge bg-success">Disetujui</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-warning">Menunggu</span>
-                                    <?php endif; ?>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Dibuat</span>
-                                <span><?php echo date('d M Y', strtotime($testimonial['created_at'])); ?></span>
-                            </div>
-                        </div>
-                        
-                        <?php if ($testimonial['departure_date']): ?>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Keberangkatan</span>
-                                <span><?php echo date('M Y', strtotime($testimonial['departure_date'])); ?></span>
-                            </div>
-                        </div>
-                        <?php endif; ?>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1274,11 +1226,17 @@ function processDeleteTestimonial($id) {
     <?php include 'includes/footer.php'; ?>
     
     <script>
-        // Confirm delete function with filters
-        function confirmDelete(testimonialId, name, status, startDate, endDate) {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+        
+        // Confirm delete function
+        function confirmDelete(testimonialId, testimonialName) {
             Swal.fire({
                 title: 'Hapus Testimoni?',
-                html: `Apakah Anda yakin ingin menghapus testimoni dari <strong>${name}</strong>?`,
+                html: `Apakah Anda yakin ingin menghapus testimoni dari <strong>${testimonialName}</strong>?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -1288,93 +1246,111 @@ function processDeleteTestimonial($id) {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let url = `?action=delete&id=${testimonialId}`;
-                    if (status) url += `&status=${status}`;
-                    if (startDate) url += `&start_date=${startDate}`;
-                    if (endDate) url += `&end_date=${endDate}`;
-                    window.location.href = url;
+                    window.location.href = '?action=delete&id=' + testimonialId;
                 }
             });
         }
         
-        // Star rating selector for edit form
+        // Confirm approve function
+        function confirmApprove(testimonialId, testimonialName) {
+            Swal.fire({
+                title: 'Setujui Testimoni?',
+                html: `Apakah Anda yakin ingin menyetujui testimoni dari <strong>${testimonialName}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4CAF50',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Setujui!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '?action=approve&id=' + testimonialId;
+                }
+            });
+        }
+        
+        // Filter type switching
         document.addEventListener('DOMContentLoaded', function() {
-            const starSelector = document.getElementById('star-selector');
-            const ratingValue = document.getElementById('rating-value');
+            const filterTypeBtns = document.querySelectorAll('.filter-type-btn');
+            const filterContents = document.querySelectorAll('.filter-content');
             
-            if (starSelector && ratingValue) {
-                const stars = starSelector.querySelectorAll('.fa-star');
-                
-                stars.forEach(star => {
-                    star.addEventListener('mouseover', function() {
-                        const value = this.getAttribute('data-value');
-                        updateStars(value);
+            filterTypeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    
+                    // Update active button
+                    filterTypeBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    filterContents.forEach(content => {
+                        content.classList.remove('active');
                     });
                     
-                    star.addEventListener('click', function() {
-                        const value = this.getAttribute('data-value');
-                        ratingValue.value = value;
-                    });
+                    document.getElementById(`filter-${type}`).classList.add('active');
                 });
+            });
+            
+            // Set max date for date_to to today
+            const dateFromInput = document.querySelector('input[name="date_from"]');
+            const dateToInput = document.querySelector('input[name="date_to"]');
+            
+            if (dateFromInput) {
+                dateFromInput.max = new Date().toISOString().split('T')[0];
                 
-                starSelector.addEventListener('mouseleave', function() {
-                    const currentValue = ratingValue.value;
-                    updateStars(currentValue);
-                });
-                
-                function updateStars(value) {
-                    stars.forEach(star => {
-                        const starValue = star.getAttribute('data-value');
-                        if (starValue <= value) {
-                            star.classList.remove('fa-star-o');
-                            star.classList.add('fa-star');
-                        } else {
-                            star.classList.remove('fa-star');
-                            star.classList.add('fa-star-o');
+                dateFromInput.addEventListener('change', function() {
+                    if (dateToInput) {
+                        dateToInput.min = this.value;
+                        if (dateToInput.value && dateToInput.value < this.value) {
+                            dateToInput.value = this.value;
                         }
-                    });
-                }
-            }
-            
-            // Set end date min based on start date
-            const startDateInput = document.querySelector('input[name="start_date"]');
-            const endDateInput = document.querySelector('input[name="end_date"]');
-            
-            if (startDateInput && endDateInput) {
-                startDateInput.addEventListener('change', function() {
-                    endDateInput.min = this.value;
-                    if (endDateInput.value && endDateInput.value < this.value) {
-                        endDateInput.value = this.value;
                     }
                 });
+            }
+            
+            if (dateToInput) {
+                dateToInput.max = new Date().toISOString().split('T')[0];
             }
             
             // Export confirmation
-            document.querySelectorAll('a[href*="export="]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const exportType = this.href.includes('export=excel') ? 'Excel' : 'CSV';
-                    const count = <?php echo count($testimonials); ?>;
+            const csvBtn = document.querySelector('.btn-export-csv');
+            
+            if (csvBtn) {
+                csvBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     
-                    if (count > 100) {
-                        e.preventDefault();
-                        Swal.fire({
-                            title: 'Export Data?',
-                            html: `Anda akan mengekspor <strong>${count}</strong> data testimoni ke format ${exportType}.<br><small>Proses ini mungkin memerlukan waktu beberapa saat.</small>`,
-                            icon: 'info',
-                            showCancelButton: true,
-                            confirmButtonColor: '#4CAF50',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Ya, Export!',
-                            cancelButtonText: 'Batal',
-                            reverseButtons: true
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = this.href;
-                            }
-                        });
+                    let filterText = 'Semua data testimoni';
+                    const filterType = '<?php echo $filter_type; ?>';
+                    
+                    if (filterType === 'range') {
+                        const dateFrom = '<?php echo $date_from; ?>';
+                        const dateTo = '<?php echo $date_to; ?>';
+                        if (dateFrom && dateTo) {
+                            filterText = `Data dari ${dateFrom} sampai ${dateTo}`;
+                        }
+                    } else if (filterType === 'month') {
+                        const month = '<?php echo date("F", mktime(0, 0, 0, $filter_month, 1)); ?>';
+                        const year = '<?php echo $filter_year; ?>';
+                        filterText = `Data bulan ${month} ${year}`;
                     }
+                    
+                    Swal.fire({
+                        title: 'Export ke CSV?',
+                        html: `${filterText} akan diexport dalam format CSV (.csv)`,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2196F3',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Export',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = this.href;
+                        }
+                    });
                 });
-            });
+            }
         });
     </script>
 </body>

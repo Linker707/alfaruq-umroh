@@ -12,6 +12,28 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']);
 }
 
+// Handle form testimonial
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $rating = (int)($_POST['rating'] ?? 0);
+
+    if (empty($name) || empty($email) || $rating < 1 || $rating > 5) {
+        $message = '<div class="alert alert-danger rounded-pill">Semua field wajib diisi, dan rating 1-5!</div>';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = '<div class="alert alert-danger rounded-pill">Email tidak valid!</div>';
+    } else {
+        $_SESSION['testimonial'] = [
+            'name' => $name,
+            'email' => $email,
+            'rating' => $rating
+        ];
+        header('Location: testimonial-qna.php');
+        exit;
+    }
+}
+
 // Include header
 include 'views/header.php';
 
@@ -59,27 +81,6 @@ $tagline1 = $settings['tagline1'] ?? "LANGKAH AWAL MENUJU BAITULLAH";
 $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
 $whatsapp = $settings['contact_phone'] ?? "+6281234567890";
 
-// Handle form testimonial
-$message = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_testimonial'])) {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $rating = (int)($_POST['rating'] ?? 0);
-
-    if (empty($name) || empty($email) || $rating < 1 || $rating > 5) {
-        $message = '<div class="alert alert-danger rounded-pill">Semua field wajib diisi, dan rating 1-5!</div>';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = '<div class="alert alert-danger rounded-pill">Email tidak valid!</div>';
-    } else {
-        $_SESSION['testimonial'] = [
-            'name' => $name,
-            'email' => $email,
-            'rating' => $rating
-        ];
-        header('Location: testimonial-qna.php');
-        exit;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">

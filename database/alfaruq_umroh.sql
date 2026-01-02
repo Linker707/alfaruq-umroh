@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2026 at 05:37 AM
+-- Generation Time: Jan 02, 2026 at 10:57 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -58,7 +58,28 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `details`, `ip_address`,
 (14, 1, 'UPDATE_USER', 'Memperbarui user: diann', NULL, NULL, '2026-01-02 04:34:41'),
 (15, 1, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:12'),
 (16, 3, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:17'),
-(17, 3, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:22');
+(17, 3, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:22'),
+(18, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:41:56'),
+(19, 1, 'ADD_SCHEDULE', 'Menambahkan jadwal baru: 2026-01-15 - LION AIR', NULL, NULL, '2026-01-02 04:42:59'),
+(20, 1, 'DELETE_SCHEDULE', 'Menghapus jadwal: 2026-01-15 - LION AIR', NULL, NULL, '2026-01-02 04:43:39'),
+(21, 1, 'ADD_SCHEDULE', 'Menambahkan jadwal baru: 2026-04-17 - LION AIR', NULL, NULL, '2026-01-02 04:44:03'),
+(22, 1, 'DELETE_SCHEDULE', 'Menghapus jadwal: 2026-04-17 - LION AIR', NULL, NULL, '2026-01-02 04:44:10'),
+(23, 1, 'UPDATE_PRICE', 'Memperbarui harga UMROH AWAL RAMADHAN (Reguler: Rp 29.500.000) menjadi (Reguler: Rp 30.500.000)', NULL, NULL, '2026-01-02 05:05:19'),
+(24, 1, 'UPDATE_PRICE', 'Memperbarui harga UMROH AWAL RAMADHAN (Reguler: Rp 30.500.000) menjadi (Reguler: Rp 29.500.000)', NULL, NULL, '2026-01-02 05:05:32'),
+(25, 1, 'ADD_PRICE', 'Menambahkan harga Platinum untuk paket: UMROH AWAL RAMADHAN', NULL, NULL, '2026-01-02 05:05:53'),
+(26, 1, 'DELETE_PRICE', 'Menghapus harga Platinum (Rp 30.500.000) untuk paket: UMROH AWAL RAMADHAN', NULL, NULL, '2026-01-02 05:05:57'),
+(27, 1, 'ADD_PACKAGE', 'Menambahkan paket baru: UMROH AQSO', NULL, NULL, '2026-01-02 07:05:45'),
+(28, 1, 'DELETE_PACKAGE', 'Menghapus paket: UMROH AQSO', NULL, NULL, '2026-01-02 07:07:59'),
+(29, 1, 'UPDATE_USER', 'Memperbarui user: dian', NULL, NULL, '2026-01-02 07:08:56'),
+(30, 1, 'UPDATE_DESTINATION', 'Memperbarui destinasi: Lainnya', NULL, NULL, '2026-01-02 07:19:10'),
+(31, 1, 'UPDATE_DESTINATION', 'Memperbarui destinasi: Lainnya', NULL, NULL, '2026-01-02 07:19:23'),
+(32, 1, 'DELETE_GALLERY', 'Menghapus foto galeri: city tour mekkah', NULL, NULL, '2026-01-02 07:19:33'),
+(33, 1, 'DELETE_GALLERY', 'Menghapus foto galeri: Sampai di Tanah Air', NULL, NULL, '2026-01-02 07:19:38'),
+(34, 1, 'UPDATE_DESTINATION', 'Memperbarui destinasi: Makkah', NULL, NULL, '2026-01-02 07:20:00'),
+(35, 1, 'ADD_DESTINATION', 'Menambahkan destinasi baru: bandara', NULL, NULL, '2026-01-02 07:20:41'),
+(36, 1, 'ADD_GALLERY', 'Menambahkan foto galeri: sampai dibandara', NULL, NULL, '2026-01-02 07:21:23'),
+(37, 1, 'DELETE_TESTIMONIAL', 'Menghapus testimonial: aidil', NULL, NULL, '2026-01-02 09:46:18'),
+(38, 1, 'DELETE_TESTIMONIAL', 'Menghapus testimonial: aidil', NULL, NULL, '2026-01-02 09:57:04');
 
 -- --------------------------------------------------------
 
@@ -122,12 +143,13 @@ CREATE TABLE `destinations` (
 --
 
 INSERT INTO `destinations` (`id`, `name`, `slug`, `icon`, `is_active`, `created_at`) VALUES
-(1, 'Makkah', 'makkah', '🕋', 1, '2025-12-30 06:40:25'),
+(1, 'Makkah', 'makkah', '????', 1, '2025-12-30 06:40:25'),
 (2, 'Madinah', 'madinah', '🕌', 1, '2025-12-30 06:40:25'),
 (3, 'Turki', 'turki', '🇹🇷', 1, '2025-12-30 06:40:25'),
 (4, 'Thaif', 'thaif', '⛰️', 1, '2025-12-30 06:40:25'),
-(5, 'Lainnya', 'lainnya', '📍', 1, '2025-12-30 06:40:25'),
-(6, 'Badar', 'badar', '⛰️', 1, '2025-12-30 06:44:37');
+(5, 'Lainnya', 'lainnya', '????', 1, '2025-12-30 06:40:25'),
+(6, 'Badar', 'badar', '⛰️', 1, '2025-12-30 06:44:37'),
+(7, 'bandara', 'bandara', '????', 1, '2026-01-02 07:20:41');
 
 -- --------------------------------------------------------
 
@@ -156,7 +178,6 @@ INSERT INTO `galleries` (`id`, `title`, `description`, `image`, `type`, `destina
 (3, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, 1, '2025-11-19 09:17:03'),
 (4, 'Ziarah di Madinah', 'Kunjungan ke makam Rasulullah SAW.', 'assets/img/raudah1.jpeg', 'image', 'madinah', 2, 1, '2025-11-19 09:17:03'),
 (7, 'Grup Jamaah', 'Foto bersama seluruh jamaah.', 'assets/img/jamaah1.jpeg', 'image', NULL, NULL, 1, '2025-11-19 09:17:03'),
-(8, 'Sampai di Tanah Air', 'Kembali dengan penuh berkah.', 'assets/img/galeri-kembali.jpg', 'image', NULL, NULL, 1, '2025-11-19 09:17:03'),
 (10, 'Sholat di Masjidil Haram', 'Jamaah melaksanakan sholat di Masjidil Haram, Makkah.', 'assets/img/sholat1.jpeg', 'image', 'makkah', 1, 1, '2025-11-24 07:57:18'),
 (11, 'Ziarah Di Madinah', 'Kunjungan ke Masjid Nabawi', 'assets/img/madinah1.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
 (12, 'Perjalanan di Madinah', 'Mengunjungi Masjid Quba yaitu masjid pertama yang dibangun oleh Nabi Muhammad SAW saat hijrah ke Madinah', 'assets/img/madinah2.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
@@ -165,7 +186,7 @@ INSERT INTO `galleries` (`id`, `title`, `description`, `image`, `type`, `destina
 (16, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki1.jpeg', 'image', 'turki', 3, 1, '2025-11-24 07:57:18'),
 (18, 'Tour Leader', 'Profesionalitas para tour leader', 'assets/img/madinah4.jpeg', 'image', 'madinah', 2, 1, '2025-11-24 07:57:18'),
 (19, 'Kota Tua di Turki', 'Menelusuri indahnya kota di Turki', 'assets/img/turki2.jpeg', 'image', 'turki', 3, 1, '2025-11-24 07:57:18'),
-(20, 'city tour mekkah', NULL, 'assets/img/gallery/1767163502_6954c66ec59ee.jpeg', 'image', '', 5, 1, '2025-12-31 06:45:02');
+(21, 'sampai dibandara', 'alhamdulillah', 'assets/img/gallery_1767338483_695771f3c8d6e.jpeg', 'image', '', 7, 1, '2026-01-02 07:21:23');
 
 -- --------------------------------------------------------
 
@@ -396,8 +417,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`, `role`, `is_active`, `failed_attempts`, `last_login`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$Qu1Ith0nWrkUvn18RxJFk.kdCIFgEpgi8.tqUEyoMZthiU595vibK', 'Administrator Utama', 'admin@alfaruqteam.com', '081234567890', 'master_admin', 1, 0, '2026-01-02 11:24:04', NULL, '2026-01-02 03:27:05', '2026-01-02 04:24:04'),
-(3, 'diann', '$2y$10$tl6IDWmzUE15PILVtBTo5e2UtlwiimDlWT947oKm9FyiScjEs6uKa', 'dian', '', '', 'admin', 1, 0, '2026-01-02 11:36:17', 1, '2026-01-02 04:34:23', '2026-01-02 04:36:17');
+(1, 'admin', '$2y$10$Qu1Ith0nWrkUvn18RxJFk.kdCIFgEpgi8.tqUEyoMZthiU595vibK', 'Administrator Utama', 'admin@alfaruqteam.com', '081234567890', 'master_admin', 1, 0, '2026-01-02 11:41:56', NULL, '2026-01-02 03:27:05', '2026-01-02 04:41:56'),
+(3, 'dian', '$2y$10$tl6IDWmzUE15PILVtBTo5e2UtlwiimDlWT947oKm9FyiScjEs6uKa', 'dian', '', '', 'admin', 1, 0, '2026-01-02 11:36:17', 1, '2026-01-02 04:34:23', '2026-01-02 07:08:56');
 
 --
 -- Indexes for dumped tables
@@ -476,37 +497,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `destinations`
 --
 ALTER TABLE `destinations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `galleries`
 --
 ALTER TABLE `galleries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `packages`
 --
 ALTER TABLE `packages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `package_prices`
 --
 ALTER TABLE `package_prices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -518,7 +539,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `testimonials`
 --
 ALTER TABLE `testimonials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`

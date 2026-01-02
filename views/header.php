@@ -1,7 +1,4 @@
 <?php
-// views/header.php - File header untuk navbar dan meta tags
-
-// Ambil settings untuk kontak
 require_once 'config/database.php';
 $querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('contact_phone', 'tagline1', 'tagline2')";
 $stmtSettings = $pdo->prepare($querySettings);

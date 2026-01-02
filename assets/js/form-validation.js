@@ -1,12 +1,15 @@
 /**
  * FORM VALIDATION JS - Advanced form validation
- * @description Enhanced form validation for contact forms
- * @version 1.0.0
+ * @description Enhanced form validation for all forms
+ * @version 2.0.0
  */
 
 (function() {
     'use strict';
 
+    // ============================================
+    // MAIN FORM VALIDATOR CLASS
+    // ============================================
     class FormValidator {
         constructor(formId, options = {}) {
             this.form = document.getElementById(formId);
@@ -17,6 +20,7 @@
                 showSuccess: true,
                 scrollToError: true,
                 disableOnSubmit: true,
+                autoValidate: true,
                 ...options
             };
 
@@ -347,6 +351,7 @@
             const submitBtn = this.form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengirim...';
+                submitBtn.classList.add('loading');
             }
         }
 
@@ -357,6 +362,7 @@
             const submitBtn = this.form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Kirim Pesan';
+                submitBtn.classList.remove('loading');
             }
         }
 
@@ -473,7 +479,258 @@
     }
 
     // ============================================
-    // AUTO-INITIALIZE FOR SPECIFIC FORMS
+    // QNA FORM VALIDATOR (EXTENDS MAIN VALIDATOR)
+    // ============================================
+    class QnAFormValidator extends FormValidator {
+        constructor(formId) {
+            super(formId);
+            this.setupQnAValidation();
+        }
+
+        setupQnAValidation() {
+            // Date validation for departure
+            const daySelect = this.form.querySelector('[name="departure_day"]');
+            const monthSelect = this.form.querySelector('[name="departure_month"]');
+            const yearSelect = this.form.querySelector('[name="departure_year"]');
+
+            [daySelect, monthSelect, yearSelect].forEach(select => {
+                select.addEventListener('change', () => this.validateDate(daySelect, monthSelect, yearSelect));
+            });
+
+            // Radio button validation
+            const radioGroups = this.form.querySelectorAll('input[type="radio"][required]');
+            radioGroups.forEach(radio => {
+                radio.addEventListener('change', () => this.validateRadioGroup(radio.name));
+            });
+
+            // Character counters for textareas
+            this.setupQnATextareaCounters();
+        }
+
+        validateDate(day, month, year) {
+            if (day.value && month.value && year.value) {
+                const dayNum = parseInt(day.value);
+                const monthNum = parseInt(month.value);
+                const yearNum = parseInt(year.value);
+                
+                // Validate day for the month
+                const daysInMonth = new Date(yearNum, monthNum, 0).getDate();
+                if (dayNum > daysInMonth) {
+                    this.showFieldError(day, `Tanggal tidak valid untuk bulan ${month.value}`);
+                    return false;
+                }
+                
+                // Validate not in the future
+                const selectedDate = new Date(yearNum, monthNum - 1, dayNum);
+                const today = new Date();
+                if (selectedDate > today) {
+                    this.showFieldError(day, 'Tanggal tidak boleh di masa depan');
+                    return false;
+                }
+                
+                this.clearError(day);
+                return true;
+            }
+            return false;
+        }
+
+        validateRadioGroup(groupName) {
+            const radios = this.form.querySelectorAll(`input[name="${groupName}"]`);
+            const groupChecked = Array.from(radios).some(radio => radio.checked);
+            
+            if (!groupChecked) {
+                this.showRadioGroupError(groupName, 'Pilih salah satu opsi');
+                return false;
+            }
+            
+            this.clearRadioGroupError(groupName);
+            return true;
+        }
+
+        showRadioGroupError(groupName, message) {
+            const firstRadio = this.form.querySelector(`input[name="${groupName}"]`);
+            if (firstRadio) {
+                const groupContainer = firstRadio.closest('.form-check-modern')?.parentElement;
+                if (groupContainer) {
+                    this.clearRadioGroupError(groupName);
+                    
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'qna-error-message mt-2';
+                    errorElement.textContent = message;
+                    
+                    groupContainer.appendChild(errorElement);
+                    groupContainer.classList.add('qna-error');
+                }
+            }
+        }
+
+        clearRadioGroupError(groupName) {
+            const firstRadio = this.form.querySelector(`input[name="${groupName}"]`);
+            if (firstRadio) {
+                const groupContainer = firstRadio.closest('.form-check-modern')?.parentElement;
+                if (groupContainer) {
+                    const errorElement = groupContainer.querySelector('.qna-error-message');
+                    if (errorElement) {
+                        errorElement.remove();
+                    }
+                    groupContainer.classList.remove('qna-error');
+                }
+            }
+        }
+
+        setupQnATextareaCounters() {
+            const textareas = this.form.querySelectorAll('textarea[maxlength]');
+            
+            textareas.forEach(textarea => {
+                const maxLength = parseInt(textarea.getAttribute('maxlength')) || 500;
+                const counter = document.createElement('div');
+                counter.className = 'character-counter text-end text-muted small mt-1';
+                counter.textContent = `0/${maxLength}`;
+                
+                textarea.parentNode.appendChild(counter);
+                
+                textarea.addEventListener('input', () => {
+                    const length = textarea.value.length;
+                    counter.textContent = `${length}/${maxLength}`;
+                    
+                    if (length > maxLength * 0.9) {
+                        counter.classList.add('text-warning');
+                    } else {
+                        counter.classList.remove('text-warning');
+                    }
+                    
+                    if (length > maxLength) {
+                        counter.classList.add('text-danger');
+                        textarea.value = textarea.value.substring(0, maxLength);
+                    } else {
+                        counter.classList.remove('text-danger');
+                    }
+                });
+            });
+        }
+
+        validateForm() {
+            let isValid = super.validateForm();
+            
+            // Validate date
+            const daySelect = this.form.querySelector('[name="departure_day"]');
+            const monthSelect = this.form.querySelector('[name="departure_month"]');
+            const yearSelect = this.form.querySelector('[name="departure_year"]');
+            
+            if (!this.validateDate(daySelect, monthSelect, yearSelect)) {
+                isValid = false;
+            }
+            
+            // Validate all radio groups
+            const radioGroups = new Set();
+            this.form.querySelectorAll('input[type="radio"][required]').forEach(radio => {
+                radioGroups.add(radio.name);
+            });
+            
+            radioGroups.forEach(groupName => {
+                if (!this.validateRadioGroup(groupName)) {
+                    isValid = false;
+                }
+            });
+            
+            return isValid;
+        }
+
+        handleSubmit(event) {
+            event.preventDefault();
+            
+            const isValid = this.validateForm();
+            
+            if (isValid) {
+                this.submitQnAForm();
+            } else {
+                // Scroll to first error
+                const firstError = this.form.querySelector('.is-invalid, .qna-error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        }
+
+        async submitQnAForm() {
+            // Disable submit button
+            const submitBtn = this.form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+            }
+            
+            // Show loading state
+            this.showLoading();
+            
+            try {
+                // Simulate form submission (replace with actual fetch)
+                const response = await this.simulateQnAApiCall();
+                
+                if (response.success) {
+                    this.showSuccess('Terima kasih! Testimoni Anda telah berhasil dikirim.');
+                    this.form.reset();
+                    
+                    // Redirect to home after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.php';
+                    }, 3000);
+                } else {
+                    this.showError('Gagal mengirim testimoni. Silakan coba lagi.');
+                }
+            } catch (error) {
+                this.showError('Terjadi kesalahan. Silakan coba lagi.');
+                console.error('QnA form error:', error);
+            } finally {
+                // Re-enable submit button
+                if (submitBtn) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                }
+                
+                // Hide loading state
+                this.hideLoading();
+            }
+        }
+
+        simulateQnAApiCall() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        success: true,
+                        message: 'Testimoni berhasil dikirim!'
+                    });
+                }, 1500);
+            });
+        }
+
+        showSuccess(message) {
+            if (!this.options.showSuccess) return;
+
+            // Remove existing messages
+            this.clearMessages();
+
+            // Create success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'qna-success-message mt-3';
+            successDiv.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
+            successDiv.setAttribute('role', 'alert');
+
+            // Insert before form
+            this.form.parentNode.insertBefore(successDiv, this.form);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.remove();
+                }
+            }, 5000);
+        }
+    }
+
+    // ============================================
+    // AUTO-INITIALIZE FORMS
     // ============================================
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize contact form
@@ -485,13 +742,9 @@
             });
         }
 
-        // Initialize testimonial form
-        if (document.getElementById('testimonialForm')) {
-            new FormValidator('testimonialForm', {
-                scrollToError: true,
-                showSuccess: true,
-                showErrors: true
-            });
+        // Initialize QnA form
+        if (document.getElementById('qnaForm')) {
+            new QnAFormValidator('qnaForm');
         }
 
         // Initialize newsletter form
@@ -502,11 +755,129 @@
                 showErrors: false
             });
         }
+
+        // Initialize testimonial form (on index page)
+        if (document.querySelector('form[action*="testimonial"]')) {
+            const form = document.querySelector('form[action*="testimonial"]');
+            form.addEventListener('submit', function(e) {
+                // Validate rating
+                const rating = this.querySelector('input[name="rating"]:checked');
+                if (!rating) {
+                    e.preventDefault();
+                    alert('Harap berikan rating terlebih dahulu.');
+                    return false;
+                }
+                
+                // Validate name and email
+                const name = this.querySelector('input[name="name"]');
+                const email = this.querySelector('input[name="email"]');
+                
+                if (!name.value.trim()) {
+                    e.preventDefault();
+                    alert('Harap isi nama lengkap.');
+                    name.focus();
+                    return false;
+                }
+                
+                if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                    e.preventDefault();
+                    alert('Harap isi email yang valid.');
+                    email.focus();
+                    return false;
+                }
+                
+                return true;
+            });
+        }
     });
 
     // ============================================
-    // EXPOSE TO GLOBAL SCOPE
+    // GLOBAL UTILITY FUNCTIONS
     // ============================================
-    window.FormValidator = FormValidator;
+    window.FormUtils = {
+        /**
+         * Validate email format
+         */
+        isValidEmail: function(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        },
+
+        /**
+         * Format phone number
+         */
+        formatPhoneNumber: function(phone) {
+            return phone.replace(/\D/g, '');
+        },
+
+        /**
+         * Show notification
+         */
+        showNotification: function(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} notification-fixed`;
+            notification.innerHTML = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        },
+
+        /**
+         * Debounce function
+         */
+        debounce: function(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    };
+
+    // ============================================
+    // ADD GLOBAL ANIMATION STYLES
+    // ============================================
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-fixed {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease;
+        }
+    `;
+    document.head.appendChild(style);
 
 })();
+
+// ============================================
+// EXPOSE TO GLOBAL SCOPE FOR BACKWARDS COMPATIBILITY
+// ============================================
+if (typeof window.FormValidator === 'undefined') {
+    window.FormValidator = FormValidator;
+}
+if (typeof window.QnAFormValidator === 'undefined') {
+    window.QnAFormValidator = QnAFormValidator;
+}
