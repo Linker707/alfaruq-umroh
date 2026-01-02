@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 31, 2025 at 08:01 AM
+-- Generation Time: Jan 02, 2026 at 05:37 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -42,22 +42,23 @@ CREATE TABLE `activity_logs` (
 --
 
 INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `user_agent`, `created_at`) VALUES
-(1, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:23:09'),
-(2, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:53:25'),
-(3, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:57:06'),
-(4, 1, 'ADD_USER', 'Menambahkan user baru: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 03:57:54'),
-(5, 1, 'LOGOUT', 'User logout', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:12:22'),
-(6, 1, 'CHANGE_PASSWORD', 'Mengubah password user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:58:56'),
-(7, 1, 'UPDATE_USER', 'Memperbarui user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:02'),
-(8, 1, 'DELETE_USER', 'Menghapus user: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:06'),
-(9, 1, 'ADD_USER', 'Menambahkan user baru: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:16'),
-(10, 1, 'LOGOUT', 'User logout: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:19'),
-(11, 5, 'LOGIN', 'User: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:29'),
-(12, 5, 'LOGOUT', 'User logout: admin1', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:40'),
-(13, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 04:59:52'),
-(14, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:14:15'),
-(15, 1, 'LOGOUT', 'User logout: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:14:28'),
-(16, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2025-12-31 06:44:11');
+(1, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:28:50'),
+(2, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:29:01'),
+(3, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:29:10'),
+(4, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:38:00'),
+(5, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:38:58'),
+(6, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:39:07'),
+(7, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:49:25'),
+(8, 1, 'LOGIN', 'User: admin', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 03:59:25'),
+(9, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:16:07'),
+(10, 1, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:20:58'),
+(11, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:24:04'),
+(12, 1, 'ADD_USER', 'Menambahkan user baru: dian', NULL, NULL, '2026-01-02 04:34:23'),
+(13, 1, 'CHANGE_PASSWORD', 'Mengubah password user: dian', NULL, NULL, '2026-01-02 04:34:33'),
+(14, 1, 'UPDATE_USER', 'Memperbarui user: diann', NULL, NULL, '2026-01-02 04:34:41'),
+(15, 1, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:12'),
+(16, 3, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:17'),
+(17, 3, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-02 04:36:22');
 
 -- --------------------------------------------------------
 
@@ -381,11 +382,9 @@ CREATE TABLE `users` (
   `full_name` varchar(100) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `role` varchar(20) DEFAULT 'admin',
+  `role` enum('admin','master_admin') DEFAULT 'admin',
   `is_active` tinyint(1) DEFAULT 1,
   `failed_attempts` int(11) DEFAULT 0,
-  `is_locked` tinyint(1) DEFAULT 0,
-  `lock_until` datetime DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -396,9 +395,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`, `role`, `is_active`, `failed_attempts`, `is_locked`, `lock_until`, `last_login`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$FO6A8CI9cPDRVD4/6K6Z3O0ZhvsrH6knEpVWCqa8YNDcVAUb.WNNS', 'Administrator Utama', NULL, NULL, 'master_admin', 1, 0, 0, NULL, '2025-12-31 13:44:11', NULL, '2025-12-30 02:01:07', '2025-12-31 06:44:11'),
-(5, 'admin1', '$2y$10$10rW0.XCwrVLOz5YIlrIDOt4dpMy0GQC9dDNRhGuWvmuy.ZQVLmbS', 'bella', '', '', 'admin', 1, 0, 0, NULL, '2025-12-31 11:59:29', 1, '2025-12-31 04:59:16', '2025-12-31 04:59:29');
+INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`, `role`, `is_active`, `failed_attempts`, `last_login`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'admin', '$2y$10$Qu1Ith0nWrkUvn18RxJFk.kdCIFgEpgi8.tqUEyoMZthiU595vibK', 'Administrator Utama', 'admin@alfaruqteam.com', '081234567890', 'master_admin', 1, 0, '2026-01-02 11:24:04', NULL, '2026-01-02 03:27:05', '2026-01-02 04:24:04'),
+(3, 'diann', '$2y$10$tl6IDWmzUE15PILVtBTo5e2UtlwiimDlWT947oKm9FyiScjEs6uKa', 'dian', '', '', 'admin', 1, 0, '2026-01-02 11:36:17', 1, '2026-01-02 04:34:23', '2026-01-02 04:36:17');
 
 --
 -- Indexes for dumped tables
@@ -477,7 +476,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `destinations`
@@ -525,7 +524,7 @@ ALTER TABLE `testimonials`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

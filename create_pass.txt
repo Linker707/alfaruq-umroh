@@ -1,0 +1,33 @@
+<?php
+require_once __DIR__ . '../config/database.php';
+
+// Password baru yang ingin di-set
+$new_password = 'admin123';
+
+// Hash password
+$hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+// Update password untuk semua user
+$query = "UPDATE users SET password = ?";
+$stmt = $pdo->prepare($query);
+$result = $stmt->execute([$hashed_password]);
+
+if ($result) {
+    echo "Password berhasil direset ke: " . $new_password . "<br>";
+    echo "Hash: " . $hashed_password . "<br><br>";
+    
+    // Tampilkan semua user
+    $query = "SELECT id, username, role FROM users";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $users = $stmt->fetchAll();
+    
+    echo "Daftar User:<br>";
+    foreach ($users as $user) {
+        echo "ID: " . $user['id'] . " - Username: " . $user['username'] . " - Role: " . $user['role'] . "<br>";
+    }
+} else {
+    echo "Gagal reset password";
+}
+
+echo "<br><br><a href='login.php'>Kembali ke Login</a>";
