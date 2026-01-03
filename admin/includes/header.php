@@ -346,6 +346,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
 
+                <!-- Tambahkan setelah menu Users -->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'profile.php') !== false ? 'active' : ''; ?>" href="profile.php">
+                        <i class="fas fa-building"></i>
+                        <span>Profil Perusahaan</span>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="../index.php" target="_blank">
                         <i class="fas fa-external-link-alt"></i>
