@@ -85,353 +85,9 @@ $month_stats = $pdo->prepare("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Admin ALFARUQ TEAM</title>
-    <style>
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: none;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card.warning {
-            border-left: 5px solid #FF9800;
-        }
-        
-        .stat-card.success {
-            border-left: 5px solid #4CAF50;
-        }
-        
-        .stat-card.info {
-            border-left: 5px solid #2196F3;
-        }
-        
-        .stat-card.danger {
-            border-left: 5px solid #F44336;
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .stat-icon.warning {
-            background: rgba(255, 152, 0, 0.1);
-            color: #FF9800;
-        }
-        
-        .stat-icon.success {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-        }
-        
-        .stat-icon.info {
-            background: rgba(33, 150, 243, 0.1);
-            color: #2196F3;
-        }
-        
-        .stat-icon.danger {
-            background: rgba(244, 67, 54, 0.1);
-            color: #F44336;
-        }
-        
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .stat-subtext {
-            font-size: 0.8rem;
-            color: #999;
-        }
-        
-        .quick-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .quick-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            border-radius: 10px;
-            padding: 15px 20px;
-            text-decoration: none;
-            color: #333;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .quick-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            color: #4CAF50;
-        }
-        
-        .quick-link i {
-            font-size: 1.2rem;
-            color: #4CAF50;
-        }
-        
-        .quick-link-content h6 {
-            margin: 0;
-            font-weight: 600;
-        }
-        
-        .quick-link-content small {
-            color: #666;
-            font-size: 0.8rem;
-        }
-        
-        .dashboard-section {
-            margin-bottom: 30px;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        
-        .section-header h5 {
-            margin: 0;
-            color: #2E7D32;
-            font-weight: 600;
-        }
-        
-        .see-all {
-            color: #4CAF50;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .see-all:hover {
-            color: #2E7D32;
-        }
-        
-        .upcoming-schedule {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s;
-        }
-        
-        .upcoming-schedule:hover {
-            border-color: #4CAF50;
-            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.1);
-        }
-        
-        .schedule-date {
-            font-weight: bold;
-            color: #2E7D32;
-            font-size: 1.1rem;
-        }
-        
-        .schedule-airline {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        
-        .schedule-slots {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .schedule-slots.available {
-            background: rgba(76, 175, 80, 0.1);
-            color: #2E7D32;
-        }
-        
-        .schedule-slots.low {
-            background: rgba(255, 152, 0, 0.1);
-            color: #FF9800;
-        }
-        
-        .schedule-slots.full {
-            background: rgba(244, 67, 54, 0.1);
-            color: #F44336;
-        }
-        
-        .package-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-        
-        .package-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .package-image {
-            height: 150px;
-            overflow: hidden;
-        }
-        
-        .package-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .package-info {
-            padding: 15px;
-        }
-        
-        .package-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-        }
-        
-        .package-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #666;
-        }
-        
-        .testimonial-item {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .testimonial-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .testimonial-message {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .testimonial-date {
-            font-size: 0.8rem;
-            color: #999;
-            text-align: right;
-        }
-        
-        .activity-item {
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        
-        .activity-action {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .activity-details {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 5px 0;
-        }
-        
-        .activity-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: #999;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-        
-        .no-data i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.3;
-        }
-        
-        .welcome-card {
-            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
-        }
-        
-        .welcome-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .welcome-subtitle {
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .last-login {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-    </style>
+    <!-- Include CSS files -->
+    <link href="assets/admin.css" rel="stylesheet">
+    <link href="assets/admin-responsive.css" rel="stylesheet">
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
@@ -470,26 +126,8 @@ $month_stats = $pdo->prepare("
             </div>
         </div>
         
-        <!-- Stats Grid -->
+        <!-- Stats Grid (Horizontal di atas) -->
         <div class="stats-grid">
-            <div class="stats-grid row-responsive">
-    <!-- Users -->
-            <div class="stat-card info">
-                <div class="stat-icon info">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['users']; ?></div>
-                <div class="stat-label">Total Users Aktif</div>
-                <div class="stat-subtext">
-                    <?php 
-                    $master_admin_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'master_admin' AND is_active = 1")->fetchColumn();
-                    $admin_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1")->fetchColumn();
-                    ?>
-                    <i class="fas fa-crown me-1"></i><?php echo $master_admin_count; ?> Master
-                    <i class="fas fa-user ms-3 me-1"></i><?php echo $admin_count; ?> Admin
-                </div>
-            </div>
-            <!-- Users -->
             <div class="stat-card info">
                 <div class="stat-icon info">
                     <i class="fas fa-users"></i>
@@ -506,7 +144,6 @@ $month_stats = $pdo->prepare("
                 </div>
             </div>
             
-            <!-- Packages -->
             <div class="stat-card success">
                 <div class="stat-icon success">
                     <i class="fas fa-box-open"></i>
@@ -518,7 +155,6 @@ $month_stats = $pdo->prepare("
                 </div>
             </div>
             
-            <!-- Testimonials -->
             <div class="stat-card warning">
                 <div class="stat-icon warning">
                     <i class="fas fa-comments"></i>
@@ -530,7 +166,6 @@ $month_stats = $pdo->prepare("
                 </div>
             </div>
             
-            <!-- Schedules -->
             <div class="stat-card">
                 <div class="stat-icon success">
                     <i class="fas fa-calendar-alt"></i>
@@ -541,36 +176,6 @@ $month_stats = $pdo->prepare("
                     <i class="fas fa-plane-departure me-1"></i><?php echo count($upcoming_schedules); ?> Jadwal Mendatang
                 </div>
             </div>
-            
-            <!-- Gallery -->
-            <div class="stat-card info">
-                <div class="stat-icon info">
-                    <i class="fas fa-images"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['gallery']; ?></div>
-                <div class="stat-label">Foto Galeri</div>
-                <div class="stat-subtext">
-                    <?php 
-                    $destinations_count = $pdo->query("SELECT COUNT(DISTINCT destination_id) FROM galleries WHERE destination_id IS NOT NULL")->fetchColumn();
-                    ?>
-                    <i class="fas fa-map-marker-alt me-1"></i><?php echo $destinations_count; ?> Destinasi
-                </div>
-            </div>
-            
-            <!-- Destinations -->
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-map-marked-alt"></i>
-                </div>
-                <div class="stat-number"><?php echo $stats['destinations']; ?></div>
-                <div class="stat-label">Destinasi Aktif</div>
-                <div class="stat-subtext">
-                    <?php 
-                    $total_gallery = $pdo->query("SELECT COUNT(*) FROM galleries WHERE is_active = 1")->fetchColumn();
-                    ?>
-                    <i class="fas fa-image me-1"></i><?php echo $total_gallery; ?> Total Foto
-                </div>
-            </div>
         </div>
         
         <!-- Quick Links -->
@@ -578,7 +183,7 @@ $month_stats = $pdo->prepare("
             <div class="section-header">
                 <h5><i class="fas fa-bolt me-2"></i>Tautan Cepat</h5>
             </div>
-            <div class="quick-links row-responsive">
+            <div class="quick-links">
                 <a href="package.php" class="quick-link">
                     <i class="fas fa-box-open"></i>
                     <div class="quick-link-content">
@@ -629,8 +234,9 @@ $month_stats = $pdo->prepare("
             </div>
         </div>
         
-        <!-- Two Column Layout -->
+        <!-- Two Column Layout untuk Jadwal dan Paket -->
         <div class="row">
+            <!-- Kolom Kiri: Jadwal dan Testimoni -->
             <div class="col-lg-6">
                 <!-- Upcoming Schedules -->
                 <div class="dashboard-section">
@@ -723,6 +329,7 @@ $month_stats = $pdo->prepare("
                 </div>
             </div>
             
+            <!-- Kolom Kanan: Paket Populer dan Aktivitas -->
             <div class="col-lg-6">
                 <!-- Popular Packages -->
                 <div class="dashboard-section">
@@ -740,7 +347,7 @@ $month_stats = $pdo->prepare("
                     <?php else: ?>
                         <div class="row">
                             <?php foreach ($popular_packages as $package): ?>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <div class="package-card">
                                     <?php if ($package['image']): ?>
                                     <div class="package-image">
@@ -776,7 +383,7 @@ $month_stats = $pdo->prepare("
                     <?php endif; ?>
                 </div>
                 
-                <!-- Recent Activities -->
+                <!-- Recent Activities (Admin Log) -->
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h5><i class="fas fa-history me-2"></i>Aktivitas Terakhir</h5>
@@ -859,7 +466,7 @@ $month_stats = $pdo->prepare("
         // Auto-refresh page every 5 minutes
         setTimeout(function() {
             window.location.reload();
-        }, 300000); // 5 minutes
+        }, 300000);
         
         // Tooltip initialization
         document.addEventListener('DOMContentLoaded', function() {
