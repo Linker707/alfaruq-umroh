@@ -91,7 +91,7 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
             <div class="col-md-10">
                 <div class="card-modern-green-light">
                     <div class="card-body-modern">
-                        <form method="POST" action="testimonial-qna.php">
+                        <form method="POST" action="testimonial-qna.php" id="qnaForm">
                             <!-- Pertanyaan 1-5: Data pribadi dan awal -->
                             <h5 class="text-green-800 fw-bold mb-3 border-bottom pb-2">
                                 <i class="fas fa-user-circle me-2"></i>Data Pribadi
@@ -124,9 +124,9 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                         <div class="col-md-4">
                                             <select class="form-control-modern" name="departure_day" required>
                                                 <option value="">Tanggal</option>
-                                                <?php for ($i = 1; $i <= 31; $i++): ?>
+                                                <?php for ($i = 1; $i <= 31; $i++) { ?>
                                                     <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
-                                                <?php endforeach; ?>
+                                                <?php } ?>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -149,9 +149,9 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                         <div class="col-md-4">
                                             <select class="form-control-modern" name="departure_year" required>
                                                 <option value="">Tahun</option>
-                                                <?php for ($i = 2020; $i <= 2030; $i++): ?>
+                                                <?php for ($i = 2020; $i <= 2030; $i++) { ?>
                                                     <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                                <?php endforeach; ?>
+                                                <?php } ?>
                                             </select>
                                         </div>
                                     </div>
@@ -168,17 +168,17 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                             'Rekanan travel' => 'Rekanan travel',
                                             'Lainnya' => 'Lainnya'
                                         ];
-                                        foreach ($sources as $value => $label): ?>
+                                        foreach ($sources as $value => $label) { ?>
                                         <div class="col-md-3">
                                             <div class="form-check-modern">
                                                 <input class="form-check-input" type="radio" name="q4" 
-                                                       value="<?php echo $value; ?>" id="q4_<?php echo $value; ?>" required>
-                                                <label class="form-check-label" for="q4_<?php echo $value; ?>">
-                                                    <?php echo $label; ?>
+                                                       value="<?php echo htmlspecialchars($value); ?>" id="q4_<?php echo htmlspecialchars($value); ?>" required>
+                                                <label class="form-check-label" for="q4_<?php echo htmlspecialchars($value); ?>">
+                                                    <?php echo htmlspecialchars($label); ?>
                                                 </label>
                                             </div>
                                         </div>
-                                        <?php endforeach; ?>
+                                        <?php } ?>
                                     </div>
                                 </div>
                                 
@@ -194,17 +194,22 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                 <i class="fas fa-star me-2"></i>Penilaian Pelayanan
                             </h5>
                             
-                            <?php for ($i = 6; $i <= 19; $i += 2): ?>
+                            <?php for ($i = 6; $i <= 19; $i += 2) { ?>
                                 <div class="mb-4">
                                     <label class="form-label-modern fw-semibold">
                                         <?php echo $i; ?>. 
-                                        <?php echo $i == 6 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team dalam pemberian informasi sebelum keberangkatan.' : 
-                                              ($i == 8 ? 'Penilaian Anda terhadap pelayanan dan penyampaian informasi saat manasik.' : 
-                                              ($i == 10 ? 'Penilaian Anda terhadap pelayanan Alfaruq Team selama tour berlangsung.' : 
-                                              ($i == 12 ? 'Penilaian Anda terhadap makanan yang disajikan selama program Umroh.' : 
-                                              ($i == 14 ? 'Penilaian Anda terhadap pembimbingan ibadah atau Tour Leader.' : 
-                                              ($i == 16 ? 'Penilaian Anda terhadap pelayanan Muthawif atau Guide Local.' : 
-                                              'Penilaian Anda terhadap itinerary program Umroh.'))))); ?>
+                                        <?php 
+                                        $questions = [
+                                            6 => 'Penilaian Anda terhadap pelayanan Alfaruq Team dalam pemberian informasi sebelum keberangkatan.',
+                                            8 => 'Penilaian Anda terhadap pelayanan dan penyampaian informasi saat manasik.',
+                                            10 => 'Penilaian Anda terhadap pelayanan Alfaruq Team selama tour berlangsung.',
+                                            12 => 'Penilaian Anda terhadap makanan yang disajikan selama program Umroh.',
+                                            14 => 'Penilaian Anda terhadap pembimbingan ibadah atau Tour Leader.',
+                                            16 => 'Penilaian Anda terhadap pelayanan Muthawif atau Guide Local.',
+                                            18 => 'Penilaian Anda terhadap itinerary program Umroh.'
+                                        ];
+                                        echo $questions[$i] ?? '';
+                                        ?>
                                     </label>
                                     
                                     <div class="row g-2 mb-3">
@@ -216,17 +221,17 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                             'Kurang puas' => 'Kurang puas',
                                             'Sangat tidak puas' => 'Sangat tidak puas'
                                         ];
-                                        foreach ($ratings as $value => $label): ?>
+                                        foreach ($ratings as $value => $label) { ?>
                                             <div class="col-md-3 col-6">
                                                 <div class="form-check-modern">
                                                     <input class="form-check-input" type="radio" name="q<?php echo $i; ?>" 
-                                                           value="<?php echo $value; ?>" id="q<?php echo $i; ?>_<?php echo $value; ?>" required>
-                                                    <label class="form-check-label" for="q<?php echo $i; ?>_<?php echo $value; ?>">
-                                                        <?php echo $label; ?>
+                                                           value="<?php echo htmlspecialchars($value); ?>" id="q<?php echo $i; ?>_<?php echo htmlspecialchars($value); ?>" required>
+                                                    <label class="form-check-label" for="q<?php echo $i; ?>_<?php echo htmlspecialchars($value); ?>">
+                                                        <?php echo htmlspecialchars($label); ?>
                                                     </label>
                                                 </div>
                                             </div>
-                                        <?php endforeach; ?>
+                                        <?php } ?>
                                     </div>
                                     
                                     <div class="mb-4">
@@ -236,7 +241,7 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
                                         <textarea class="form-control-modern" name="q<?php echo $i + 1; ?>" rows="3" required></textarea>
                                     </div>
                                 </div>
-                            <?php endfor; ?>
+                            <?php } ?>
 
                             <!-- Pertanyaan 20-23: Kesimpulan -->
                             <h5 class="text-green-800 fw-bold mb-3 mt-5 border-bottom pb-2">
@@ -312,100 +317,6 @@ $tagline2 = $settings['tagline2'] ?? "HARGA HEMAT FASILITAS TERHORMAT";
     </div>
 </section>
 
-<style>
-/* Custom styles for testimonial form */
-.form-check-modern {
-    padding: 0.75rem;
-    border: 2px solid var(--neutral-200);
-    border-radius: var(--radius-md);
-    margin-bottom: 0.5rem;
-    transition: all var(--transition-fast);
-    background: white;
-}
-
-.form-check-modern:hover {
-    border-color: var(--green-300);
-    background-color: var(--green-50);
-}
-
-.form-check-modern .form-check-input {
-    margin-top: 0.3rem;
-    border-color: var(--green-400);
-}
-
-.form-check-modern .form-check-input:checked {
-    background-color: var(--green-500);
-    border-color: var(--green-500);
-}
-
-.form-check-modern .form-check-label {
-    font-weight: 500;
-    color: var(--neutral-700);
-    margin-left: 0.5rem;
-}
-
-/* Form validation states */
-.is-invalid {
-    border-color: #dc3545 !important;
-}
-
-.border-danger {
-    border-color: #dc3545 !important;
-}
-</style>
-
-<script>
-// Form validation
-$(document).ready(function() {
-    $('#qnaForm').submit(function(e) {
-        let isValid = true;
-        let firstError = null;
-        
-        // Check all required fields
-        $(this).find('[required]').each(function() {
-            if (!$(this).val().trim()) {
-                isValid = false;
-                if (!firstError) {
-                    firstError = $(this);
-                }
-                $(this).addClass('is-invalid');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-        
-        // Check radio buttons
-        $(this).find('input[type="radio"][required]').each(function() {
-            const name = $(this).attr('name');
-            if (!$('input[name="' + name + '"]:checked').length) {
-                isValid = false;
-                if (!firstError) {
-                    firstError = $(this);
-                }
-                $(this).closest('.form-check-modern').addClass('border-danger');
-            } else {
-                $(this).closest('.form-check-modern').removeClass('border-danger');
-            }
-        });
-        
-        if (!isValid) {
-            e.preventDefault();
-            alert('Harap lengkapi semua field yang wajib diisi!');
-            if (firstError) {
-                $('html, body').animate({
-                    scrollTop: firstError.offset().top - 100
-                }, 500);
-                firstError.focus();
-            }
-        }
-    });
-    
-    // Remove error classes on input
-    $('input, textarea, select').on('input change', function() {
-        $(this).removeClass('is-invalid');
-        $(this).closest('.form-check-modern').removeClass('border-danger');
-    });
-});
-</script>
+<script src="js/form-validation.js"></script>
 
 <?php include 'views/footer.php'; ?>

@@ -1,7 +1,4 @@
 <?php
-// views/header.php - File header untuk navbar dan meta tags
-
-// Ambil settings untuk kontak
 require_once 'config/database.php';
 $querySettings = "SELECT key_name, value FROM settings WHERE key_name IN ('contact_phone', 'tagline1', 'tagline2')";
 $stmtSettings = $pdo->prepare($querySettings);
@@ -37,10 +34,8 @@ $waNumber = preg_replace('/[^0-9]/', '', $whatsapp);
     <meta name="twitter:image" content="assets/img/og-image.jpg">
     
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon/favicon-16x16.png">
-    <link rel="manifest" href="assets/img/favicon/site.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
     <meta name="theme-color" content="#4CAF50">
     
     <!-- Bootstrap 5 CSS -->
@@ -52,9 +47,6 @@ $waNumber = preg_replace('/[^0-9]/', '', $whatsapp);
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
-    <!-- FontAwesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     
@@ -119,7 +111,7 @@ $waNumber = preg_replace('/[^0-9]/', '', $whatsapp);
                         <li><a class="dropdown-item <?php echo basename($_SERVER['PHP_SELF']) == 'contact.php' ? 'active' : ''; ?>" href="contact.php"><i class="fas fa-phone me-2"></i> Contact</a></li>
                         <li><a class="dropdown-item <?php echo basename($_SERVER['PHP_SELF']) == 'gallery.php' ? 'active' : ''; ?>" href="gallery.php"><i class="fas fa-images me-2"></i> Gallery</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item <?php echo basename($_SERVER['PHP_SELF']) == 'register.php' ? 'active' : ''; ?>" href="register.php"><i class="fas fa-user-plus me-2"></i> Register</a></li>
+                        <li><a class="dropdown-item <?php echo basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : ''; ?>" href="admin/login.php"><i class="fas fa-sign-in-alt me-2"></i> Login</a></li>
                     </ul>
                 </li>
                 <li class="nav-item ms-lg-3">
