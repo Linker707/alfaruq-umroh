@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2026 at 10:57 AM
+-- Generation Time: Jan 03, 2026 at 03:45 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -79,7 +79,13 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `details`, `ip_address`,
 (35, 1, 'ADD_DESTINATION', 'Menambahkan destinasi baru: bandara', NULL, NULL, '2026-01-02 07:20:41'),
 (36, 1, 'ADD_GALLERY', 'Menambahkan foto galeri: sampai dibandara', NULL, NULL, '2026-01-02 07:21:23'),
 (37, 1, 'DELETE_TESTIMONIAL', 'Menghapus testimonial: aidil', NULL, NULL, '2026-01-02 09:46:18'),
-(38, 1, 'DELETE_TESTIMONIAL', 'Menghapus testimonial: aidil', NULL, NULL, '2026-01-02 09:57:04');
+(38, 1, 'DELETE_TESTIMONIAL', 'Menghapus testimonial: aidil', NULL, NULL, '2026-01-02 09:57:04'),
+(39, 1, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-03 01:35:58'),
+(40, 1, 'UPDATE_COMPANY_PROFILE', 'Memperbarui profil perusahaan', NULL, NULL, '2026-01-03 02:01:06'),
+(41, 1, 'UPDATE_COMPANY_PROFILE', 'Memperbarui profil perusahaan', NULL, NULL, '2026-01-03 02:01:52'),
+(42, 1, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-03 02:27:44'),
+(43, 3, 'LOGIN', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-03 02:27:48'),
+(44, 3, 'LOGOUT', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-03 02:27:57');
 
 -- --------------------------------------------------------
 
@@ -328,7 +334,7 @@ INSERT INTO `settings` (`id`, `key_name`, `value`, `updated_at`) VALUES
 (9, 'ppiu_license', 'SK PPIU NO.24022300153650007', '2025-12-01 04:30:09'),
 (10, 'office_address1', 'Ruko Bintan Center No. 56 RT.04 RW. 01 KM.10, Tanjungpinang', '2025-12-01 04:30:09'),
 (11, 'office_address2', 'Ruko Grand Niaga Mas Blok C No. 69. Belian, Batam Centre', '2025-12-01 04:30:09'),
-(12, 'branch_addresses', 'Cabang 1: Selat Panjang\r\n(Jl. Dorak RT 002 RW 003, kel. Selat panjang timur, kec. Tebing tinggi, kab. Kepulauan Meranti, provinsi riau)', '2025-12-01 04:30:09'),
+(12, 'branch_addresses', 'Cabang 1: Selat Panjang\r\n(Jl. Dorak RT 002 RW 003, kel. Selat panjang timur, kec. Tebing tinggi, kab. Kepulauan Meranti, provinsi riau)', '2026-01-03 02:01:52'),
 (13, 'admin_phone1', '+6281266303236', '2025-12-01 04:30:09'),
 (14, 'admin_phone2', '+6281377327477', '2025-12-01 04:30:09'),
 (15, 'company_email', 'alfaruq5619@gmail.com', '2025-12-01 04:30:09');
@@ -417,8 +423,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `email`, `phone`, `role`, `is_active`, `failed_attempts`, `last_login`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'admin', '$2y$10$Qu1Ith0nWrkUvn18RxJFk.kdCIFgEpgi8.tqUEyoMZthiU595vibK', 'Administrator Utama', 'admin@alfaruqteam.com', '081234567890', 'master_admin', 1, 0, '2026-01-02 11:41:56', NULL, '2026-01-02 03:27:05', '2026-01-02 04:41:56'),
-(3, 'dian', '$2y$10$tl6IDWmzUE15PILVtBTo5e2UtlwiimDlWT947oKm9FyiScjEs6uKa', 'dian', '', '', 'admin', 1, 0, '2026-01-02 11:36:17', 1, '2026-01-02 04:34:23', '2026-01-02 07:08:56');
+(1, 'admin', '$2y$10$Qu1Ith0nWrkUvn18RxJFk.kdCIFgEpgi8.tqUEyoMZthiU595vibK', 'Administrator Utama', 'admin@alfaruqteam.com', '081234567890', 'master_admin', 1, 0, '2026-01-03 08:35:58', NULL, '2026-01-02 03:27:05', '2026-01-03 01:35:58'),
+(3, 'dian', '$2y$10$tl6IDWmzUE15PILVtBTo5e2UtlwiimDlWT947oKm9FyiScjEs6uKa', 'dian', '', '', 'admin', 1, 0, '2026-01-03 09:27:48', 1, '2026-01-02 04:34:23', '2026-01-03 02:27:48');
 
 --
 -- Indexes for dumped tables
@@ -497,7 +503,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `destinations`
