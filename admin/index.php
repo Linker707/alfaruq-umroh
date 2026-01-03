@@ -472,6 +472,23 @@ $month_stats = $pdo->prepare("
         
         <!-- Stats Grid -->
         <div class="stats-grid">
+            <div class="stats-grid row-responsive">
+    <!-- Users -->
+            <div class="stat-card info">
+                <div class="stat-icon info">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number"><?php echo $stats['users']; ?></div>
+                <div class="stat-label">Total Users Aktif</div>
+                <div class="stat-subtext">
+                    <?php 
+                    $master_admin_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'master_admin' AND is_active = 1")->fetchColumn();
+                    $admin_count = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1")->fetchColumn();
+                    ?>
+                    <i class="fas fa-crown me-1"></i><?php echo $master_admin_count; ?> Master
+                    <i class="fas fa-user ms-3 me-1"></i><?php echo $admin_count; ?> Admin
+                </div>
+            </div>
             <!-- Users -->
             <div class="stat-card info">
                 <div class="stat-icon info">
@@ -561,7 +578,7 @@ $month_stats = $pdo->prepare("
             <div class="section-header">
                 <h5><i class="fas fa-bolt me-2"></i>Tautan Cepat</h5>
             </div>
-            <div class="quick-links">
+            <div class="quick-links row-responsive">
                 <a href="package.php" class="quick-link">
                     <i class="fas fa-box-open"></i>
                     <div class="quick-link-content">

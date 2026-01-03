@@ -25,6 +25,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
+            overflow-x: hidden;
         }
         
         /* Sidebar */
@@ -38,24 +39,51 @@ $current_page = basename($_SERVER['PHP_SELF']);
             color: white;
             padding-top: 20px;
             box-shadow: 3px 0 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s;
+            z-index: 1050;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-collapsed {
+            width: 70px;
+        }
+        
+        .sidebar-collapsed .sidebar-brand h4,
+        .sidebar-collapsed .sidebar-brand p,
+        .sidebar-collapsed .nav-link span {
+            opacity: 0;
+            visibility: hidden;
+            width: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .sidebar-collapsed .nav-link {
+            padding: 12px;
+            justify-content: center;
+        }
+        
+        .sidebar-collapsed .nav-link i {
+            margin-right: 0;
+            font-size: 1.3rem;
         }
         
         .sidebar-brand {
             padding: 0 20px 30px;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
         }
         
         .sidebar-brand h4 {
             font-weight: 700;
             margin-bottom: 5px;
+            transition: all 0.3s;
         }
         
         .sidebar-brand p {
             font-size: 0.8rem;
             opacity: 0.8;
+            transition: all 0.3s;
         }
         
         .sidebar-menu {
@@ -70,6 +98,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            white-space: nowrap;
         }
         
         .nav-link:hover, .nav-link.active {
@@ -82,13 +111,19 @@ $current_page = basename($_SERVER['PHP_SELF']);
             width: 25px;
             font-size: 1.1rem;
             margin-right: 10px;
+            transition: all 0.3s;
         }
         
         /* Main Content */
         .main-content {
             margin-left: 250px;
             padding: 20px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        
+        .main-content-expanded {
+            margin-left: 70px;
         }
         
         /* Top Navbar */
@@ -97,6 +132,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
             padding: 15px 25px;
             border-bottom: 1px solid #e0e0e0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+        }
+        
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: var(--primary-green);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .sidebar-toggle:hover {
+            background: var(--light-green);
         }
         
         .user-info {
@@ -115,6 +169,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             justify-content: center;
             color: white;
             font-weight: 600;
+            flex-shrink: 0;
         }
         
         .user-details small {
@@ -128,6 +183,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         /* Cards */
@@ -137,6 +193,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s;
+            margin-bottom: 20px;
         }
         
         .admin-card:hover {
@@ -164,6 +221,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             padding: 8px 20px;
             font-weight: 500;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .btn-admin-primary:hover {
@@ -180,6 +238,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             padding: 8px 20px;
             font-weight: 500;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .btn-admin-outline:hover {
@@ -204,11 +263,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
             color: var(--dark-green);
             border-bottom: 2px solid var(--primary-green);
             padding: 15px;
+            white-space: nowrap;
         }
         
         .admin-table td {
             padding: 12px 15px;
             vertical-align: middle;
+            word-break: break-word;
         }
         
         .status-badge {
@@ -216,6 +277,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
+            display: inline-block;
+            white-space: nowrap;
         }
         
         .status-active {
@@ -230,46 +293,166 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border: 1px solid rgba(158, 158, 158, 0.3);
         }
         
+        /* Mobile Menu Overlay */
+        .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+        
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 1200px) {
             .sidebar {
                 width: 70px;
-                overflow: hidden;
             }
             
-            .sidebar:hover {
+            .sidebar:not(.sidebar-collapsed) {
                 width: 250px;
-            }
-            
-            .sidebar-brand h4, 
-            .sidebar-brand p,
-            .nav-link span {
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-            
-            .sidebar:hover .sidebar-brand h4,
-            .sidebar:hover .sidebar-brand p,
-            .sidebar:hover .nav-link span {
-                opacity: 1;
             }
             
             .main-content {
                 margin-left: 70px;
             }
             
-            .sidebar:hover + .main-content {
+            .sidebar:not(.sidebar-collapsed) + .main-content {
                 margin-left: 250px;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .mobile-menu-overlay.active {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .admin-table {
+                font-size: 0.9rem;
+            }
+            
+            .admin-table th,
+            .admin-table td {
+                padding: 10px;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+            
+            .user-details {
+                text-align: center;
+            }
+            
+            .top-navbar {
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 15px;
+            }
+            
+            .mobile-menu-overlay.active {
+                display: block;
+            }
+            
+            .admin-card {
+                margin-bottom: 15px;
+            }
+            
+            .admin-card .card-body {
+                padding: 15px;
+            }
+            
+            .btn-admin-primary,
+            .btn-admin-outline {
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .table-responsive {
+                border: none;
             }
         }
         
         @media (max-width: 576px) {
-            .sidebar {
-                display: none;
+            .container-fluid {
+                padding: 0 10px;
+            }
+            
+            .top-navbar {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .top-navbar > div {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .admin-table {
+                font-size: 0.85rem;
+            }
+            
+            .admin-table th,
+            .admin-table td {
+                padding: 8px;
+            }
+            
+            .nav-link {
+                padding: 10px 15px;
+                margin: 3px 10px;
+            }
+            
+            .sidebar-brand {
+                padding: 0 15px 20px;
             }
             
             .main-content {
-                margin-left: 0;
+                padding: 10px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .top-navbar,
+            .sidebar-toggle,
+            .btn-admin-primary,
+            .btn-admin-outline {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0;
+            }
+            
+            .admin-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 10px;
             }
         }
 
@@ -282,11 +465,127 @@ $current_page = basename($_SERVER['PHP_SELF']);
             background: #f8f9fa !important;
             color: #212529 !important;
         }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-green);
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(76, 175, 80, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-green);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1060;
+            max-width: 350px;
+        }
+        
+        .toast {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--primary-green);
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Badge Responsive */
+        .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+            display: inline-block;
+        }
+        
+        /* Grid System Responsive */
+        .row-responsive {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Form Controls Responsive */
+        .form-control {
+            width: 100%;
+        }
+        
+        /* Image Responsive */
+        .img-responsive {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Modal Responsive */
+        .modal-dialog {
+            max-width: 95%;
+            margin: 1.75rem auto;
+        }
+        
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 500px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .modal-dialog {
+                max-width: 700px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .modal-dialog {
+                max-width: 900px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+    
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <i class="fas fa-cog fa-2x mb-3"></i>
             <h4>Admin Panel</h4>
@@ -304,7 +603,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 
                 <?php if ($_SESSION['admin_role'] === 'master_admin'): ?>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'users') !== false ? 'active' : ''; ?>" href="user.php">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'users') !== false || strpos($_SERVER['PHP_SELF'], 'user.php') !== false ? 'active' : ''; ?>" href="user.php">
                         <i class="fas fa-users"></i>
                         <span>Kelola Users</span>
                     </a>
@@ -345,10 +644,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span>Kelola Testimoni</span>
                     </a>
                 </li>
-
-                <!-- Tambahkan setelah menu Users -->
+                
                 <li class="nav-item">
-                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'profile.php') !== false ? 'active' : ''; ?>" href="profile.php">
+                    <a class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'profile') !== false ? 'active' : ''; ?>" href="profile.php">
                         <i class="fas fa-building"></i>
                         <span>Profil Perusahaan</span>
                     </a>
@@ -372,29 +670,41 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="container-fluid">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0 text-dark">
-                            <?php 
-                            $page_titles = [
-                                'index.php' => 'Dashboard',
-                                'login.php' => 'Login',
-                                'users/index.php' => 'Kelola Users',
-                                'users/create.php' => 'Tambah User',
-                                'users/edit.php' => 'Edit User',
-                                'users/reset-password.php' => 'Reset Password'
-                            ];
-                            echo $page_titles[$current_page] ?? 'Admin Panel';
-                            ?>
-                        </h5>
-                        <small class="text-muted">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            <?php echo date('l, d F Y'); ?>
-                        </small>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="sidebar-toggle" id="sidebarToggle">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <div>
+                            <h5 class="mb-0 text-dark">
+                                <?php 
+                                $page_titles = [
+                                    'index.php' => 'Dashboard',
+                                    'login.php' => 'Login',
+                                    'user.php' => 'Kelola Users',
+                                    'users/index.php' => 'Kelola Users',
+                                    'users/create.php' => 'Tambah User',
+                                    'users/edit.php' => 'Edit User',
+                                    'users/reset-password.php' => 'Reset Password',
+                                    'package.php' => 'Kelola Paket',
+                                    'schedule.php' => 'Kelola Jadwal',
+                                    'price.php' => 'Kelola Harga',
+                                    'gallery.php' => 'Kelola Galeri',
+                                    'testimonial.php' => 'Kelola Testimoni',
+                                    'profile.php' => 'Profil Perusahaan'
+                                ];
+                                echo $page_titles[$current_page] ?? 'Admin Panel';
+                                ?>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                <?php echo date('l, d F Y'); ?>
+                            </small>
+                        </div>
                     </div>
                     
                     <div class="user-info">
